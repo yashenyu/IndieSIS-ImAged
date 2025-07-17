@@ -38,6 +38,9 @@ G:\Repos\ImAged\ImAged\obj\Debug\Theme\TextboxTheme.baml
 G:\Repos\ImAged\ImAged\obj\Debug\MVVM\View\HomeView.g.cs
 G:\Repos\ImAged\ImAged\obj\Debug\GeneratedInternalTypeHelper.g.cs
 G:\Repos\ImAged\ImAged\obj\Debug\MVVM\View\HomeView.baml
-G:\Repos\ImAged\ImAged\obj\Debug\ImAged.exe.config
 G:\Repos\ImAged\ImAged\obj\Debug\MVVM\View\ViewView.g.cs
 G:\Repos\ImAged\ImAged\obj\Debug\MVVM\View\ViewView.baml
+G:\Repos\ImAged\ImAged\obj\Debug\MVVM\View\SidebarView.g.cs
+G:\Repos\ImAged\ImAged\obj\Debug\MVVM\View\SidebarView.baml
+G:\Repos\ImAged\ImAged\obj\Debug\Theme\ExpanderTheme.baml
+G:\Repos\ImAged\ImAged\obj\Debug\ImAged.exe.config

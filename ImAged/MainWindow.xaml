@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:ImAged"
         xmlns:viewModel="clr-namespace:ImAged.MVVM.ViewModel"
         mc:Ignorable="d"
-        Title="MainWindow" Height="600" Width="920"
+        Title="MainWindow" Height="640" Width="960"
         WindowStyle="None"
         ResizeMode="NoResize"
         Background="Transparent"
@@ -16,72 +16,132 @@
         <viewModel:MainViewModel/>
     </Window.DataContext>
 
-    <Border Background="#272537"
-            CornerRadius=" 20">
+    <Border Background="#060606" CornerRadius="20">
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="200"/>
+                <ColumnDefinition Width="213"/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
 
-            <Grid.RowDefinitions>
-                <RowDefinition Height="75"/>
-                <RowDefinition/>
-            </Grid.RowDefinitions>
+            <!-- SIDEBAR -->
+            <DockPanel Grid.Column="0" LastChildFill="True" Background="Transparent">
+                <StackPanel DockPanel.Dock="Top">
+                    <!-- PROFILE HEADER -->
+                    <StackPanel Orientation="Horizontal" Margin="10,13,10,16">
+                        <Border Width="40" Height="40" Background="Violet" CornerRadius="8"/>
+                        <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
+                            <TextBlock Text="IMAGED" Foreground="White" FontWeight="Bold" FontSize="16"/>
+                            <TextBlock Text="by IndieSIS" Foreground="#B0B0B0" FontSize="12"/>
+                        </StackPanel>
+                    </StackPanel>
 
-            <TextBlock Text="ImAged"
-                       VerticalAlignment="Center"
-                       HorizontalAlignment="Left"
-                       Foreground="White"
-                       FontSize="22"
-                       Margin="20,0,0,0"/>
+                    <!-- TOP MENU -->
+                    <StackPanel Margin="0,0,0,16">
+                        <RadioButton Content="Home"
+                                     Height="40"
+                                     FontSize="11"
+                                     Foreground="White"
+                                     Style="{StaticResource MenuButtonTheme}"
+                                     IsChecked="True"
+                                     Command="{Binding HomeViewCommand}"/>
 
-            <StackPanel Grid.Row="1">
-                <RadioButton Content="Home"
-                             Height="50"
-                             Foreground="White"
-                             FontSize="14"
-                             Style="{StaticResource MenuButtonTheme}"
-                             IsChecked="True"
-                             Command="{Binding HomeViewCommand}"
-                             />
-                <RadioButton Content="View"
-                             Height="50"
-                             Foreground="White"
-                             FontSize="14"
-                             Style="{StaticResource MenuButtonTheme}"
-                             Command="{Binding ViewViewCommand}"
-                             />
-                <RadioButton Content="Favorites"
-                             Height="50"
-                             Foreground="White"
-                             FontSize="14"
-                             Style="{StaticResource MenuButtonTheme}"
-                             />
-                <RadioButton Content="Tools"
-                             Height="50"
-                             Foreground="White"
-                             FontSize="14"
-                             Style="{StaticResource MenuButtonTheme}"
-                             />
+                        <RadioButton Content="My Projects"
+                                     Height="40"
+                                     FontSize="11"
+                                     Foreground="White"
+                                     Style="{StaticResource MenuButtonTheme}"
+                                     Command="{Binding ViewViewCommand}"/>
 
-            </StackPanel>
-            <TextBox Width="250"
-                     Height="40"
-                     VerticalContentAlignment="Center"
-                     HorizontalAlignment="Left"
-                     Margin="5"
-                     Grid.Column="1"
-                     Style="{StaticResource ModernTextbox}"/>
+                        <Separator Margin="12,8"/>
 
-            <ContentControl Grid.Row="1"
-                            Grid.Column="1"
-                            Margin="10"
-                            Content="{Binding CurrentView}"/>
+                        <!-- FILES DROPDOWN -->
+                        <Expander Header="Files"
+                                  Foreground="White"
+                                  FontSize="11"
+                                  Background="Transparent"
+                                  BorderThickness="0"
+                                  Padding="8,4"
+                                  IsExpanded="True">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="20,4">
+                                    <Ellipse Width="8" Height="8" Fill="LimeGreen" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Active" FontSize="11" Foreground="White" Margin="8,0,0,0"/>
+                                </StackPanel>
 
+                                <StackPanel Orientation="Horizontal" Margin="20,4">
+                                    <Ellipse Width="8" Height="8" Fill="Gold" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Near Expiry" FontSize="11" Foreground="White" Margin="8,0,0,0"/>
+                                </StackPanel>
 
+                                <StackPanel Orientation="Horizontal" Margin="20,4">
+                                    <Ellipse Width="8" Height="8" Fill="Red" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Expired" FontSize="11" Foreground="White" Margin="8,0,0,0"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Expander>
+
+                        <Separator Margin="12,8"/>
+
+                        <RadioButton Content="All Folders"
+                                     Height="40"
+                                     FontSize="11"
+                                     Foreground="White"
+                                     Style="{StaticResource MenuButtonTheme}"/>
+
+                        <RadioButton Content="Tools"
+                                     Height="40"
+                                     FontSize="11"
+                                     Foreground="White"
+                                     Style="{StaticResource MenuButtonTheme}"/>
+
+                        <Separator Margin="12,8"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <Border DockPanel.Dock="Top" Height="100"/>
+
+                <!-- BOTTOM SECTION -->
+                <StackPanel DockPanel.Dock="Bottom" Margin="0,0,0,15">
+                    <RadioButton Content="❓ Support"
+                 Height="40"
+                 FontSize="11"
+                 Foreground="White"
+                 Style="{StaticResource MenuButtonTheme}"/>
+
+                    <RadioButton Content="⚙️ Settings"
+                 Height="40"
+                 FontSize="11"
+                 Foreground="White"
+                 Style="{StaticResource MenuButtonTheme}"/>
+                </StackPanel>
+            </DockPanel>
+
+            <!-- MAIN CONTENT AREA -->
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="75"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+
+                <!-- TOP SECTION -->
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0,0,0">
+                    <TextBlock Text="Welcome back"
+                               Foreground="White"
+                               FontSize="26"
+                               Height="35"
+                               VerticalAlignment="Center"
+                               Width="167"/>
+                    <TextBox Width="300"
+                             VerticalContentAlignment="Center"
+                             Margin="230,0,0,0"
+                             Style="{StaticResource ModernTextbox}"/>
+                </StackPanel>
+
+                <!-- VIEW CONTENT -->
+                <ContentControl Grid.Row="1"
+                                Margin="10,10,10,10"
+                                Content="{Binding CurrentView}"/>
+            </Grid>
         </Grid>
-
     </Border>
-
 </Window>
