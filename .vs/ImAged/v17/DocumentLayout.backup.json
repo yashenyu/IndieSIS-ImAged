@@ -7,15 +7,11 @@
       "RelativeMoniker": "D:0:0:{16B5CE67-BE93-4121-B616-4904DD0342E7}|ImAged\\ImAged.csproj|solutionrelative:imaged\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{16B5CE67-BE93-4121-B616-4904DD0342E7}|ImAged\\ImAged.csproj|g:\\repos\\imaged\\imaged\\theme\\expandertheme.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
-      "RelativeMoniker": "D:0:0:{16B5CE67-BE93-4121-B616-4904DD0342E7}|ImAged\\ImAged.csproj|solutionrelative:imaged\\theme\\expandertheme.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{16B5CE67-BE93-4121-B616-4904DD0342E7}|ImAged\\ImAged.csproj|g:\\repos\\imaged\\imaged\\app.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "AbsoluteMoniker": "D:0:0:{16B5CE67-BE93-4121-B616-4904DD0342E7}|ImAged\\ImAged.csproj|G:\\Repos\\ImAged\\imaged\\app.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
       "RelativeMoniker": "D:0:0:{16B5CE67-BE93-4121-B616-4904DD0342E7}|ImAged\\ImAged.csproj|solutionrelative:imaged\\app.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{16B5CE67-BE93-4121-B616-4904DD0342E7}|ImAged\\ImAged.csproj|g:\\repos\\imaged\\imaged\\theme\\menubuttontheme.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "AbsoluteMoniker": "D:0:0:{16B5CE67-BE93-4121-B616-4904DD0342E7}|ImAged\\ImAged.csproj|G:\\Repos\\ImAged\\imaged\\theme\\menubuttontheme.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
       "RelativeMoniker": "D:0:0:{16B5CE67-BE93-4121-B616-4904DD0342E7}|ImAged\\ImAged.csproj|solutionrelative:imaged\\theme\\menubuttontheme.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     }
   ],
@@ -26,32 +22,8 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 0,
           "Children": [
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "ExpanderTheme.xaml",
-              "DocumentMoniker": "G:\\Repos\\ImAged\\ImAged\\Theme\\ExpanderTheme.xaml",
-              "RelativeDocumentMoniker": "ImAged\\Theme\\ExpanderTheme.xaml",
-              "ToolTip": "G:\\Repos\\ImAged\\ImAged\\Theme\\ExpanderTheme.xaml",
-              "RelativeToolTip": "ImAged\\Theme\\ExpanderTheme.xaml",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2025-07-17T16:05:21.777Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "MenuButtonTheme.xaml",
-              "DocumentMoniker": "G:\\Repos\\ImAged\\ImAged\\Theme\\MenuButtonTheme.xaml",
-              "RelativeDocumentMoniker": "ImAged\\Theme\\MenuButtonTheme.xaml",
-              "ToolTip": "G:\\Repos\\ImAged\\ImAged\\Theme\\MenuButtonTheme.xaml",
-              "RelativeToolTip": "ImAged\\Theme\\MenuButtonTheme.xaml",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2025-07-17T13:09:19.715Z",
-              "EditorCaption": ""
-            },
             {
               "$type": "Document",
               "DocumentIndex": 0,
@@ -66,7 +38,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 1,
               "Title": "App.xaml",
               "DocumentMoniker": "G:\\Repos\\ImAged\\ImAged\\App.xaml",
               "RelativeDocumentMoniker": "ImAged\\App.xaml",
@@ -74,6 +46,18 @@
               "RelativeToolTip": "ImAged\\App.xaml",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
               "WhenOpened": "2025-07-17T11:40:48.42Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "MenuButtonTheme.xaml",
+              "DocumentMoniker": "G:\\Repos\\ImAged\\ImAged\\Theme\\MenuButtonTheme.xaml",
+              "RelativeDocumentMoniker": "ImAged\\Theme\\MenuButtonTheme.xaml",
+              "ToolTip": "G:\\Repos\\ImAged\\ImAged\\Theme\\MenuButtonTheme.xaml",
+              "RelativeToolTip": "ImAged\\Theme\\MenuButtonTheme.xaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2025-07-17T13:09:19.715Z",
               "EditorCaption": ""
             }
           ]

@@ -10,11 +10,11 @@ none
 false
 DEBUG;TRACE
 G:\Repos\ImAged\ImAged\App.xaml
-7210753871
+6887353464
 5734118977
 131233674014
 24408999888
-MainWindow.xaml;MVVM\View\HomeView.xaml;MVVM\View\SidebarView.xaml;MVVM\View\ViewView.xaml;Theme\ExpanderTheme.xaml;Theme\MenuButtonTheme.xaml;Theme\TextboxTheme.xaml;
+MainWindow.xaml;MVVM\View\HomeView.xaml;MVVM\View\SidebarView.xaml;MVVM\View\ViewView.xaml;Theme\MenuButtonTheme.xaml;Theme\TextboxTheme.xaml;
 
-False
+True
 

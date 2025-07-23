@@ -7,29 +7,38 @@
         <Setter Property="Padding" Value="12,0"/>
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="Foreground" Value="White"/>
-        <Setter Property="Margin" Value="4,4"/>
+        <Setter Property="Margin" Value="6,1"/>
+        <Setter Property="FontFamily" Value="pack://application:,,,/ImAged;component/Fonts/#Poppins SemiBold"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="RadioButton">
                     <Border x:Name="BackgroundBorder"
                         Background="{TemplateBinding Background}"
-                        CornerRadius="8"
+                        CornerRadius="7"
                         Margin="{TemplateBinding Margin}"
                         Padding="{TemplateBinding Padding}">
-                        <ContentPresenter VerticalAlignment="Center"/>
+                        <ContentPresenter x:Name="contentPresenter"
+                                          VerticalAlignment="Center"
+                                          RecognizesAccessKey="True"
+                                          Content="{TemplateBinding Content}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}"/>
                     </Border>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="contentPresenter" Property="TextElement.Foreground" Value="White"/>
+                            <Setter TargetName="BackgroundBorder" Property="Background" Value="#343434"/>
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="contentPresenter" Property="TextElement.Foreground" Value="White"/>
+                            <Setter TargetName="BackgroundBorder" Property="Background" Value="#343434"/>
+                            <Setter Property="Padding" Value="14,0"/>
+                            <Setter Property="Margin" Value="6,1"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-        <Style.Triggers>
-            <Trigger Property="IsChecked" Value="True">
-                <Setter Property="Background" Value="#343434"/>
-                <Setter Property="Padding" Value="20,10"/>
-                <Setter Property="Margin" Value="2,2"/>
-            </Trigger>
-            <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="#343434"/>
-            </Trigger>
-        </Style.Triggers>
     </Style>
 </ResourceDictionary>

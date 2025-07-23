@@ -16,7 +16,7 @@
         <viewModel:MainViewModel/>
     </Window.DataContext>
 
-    <Border Background="#060606" CornerRadius="20">
+    <Border Background="#060606" CornerRadius="10">
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="213"/>
@@ -24,98 +24,99 @@
             </Grid.ColumnDefinitions>
 
             <!-- SIDEBAR -->
-            <DockPanel Grid.Column="0" LastChildFill="True" Background="Transparent">
-                <StackPanel DockPanel.Dock="Top">
-                    <!-- PROFILE HEADER -->
-                    <StackPanel Orientation="Horizontal" Margin="10,13,10,16">
-                        <Border Width="40" Height="40" Background="Violet" CornerRadius="8"/>
-                        <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
-                            <TextBlock Text="IMAGED" Foreground="White" FontWeight="Bold" FontSize="16"/>
-                            <TextBlock Text="by IndieSIS" Foreground="#B0B0B0" FontSize="12"/>
+            <Border Grid.Column="0" Background="#1E1E1E" CornerRadius="9" Margin="5,6,5,5">
+                <DockPanel LastChildFill="True" Background="Transparent" Margin="00,0,0,0">
+                    <StackPanel DockPanel.Dock="Top" Height="630" Width="200">
+                        <!-- PROFILE HEADER -->
+                        <StackPanel Orientation="Horizontal" Margin="10,13,10,16">
+                            <Border Width="40" Height="40" Background="Violet" CornerRadius="8"/>
+                            <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
+                                <TextBlock Text="IMAGED" Foreground="#FFFFFF" FontWeight="Bold" FontSize="16"/>
+                                <TextBlock Text="by IndieSIS" Foreground="#AEAEAE" FontSize="12"/>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- TOP MENU -->
+                        <StackPanel Margin="0,0,0,16">
+                            <RadioButton Content="Home"
+                             Height="35"
+                             FontSize="11"
+                             Foreground="#AEAEAE"
+                             Style="{StaticResource MenuButtonTheme}"
+                             IsChecked="True"
+                             Command="{Binding HomeViewCommand}"/>
+
+                            <RadioButton Content="My Projects"
+                             Height="35"
+                             FontSize="11"
+                             Foreground="#AEAEAE"
+                             Style="{StaticResource MenuButtonTheme}"
+                             Command="{Binding ViewViewCommand}"/>
+
+                            <Separator Margin="12,8" Height="0.1" Foreground="#383838"/>
+
+                            <!-- FILES DROPDOWN -->
+                            <Expander Header="Files"
+                                      FontFamily="pack://application:,,,/ImAged;component/Fonts/#Poppins SemiBold"
+                                      Foreground="#AEAEAE"
+                                      FontSize="11"
+                                      Background="Transparent"
+                                      BorderThickness="0"
+                                      Padding="8,4"
+                                      IsExpanded="True" Height="113"
+                                      >        
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="20,4">
+                                        <Ellipse Width="8" Height="8" Fill="LimeGreen" VerticalAlignment="Center"/>
+                                        <TextBlock Text="Active" FontSize="11" Foreground="#AEAEAE" Margin="8,0,0,0"/>
+                                    </StackPanel>
+
+                                    <StackPanel Orientation="Horizontal" Margin="20,4">
+                                        <Ellipse Width="8" Height="8" Fill="Gold" VerticalAlignment="Center"/>
+                                        <TextBlock Text="Near expiry" FontSize="11" Foreground="#AEAEAE" Margin="8,0,0,0"/>
+                                    </StackPanel>
+
+                                    <StackPanel Orientation="Horizontal" Margin="20,4">
+                                        <Ellipse Width="8" Height="8" Fill="Red" VerticalAlignment="Center"/>
+                                        <TextBlock Text="Expired" FontSize="11" Foreground="#AEAEAE" Margin="8,0,0,0"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Expander>
+
+                            <Separator Margin="12,8" Height="0.1" Foreground="#383838"/>
+
+                            <RadioButton Content="All Folders"
+                             Height="35"
+                             FontSize="11"
+                             Foreground="#AEAEAE"
+                             Style="{StaticResource MenuButtonTheme}"/>
+
+                            <RadioButton Content="Tools"
+                             Height="35"
+                             FontSize="11"
+                             Foreground="#AEAEAE"
+                             Style="{StaticResource MenuButtonTheme}"/>
+
+                            <Separator Margin="12,8" Height="0.1" Foreground="#383838"/>
+
+                            <Border DockPanel.Dock="Top" Height="170"/>
+
+                            <RadioButton Content="Support"
+                             Height="35"
+                             FontSize="11"
+                             Foreground="#AEAEAE"
+                             Style="{StaticResource MenuButtonTheme}"/>
+
+                            <RadioButton Content="Settings"
+                             Height="35"
+                             FontSize="11"
+                             Foreground="#AEAEAE"
+                             Style="{StaticResource MenuButtonTheme}"/>
                         </StackPanel>
                     </StackPanel>
-
-                    <!-- TOP MENU -->
-                    <StackPanel Margin="0,0,0,16">
-                        <RadioButton Content="Home"
-                                     Height="40"
-                                     FontSize="11"
-                                     Foreground="White"
-                                     Style="{StaticResource MenuButtonTheme}"
-                                     IsChecked="True"
-                                     Command="{Binding HomeViewCommand}"/>
-
-                        <RadioButton Content="My Projects"
-                                     Height="40"
-                                     FontSize="11"
-                                     Foreground="White"
-                                     Style="{StaticResource MenuButtonTheme}"
-                                     Command="{Binding ViewViewCommand}"/>
-
-                        <Separator Margin="12,8"/>
-
-                        <!-- FILES DROPDOWN -->
-                        <Expander Header="Files"
-                                  Foreground="White"
-                                  FontSize="11"
-                                  Background="Transparent"
-                                  BorderThickness="0"
-                                  Padding="8,4"
-                                  IsExpanded="True">
-                            <StackPanel>
-                                <StackPanel Orientation="Horizontal" Margin="20,4">
-                                    <Ellipse Width="8" Height="8" Fill="LimeGreen" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Active" FontSize="11" Foreground="White" Margin="8,0,0,0"/>
-                                </StackPanel>
-
-                                <StackPanel Orientation="Horizontal" Margin="20,4">
-                                    <Ellipse Width="8" Height="8" Fill="Gold" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Near Expiry" FontSize="11" Foreground="White" Margin="8,0,0,0"/>
-                                </StackPanel>
-
-                                <StackPanel Orientation="Horizontal" Margin="20,4">
-                                    <Ellipse Width="8" Height="8" Fill="Red" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Expired" FontSize="11" Foreground="White" Margin="8,0,0,0"/>
-                                </StackPanel>
-                            </StackPanel>
-                        </Expander>
-
-                        <Separator Margin="12,8"/>
-
-                        <RadioButton Content="All Folders"
-                                     Height="40"
-                                     FontSize="11"
-                                     Foreground="White"
-                                     Style="{StaticResource MenuButtonTheme}"/>
-
-                        <RadioButton Content="Tools"
-                                     Height="40"
-                                     FontSize="11"
-                                     Foreground="White"
-                                     Style="{StaticResource MenuButtonTheme}"/>
-
-                        <Separator Margin="12,8"/>
-                    </StackPanel>
-                </StackPanel>
-
-                <Border DockPanel.Dock="Top" Height="100"/>
-
-                <!-- BOTTOM SECTION -->
-                <StackPanel DockPanel.Dock="Bottom" Margin="0,0,0,15">
-                    <RadioButton Content="❓ Support"
-                 Height="40"
-                 FontSize="11"
-                 Foreground="White"
-                 Style="{StaticResource MenuButtonTheme}"/>
-
-                    <RadioButton Content="⚙️ Settings"
-                 Height="40"
-                 FontSize="11"
-                 Foreground="White"
-                 Style="{StaticResource MenuButtonTheme}"/>
-                </StackPanel>
-            </DockPanel>
-
+                </DockPanel>
+            </Border>
+            
             <!-- MAIN CONTENT AREA -->
             <Grid Grid.Column="1">
                 <Grid.RowDefinitions>
