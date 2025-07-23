@@ -1,0 +1,107 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Style TargetType="Expander" x:Key="LeftHeaderExpander">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Expander">
+                    <DockPanel>
+
+                        <ToggleButton
+                                  x:Name="ExpanderToggleButton"
+                                  OverridesDefaultStyle="True"
+                                  Focusable="False"
+                                  IsChecked="{Binding IsExpanded, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                  Background="Transparent"
+                                  BorderBrush="Transparent"
+                                  Height="35"
+                                  BorderThickness="0"
+                                  Cursor="Hand"
+                                  Foreground="#AEAEAE"
+                                  FontFamily="pack://application:,,,/ImAged;component/Fonts/#Poppins SemiBold"
+                                  FontWeight="SemiBold"
+                                  Padding="12,0"
+                                  Margin="6,1"
+                                  DockPanel.Dock="Top"
+                                  HorizontalContentAlignment="Stretch">
+
+
+                            <ToggleButton.Template>
+                                <ControlTemplate TargetType="ToggleButton">
+                                    <Border
+                                            x:Name="BackgroundBorder"
+                                            Background="{TemplateBinding Background}"
+                                            CornerRadius="7"
+                                            Padding="{TemplateBinding Padding}"
+                                            Margin="{TemplateBinding Margin}">
+
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <ContentPresenter
+                                                            Grid.Column="0"
+                                                            VerticalAlignment="Center"
+                                                            HorizontalAlignment="Left"
+                                                            RecognizesAccessKey="True"
+                                                            ContentSource="Content"
+                                                            Margin="0,0,8,0"/>
+
+                                            <Viewbox Grid.Column="1" 
+                                                    Width="8" 
+                                                    Height="8"
+                                                    VerticalAlignment="Center"
+                                                    Margin="4,0,0,0">
+                                                <Path
+                                                    x:Name="Arrow"
+                                                    Fill="#AEAEAE"
+                                                    Data="M 0 0 L 4 4 L 8 0 Z"
+                                                    RenderTransformOrigin="0.5,0.5">
+                                                    <Path.RenderTransform>
+                                                        <RotateTransform Angle="0"/>
+                                                    </Path.RenderTransform>
+                                                </Path>
+                                            </Viewbox>
+                                        </Grid>
+                                    </Border>
+
+
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsChecked" Value="True">
+                                            <Setter TargetName="Arrow" Property="RenderTransform">
+                                                <Setter.Value>
+                                                    <RotateTransform Angle="180"/>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </ToggleButton.Template>
+
+
+                            <ContentPresenter
+                                            ContentSource="Header"
+                                            RecognizesAccessKey="True"/>
+                        </ToggleButton>
+
+                        <!-- Expandable panel -->
+                        <ContentPresenter
+                                          x:Name="ExpandSite"
+                                          Visibility="Collapsed"
+                                          HorizontalAlignment="Stretch"
+                                          Margin="20,4,0,0"/>
+                    </DockPanel>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsExpanded" Value="True">
+                            <Setter TargetName="ExpandSite" Property="Visibility" Value="Visible"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>

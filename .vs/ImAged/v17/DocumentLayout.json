@@ -1,18 +1,18 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "G:\\Repos\\ImAged\\",
+  "WorkspaceRootPath": "C:\\Users\\Acer\\OneDrive\\Desktop\\IndieSIS-ImAged\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{16B5CE67-BE93-4121-B616-4904DD0342E7}|ImAged\\ImAged.csproj|g:\\repos\\imaged\\imaged\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "AbsoluteMoniker": "D:0:0:{16B5CE67-BE93-4121-B616-4904DD0342E7}|ImAged\\ImAged.csproj|c:\\users\\acer\\onedrive\\desktop\\indiesis-imaged\\imaged\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
       "RelativeMoniker": "D:0:0:{16B5CE67-BE93-4121-B616-4904DD0342E7}|ImAged\\ImAged.csproj|solutionrelative:imaged\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{16B5CE67-BE93-4121-B616-4904DD0342E7}|ImAged\\ImAged.csproj|G:\\Repos\\ImAged\\imaged\\app.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
-      "RelativeMoniker": "D:0:0:{16B5CE67-BE93-4121-B616-4904DD0342E7}|ImAged\\ImAged.csproj|solutionrelative:imaged\\app.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+      "AbsoluteMoniker": "D:0:0:{16B5CE67-BE93-4121-B616-4904DD0342E7}|ImAged\\ImAged.csproj|C:\\Users\\Acer\\OneDrive\\Desktop\\IndieSIS-ImAged\\imaged\\theme\\menubuttontheme.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{16B5CE67-BE93-4121-B616-4904DD0342E7}|ImAged\\ImAged.csproj|solutionrelative:imaged\\theme\\menubuttontheme.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{16B5CE67-BE93-4121-B616-4904DD0342E7}|ImAged\\ImAged.csproj|G:\\Repos\\ImAged\\imaged\\theme\\menubuttontheme.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
-      "RelativeMoniker": "D:0:0:{16B5CE67-BE93-4121-B616-4904DD0342E7}|ImAged\\ImAged.csproj|solutionrelative:imaged\\theme\\menubuttontheme.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+      "AbsoluteMoniker": "D:0:0:{16B5CE67-BE93-4121-B616-4904DD0342E7}|ImAged\\ImAged.csproj|C:\\Users\\Acer\\OneDrive\\Desktop\\IndieSIS-ImAged\\imaged\\app.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{16B5CE67-BE93-4121-B616-4904DD0342E7}|ImAged\\ImAged.csproj|solutionrelative:imaged\\app.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     }
   ],
   "DocumentGroupContainers": [
@@ -22,15 +22,19 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 1,
           "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
+            },
             {
               "$type": "Document",
               "DocumentIndex": 0,
               "Title": "MainWindow.xaml",
-              "DocumentMoniker": "G:\\Repos\\ImAged\\ImAged\\MainWindow.xaml",
+              "DocumentMoniker": "C:\\Users\\Acer\\OneDrive\\Desktop\\IndieSIS-ImAged\\ImAged\\MainWindow.xaml",
               "RelativeDocumentMoniker": "ImAged\\MainWindow.xaml",
-              "ToolTip": "G:\\Repos\\ImAged\\ImAged\\MainWindow.xaml",
+              "ToolTip": "C:\\Users\\Acer\\OneDrive\\Desktop\\IndieSIS-ImAged\\ImAged\\MainWindow.xaml",
               "RelativeToolTip": "ImAged\\MainWindow.xaml",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
               "WhenOpened": "2025-07-17T12:07:19.489Z",
@@ -38,11 +42,11 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "App.xaml",
-              "DocumentMoniker": "G:\\Repos\\ImAged\\ImAged\\App.xaml",
+              "DocumentMoniker": "C:\\Users\\Acer\\OneDrive\\Desktop\\IndieSIS-ImAged\\ImAged\\App.xaml",
               "RelativeDocumentMoniker": "ImAged\\App.xaml",
-              "ToolTip": "G:\\Repos\\ImAged\\ImAged\\App.xaml",
+              "ToolTip": "C:\\Users\\Acer\\OneDrive\\Desktop\\IndieSIS-ImAged\\ImAged\\App.xaml",
               "RelativeToolTip": "ImAged\\App.xaml",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
               "WhenOpened": "2025-07-17T11:40:48.42Z",
@@ -50,11 +54,11 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 1,
               "Title": "MenuButtonTheme.xaml",
-              "DocumentMoniker": "G:\\Repos\\ImAged\\ImAged\\Theme\\MenuButtonTheme.xaml",
+              "DocumentMoniker": "C:\\Users\\Acer\\OneDrive\\Desktop\\IndieSIS-ImAged\\ImAged\\Theme\\MenuButtonTheme.xaml",
               "RelativeDocumentMoniker": "ImAged\\Theme\\MenuButtonTheme.xaml",
-              "ToolTip": "G:\\Repos\\ImAged\\ImAged\\Theme\\MenuButtonTheme.xaml",
+              "ToolTip": "C:\\Users\\Acer\\OneDrive\\Desktop\\IndieSIS-ImAged\\ImAged\\Theme\\MenuButtonTheme.xaml",
               "RelativeToolTip": "ImAged\\Theme\\MenuButtonTheme.xaml",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
               "WhenOpened": "2025-07-17T13:09:19.715Z",

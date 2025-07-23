@@ -4,17 +4,17 @@
 winexe
 C#
 .cs
-G:\Repos\ImAged\ImAged\obj\Debug\
+C:\Users\Acer\OneDrive\Desktop\IndieSIS-ImAged\ImAged\obj\Debug\
 ImAged
 none
 false
 DEBUG;TRACE
-G:\Repos\ImAged\ImAged\App.xaml
-7210753871
+C:\Users\Acer\OneDrive\Desktop\IndieSIS-ImAged\ImAged\App.xaml
+7-225957948
 5734118977
 12-979204664
-24408999888
-MainWindow.xaml;MVVM\View\HomeView.xaml;MVVM\View\SidebarView.xaml;MVVM\View\ViewView.xaml;Theme\ExpanderTheme.xaml;Theme\MenuButtonTheme.xaml;Theme\TextboxTheme.xaml;
+24-1812991296
+MainWindow.xaml;MVVM\View\HomeView.xaml;MVVM\View\SidebarView.xaml;MVVM\View\ViewView.xaml;Theme\FilesExpanderTheme.xaml;Theme\MenuButtonTheme.xaml;Theme\TextboxTheme.xaml;
 
 False
 
