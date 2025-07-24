@@ -64,7 +64,6 @@ C:\Users\Acer\OneDrive\Desktop\IndieSIS-ImAged\ImAged\bin\Debug\System.Numerics.
 C:\Users\Acer\OneDrive\Desktop\IndieSIS-ImAged\ImAged\bin\Debug\System.Runtime.CompilerServices.Unsafe.xml
 C:\Users\Acer\OneDrive\Desktop\IndieSIS-ImAged\ImAged\bin\Debug\System.Threading.Tasks.Extensions.xml
 C:\Users\Acer\OneDrive\Desktop\IndieSIS-ImAged\ImAged\obj\Debug\ImAged.csproj.AssemblyReference.cache
-C:\Users\Acer\OneDrive\Desktop\IndieSIS-ImAged\ImAged\obj\Debug\ImAged.exe.config
 C:\Users\Acer\OneDrive\Desktop\IndieSIS-ImAged\ImAged\obj\Debug\Theme\FilesExpanderTheme.baml
 C:\Users\Acer\OneDrive\Desktop\IndieSIS-ImAged\ImAged\obj\Debug\Theme\MenuButtonTheme.baml
 C:\Users\Acer\OneDrive\Desktop\IndieSIS-ImAged\ImAged\obj\Debug\Theme\TextboxTheme.baml
