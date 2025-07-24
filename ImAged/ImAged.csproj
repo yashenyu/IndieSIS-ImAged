@@ -150,7 +150,24 @@
     </EmbeddedResource>
     <None Include="Config\config.json" />
     <None Include="Config\master.key" />
-    <Resource Include="Fonts\Poppins-SemiBold.ttf" />
+    <Resource Include="Fonts\Poppins\Poppins-Black.ttf" />
+    <Resource Include="Fonts\Poppins\Poppins-BlackItalic.ttf" />
+    <Resource Include="Fonts\Poppins\Poppins-Bold.ttf" />
+    <Resource Include="Fonts\Poppins\Poppins-BoldItalic.ttf" />
+    <Resource Include="Fonts\Poppins\Poppins-ExtraBold.ttf" />
+    <Resource Include="Fonts\Poppins\Poppins-ExtraBoldItalic.ttf" />
+    <Resource Include="Fonts\Poppins\Poppins-ExtraLight.ttf" />
+    <Resource Include="Fonts\Poppins\Poppins-ExtraLightItalic.ttf" />
+    <Resource Include="Fonts\Poppins\Poppins-Italic.ttf" />
+    <Resource Include="Fonts\Poppins\Poppins-Light.ttf" />
+    <Resource Include="Fonts\Poppins\Poppins-LightItalic.ttf" />
+    <Resource Include="Fonts\Poppins\Poppins-Medium.ttf" />
+    <Resource Include="Fonts\Poppins\Poppins-MediumItalic.ttf" />
+    <Resource Include="Fonts\Poppins\Poppins-Regular.ttf" />
+    <Resource Include="Fonts\Poppins\Poppins-SemiBold.ttf" />
+    <Resource Include="Fonts\Poppins\Poppins-SemiBoldItalic.ttf" />
+    <Resource Include="Fonts\Poppins\Poppins-Thin.ttf" />
+    <Resource Include="Fonts\Poppins\Poppins-ThinItalic.ttf" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

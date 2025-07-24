@@ -7,8 +7,8 @@
       "RelativeMoniker": "D:0:0:{16B5CE67-BE93-4121-B616-4904DD0342E7}|ImAged\\ImAged.csproj|solutionrelative:imaged\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{16B5CE67-BE93-4121-B616-4904DD0342E7}|ImAged\\ImAged.csproj|C:\\Users\\Acer\\OneDrive\\Desktop\\IndieSIS-ImAged\\imaged\\theme\\menubuttontheme.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
-      "RelativeMoniker": "D:0:0:{16B5CE67-BE93-4121-B616-4904DD0342E7}|ImAged\\ImAged.csproj|solutionrelative:imaged\\theme\\menubuttontheme.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+      "AbsoluteMoniker": "D:0:0:{16B5CE67-BE93-4121-B616-4904DD0342E7}|ImAged\\ImAged.csproj|c:\\users\\acer\\onedrive\\desktop\\indiesis-imaged\\imaged\\theme\\textboxtheme.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{16B5CE67-BE93-4121-B616-4904DD0342E7}|ImAged\\ImAged.csproj|solutionrelative:imaged\\theme\\textboxtheme.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{16B5CE67-BE93-4121-B616-4904DD0342E7}|ImAged\\ImAged.csproj|C:\\Users\\Acer\\OneDrive\\Desktop\\IndieSIS-ImAged\\imaged\\app.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
@@ -22,8 +22,12 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 2,
           "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
+            },
             {
               "$type": "Document",
               "DocumentIndex": 0,
@@ -37,10 +41,6 @@
               "EditorCaption": ""
             },
             {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
-            },
-            {
               "$type": "Document",
               "DocumentIndex": 2,
               "Title": "App.xaml",
@@ -51,17 +51,38 @@
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
               "WhenOpened": "2025-07-17T11:40:48.42Z",
               "EditorCaption": ""
-            },
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "FloatingWindowState": {
+        "Id": "3edf3658-223b-41c1-ab4d-817847df7b02",
+        "Display": 0,
+        "X": 540,
+        "Y": 41,
+        "Width": 686,
+        "Height": 766,
+        "WindowState": 0
+      },
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
             {
               "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "MenuButtonTheme.xaml",
-              "DocumentMoniker": "C:\\Users\\Acer\\OneDrive\\Desktop\\IndieSIS-ImAged\\ImAged\\Theme\\MenuButtonTheme.xaml",
-              "RelativeDocumentMoniker": "ImAged\\Theme\\MenuButtonTheme.xaml",
-              "ToolTip": "C:\\Users\\Acer\\OneDrive\\Desktop\\IndieSIS-ImAged\\ImAged\\Theme\\MenuButtonTheme.xaml",
-              "RelativeToolTip": "ImAged\\Theme\\MenuButtonTheme.xaml",
+              "Title": "TextboxTheme.xaml",
+              "DocumentMoniker": "C:\\Users\\Acer\\OneDrive\\Desktop\\IndieSIS-ImAged\\ImAged\\Theme\\TextboxTheme.xaml",
+              "RelativeDocumentMoniker": "ImAged\\Theme\\TextboxTheme.xaml",
+              "ToolTip": "C:\\Users\\Acer\\OneDrive\\Desktop\\IndieSIS-ImAged\\ImAged\\Theme\\TextboxTheme.xaml",
+              "RelativeToolTip": "ImAged\\Theme\\TextboxTheme.xaml",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2025-07-17T13:09:19.715Z",
+              "WhenOpened": "2025-07-24T07:20:07.225Z",
               "EditorCaption": ""
             }
           ]

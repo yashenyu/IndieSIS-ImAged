@@ -18,7 +18,7 @@
                                   BorderThickness="0"
                                   Cursor="Hand"
                                   Foreground="#AEAEAE"
-                                  FontFamily="pack://application:,,,/ImAged;component/Fonts/#Poppins SemiBold"
+                                  FontFamily="pack://application:,,,/ImAged;component/Fonts/Poppins/#Poppins SemiBold"
                                   FontWeight="SemiBold"
                                   Padding="12,0"
                                   Margin="6,1"

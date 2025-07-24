@@ -8,7 +8,7 @@
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="Foreground" Value="White"/>
         <Setter Property="Margin" Value="6,1"/>
-        <Setter Property="FontFamily" Value="pack://application:,,,/ImAged;component/Fonts/#Poppins SemiBold"/>
+        <Setter Property="FontFamily" Value="pack://application:,,,/ImAged;component/Fonts/Poppins/#Poppins SemiBold"/>
         <Setter Property="FontWeight" Value="SemiBold"/>
         <Setter Property="Template">
             <Setter.Value>

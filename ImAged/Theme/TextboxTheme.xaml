@@ -6,8 +6,9 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type TextBox}">
                     <Border CornerRadius="10"
-                            Background="#353340"
-                            Width="200" Height="40">
+                            Background="#252525"
+                            Width="240" Height="33"
+                            Margin="0,0,0,5">
 
                         <Grid>
                             <Rectangle StrokeThickness="1"/>
@@ -24,9 +25,10 @@
                                        Text="Search"
                                        VerticalAlignment="Center"
                                        HorizontalAlignment="Left"
+                                       FontFamily="pack://application:,,,/ImAged;component/Fonts/Poppins/#Poppins Regular"
                                        Margin="10,0,0,0"
                                        FontSize="11"
-                                       Foreground="DarkGray"
+                                       Foreground="#AEAEAE"
                                        Grid.Column="1">
                                 
                                 <TextBlock.Style>
