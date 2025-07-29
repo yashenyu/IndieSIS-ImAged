@@ -7,15 +7,15 @@
       "RelativeMoniker": "D:0:0:{16B5CE67-BE93-4121-B616-4904DD0342E7}|ImAged\\ImAged.csproj|solutionrelative:imaged\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{16B5CE67-BE93-4121-B616-4904DD0342E7}|ImAged\\ImAged.csproj|g:\\repos\\imaged\\imaged\\theme\\windowcontrolstheme.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "AbsoluteMoniker": "D:0:0:{16B5CE67-BE93-4121-B616-4904DD0342E7}|ImAged\\ImAged.csproj|G:\\Repos\\ImAged\\imaged\\theme\\windowcontrolstheme.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
       "RelativeMoniker": "D:0:0:{16B5CE67-BE93-4121-B616-4904DD0342E7}|ImAged\\ImAged.csproj|solutionrelative:imaged\\theme\\windowcontrolstheme.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{16B5CE67-BE93-4121-B616-4904DD0342E7}|ImAged\\ImAged.csproj|g:\\repos\\imaged\\imaged\\app.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "AbsoluteMoniker": "D:0:0:{16B5CE67-BE93-4121-B616-4904DD0342E7}|ImAged\\ImAged.csproj|G:\\Repos\\ImAged\\imaged\\app.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
       "RelativeMoniker": "D:0:0:{16B5CE67-BE93-4121-B616-4904DD0342E7}|ImAged\\ImAged.csproj|solutionrelative:imaged\\app.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{16B5CE67-BE93-4121-B616-4904DD0342E7}|ImAged\\ImAged.csproj|g:\\repos\\imaged\\imaged\\mvvm\\viewmodel\\mainviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{16B5CE67-BE93-4121-B616-4904DD0342E7}|ImAged\\ImAged.csproj|G:\\Repos\\ImAged\\imaged\\mvvm\\viewmodel\\mainviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{16B5CE67-BE93-4121-B616-4904DD0342E7}|ImAged\\ImAged.csproj|solutionrelative:imaged\\mvvm\\viewmodel\\mainviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
@@ -70,8 +70,7 @@
               "RelativeToolTip": "ImAged\\MVVM\\ViewModel\\MainViewModel.cs",
               "ViewState": "AgIAABoAAAAAAAAAAAAuwDsAAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-07-29T11:18:40.042Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-07-29T11:18:40.042Z"
             },
             {
               "$type": "Document",

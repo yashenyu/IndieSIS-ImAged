@@ -87,3 +87,4 @@ C:\Users\Acer\OneDrive\Desktop\IndieSIS-ImAged\ImAged\obj\Debug\ImAged.exe
 C:\Users\Acer\OneDrive\Desktop\IndieSIS-ImAged\ImAged\obj\Debug\ImAged.pdb
 G:\Repos\ImAged\ImAged\obj\Debug\Theme\FilesExpanderTheme.baml
 G:\Repos\ImAged\ImAged\obj\Debug\Theme\WindowControlsTheme.baml
+G:\Repos\ImAged\ImAged\obj\Debug\ImAged.exe.config
