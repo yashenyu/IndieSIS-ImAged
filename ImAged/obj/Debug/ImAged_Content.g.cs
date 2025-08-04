@@ -11,7 +11,6 @@
 [assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("pysrc/config.py")]
 [assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("pysrc/converter.py")]
 [assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("pysrc/crypto.py")]
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("pysrc/main.py")]
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("pysrc/python_api.py")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("pysrc/secure_backend.py")]
 
 
