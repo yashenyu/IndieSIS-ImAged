@@ -26,8 +26,7 @@ namespace ImAged
             RunSecureTest(); //test command for to check if integration works, check the output, should say Command executed succesfully...
         }
 
-        private async void RunSecureTest()
-        {
+        private async void RunSecureTest() {
             await TestSecureCommunication.TestBasicCommunication();
         }
     }
