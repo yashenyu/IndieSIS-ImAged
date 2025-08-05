@@ -184,6 +184,12 @@
     <Resource Include="256.ico" />
     <Resource Include="16.ico" />
     <Resource Include="128.ico" />
+    <Resource Include="Images\128.ico" />
+    <Resource Include="Images\16.ico" />
+    <Resource Include="Images\256.ico" />
+    <Resource Include="Images\32.ico" />
+    <Resource Include="Images\48.ico" />
+    <Resource Include="Images\64.ico" />
     <Content Include="pysrc\config.py" />
     <Content Include="pysrc\converter.py" />
     <Content Include="pysrc\crypto.py" />
@@ -191,7 +197,6 @@
     <Content Include="pysrc\python_api.py" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Images\" />
     <Folder Include="MVVM\Model\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
