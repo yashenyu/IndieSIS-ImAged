@@ -10,7 +10,8 @@
         WindowStyle="None"
         ResizeMode="NoResize"
         Background="Transparent"
-        AllowsTransparency="True">
+        AllowsTransparency="True"
+        Icon="Images/128.ico">
 
     <Window.DataContext>
         <viewModel:MainViewModel/>
