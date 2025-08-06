@@ -178,10 +178,13 @@ class SecureBackend:
             
             # Import and use existing converter
             from converter import open_ttl
-            png_path, fallback = open_ttl(input_path)
+            image_bytes, fallback = open_ttl(input_path)
+
+            import base64
+            image_base64 = base64.b64encode(image_bytes).decode('utf-8')
             
             result = {
-                "png_path": png_path,
+                "image_data": image_base64,
                 "fallback": fallback
             }
             

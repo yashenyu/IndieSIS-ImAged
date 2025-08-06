@@ -9,8 +9,10 @@
 //------------------------------------------------------------------------------
 
 [assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("pysrc/config.py")]
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("pysrc/converter.py")]
 [assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("pysrc/crypto.py")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("pysrc/file_manager.py")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("pysrc/image_processor.py")]
 [assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("pysrc/secure_backend.py")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("pysrc/time_utils.py")]
 
 
