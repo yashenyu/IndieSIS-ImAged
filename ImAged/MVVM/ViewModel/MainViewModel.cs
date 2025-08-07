@@ -18,6 +18,7 @@ namespace ImAged.MVVM.ViewModel
 
         public HomeViewModel HomeVm  { get; set; }
         public ViewViewModel ViewVm { get; set; }
+        public SettingsViewModel SettingVm { get; set; }
 
         private object _currentView;
 
@@ -35,7 +36,8 @@ namespace ImAged.MVVM.ViewModel
         {
             HomeVm = new HomeViewModel();
             ViewVm = new ViewViewModel();
-            //SettingVm = new 
+            SettingVm = new SettingsViewModel();
+
             CurrentView = HomeVm;
 
             HomeViewCommand = new RelayCommand(o =>
@@ -46,6 +48,11 @@ namespace ImAged.MVVM.ViewModel
             ViewViewCommand = new RelayCommand(o =>
             {
                 CurrentView = ViewVm;
+            });
+
+            SettingsViewCommand = new RelayCommand(o =>
+            {
+                CurrentView = SettingVm;
             });
 
             CloseCommand = new RelayCommand(o =>
