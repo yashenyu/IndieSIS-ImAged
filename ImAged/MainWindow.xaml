@@ -130,15 +130,9 @@
                         </StackPanel>
                     </ScrollViewer>
 
-                    <!-- BOTTOM BUTTONS -->
+                    <!-- BOTTOM BUTTON -->
                     <StackPanel Grid.Row="2" Margin="0,0,0,10">
                         <Separator Margin="12,8" Height="0.3" Foreground="#383838"/>
-                        <RadioButton Content="Support"
-                                     Height="35"
-                                     FontSize="11"
-                                     Foreground="#AEAEAE"
-                                     Style="{StaticResource MenuButtonTheme}"
-                                     GroupName="MenuGroup"/>
                         <RadioButton Content="Settings"
                                      Height="35"
                                      FontSize="11"
