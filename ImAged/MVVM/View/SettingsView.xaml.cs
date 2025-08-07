@@ -25,5 +25,10 @@ namespace ImAged.MVVM.View
         {
             InitializeComponent();
         }
+
+        private void SelectDownloadFolder_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }
