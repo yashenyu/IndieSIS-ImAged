@@ -23,6 +23,8 @@ namespace ImAged.MVVM.View
         public SettingsView()
         {
             InitializeComponent();
+
+            DownloadPathTextBox.Text = Properties.Settings.Default.DownloadPath ?? "No Path Selected";
         }
 
         private void SelectDownloadPath_Click(object sender, RoutedEventArgs e)
@@ -32,7 +34,18 @@ namespace ImAged.MVVM.View
 
             if (dialog.ShowDialog() == Forms.DialogResult.OK)
             {
-                DownloadPathTextBox.Text = dialog.SelectedPath;
+                string selectedPath = dialog.SelectedPath;
+
+                // Display the selected path
+                DownloadPathTextBox.Text = selectedPath;
+
+                // Save to settings
+                Properties.Settings.Default.DownloadPath = selectedPath;
+                Properties.Settings.Default.Save();
+            }
+            else
+            {
+                System.Windows.MessageBox.Show("Selected path does not exist or was cancelled.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
     }
