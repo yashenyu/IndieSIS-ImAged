@@ -14,7 +14,8 @@
                        Foreground="White" 
                        Margin="20,30,0,0"/>
             
-            <TextBox x:Name="DownloadPathTextBox" 
+            <TextBox x:Name="DownloadPathTextBox"
+                     Text="No Path Selected"
                      Margin="20,5,0,5" 
                      IsReadOnly="True" 
                      Background="#FF2B2B2B" 
