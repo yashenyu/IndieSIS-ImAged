@@ -12,23 +12,30 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-
+using System.Windows.Forms; 
+using System.IO;            // For saving path if needed
+using Forms = System.Windows.Forms;
 
 namespace ImAged.MVVM.View
 {
-    /// <summary>
-    /// Interaction logic for SettingsView.xaml
-    /// </summary>
-    public partial class SettingsView : UserControl
+    public partial class SettingsView : System.Windows.Controls.UserControl
     {
         public SettingsView()
         {
             InitializeComponent();
         }
 
-        private void SelectDownloadFolder_Click(object sender, RoutedEventArgs e)
+        private void SelectDownloadPath_Click(object sender, RoutedEventArgs e)
         {
+            var dialog = new Forms.FolderBrowserDialog();
+            dialog.Description = "Select Download Path";
 
+            if (dialog.ShowDialog() == Forms.DialogResult.OK)
+            {
+                DownloadPathTextBox.Text = dialog.SelectedPath;
+            }
         }
     }
 }
+
+
