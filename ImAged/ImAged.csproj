@@ -163,8 +163,8 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="Config\config.json" />
-    <None Include="Config\master.key" />
+    <None Include="pysrc\config\config.json" />
+    <None Include="pysrc\config\master.key" />
     <Resource Include="Fonts\Poppins\Poppins-Black.ttf" />
     <Resource Include="Fonts\Poppins\Poppins-BlackItalic.ttf" />
     <Resource Include="Fonts\Poppins\Poppins-Bold.ttf" />
@@ -194,9 +194,11 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="pysrc\config.py" />
-    <Content Include="pysrc\converter.py" />
     <Content Include="pysrc\crypto.py" />
+    <Content Include="pysrc\file_manager.py" />
+    <Content Include="pysrc\image_processor.py" />
     <Content Include="pysrc\secure_backend.py" />
+    <Content Include="pysrc\time_utils.py" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Images\" />

@@ -8,6 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("pysrc/secure_image_service.py")]
 [assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("pysrc/config.py")]
 [assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("pysrc/crypto.py")]
 [assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("pysrc/file_manager.py")]
