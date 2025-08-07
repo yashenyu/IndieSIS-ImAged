@@ -11,7 +11,8 @@ namespace ImAged.MVVM.ViewModel
     class MainViewModel : ObservableObject
     {
         public RelayCommand HomeViewCommand { get; set; }
-        public RelayCommand ViewViewCommand { get; set; }
+        public RelayCommand ViewViewCommand { get; set; } //FAVORITES
+        public RelayCommand SettingsViewCommand { get; set; }
         public RelayCommand CloseCommand { get; set; }
         public RelayCommand MinimizeCommand { get; set; }
 
@@ -34,6 +35,7 @@ namespace ImAged.MVVM.ViewModel
         {
             HomeVm = new HomeViewModel();
             ViewVm = new ViewViewModel();
+            //SettingVm = new 
             CurrentView = HomeVm;
 
             HomeViewCommand = new RelayCommand(o =>

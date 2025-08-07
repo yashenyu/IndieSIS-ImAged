@@ -138,6 +138,7 @@
                                      FontSize="11"
                                      Foreground="#AEAEAE"
                                      Style="{StaticResource MenuButtonTheme}"
+                                     Command="{Binding SettingsViewCommand}"
                                      GroupName="MenuGroup"/>
                     </StackPanel>
                 </Grid>
