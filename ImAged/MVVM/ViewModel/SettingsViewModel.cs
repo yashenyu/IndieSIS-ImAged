@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ImAged.MVVM.ViewModel
 {
-    internal class Class1
+    internal class SettingsViewModel
     {
     }
 }
