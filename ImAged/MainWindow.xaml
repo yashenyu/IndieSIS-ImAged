@@ -134,7 +134,7 @@
                     <StackPanel Grid.Row="2" Margin="0,0,0,10">
                         <Separator Margin="12,8" Height="0.3" Foreground="#383838"/>
                         <RadioButton Content="Settings"
-                                     Height="35"
+                                     Height="29"
                                      FontSize="11"
                                      Foreground="#AEAEAE"
                                      Style="{StaticResource MenuButtonTheme}"
