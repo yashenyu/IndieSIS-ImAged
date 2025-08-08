@@ -8,12 +8,25 @@
              d:DesignHeight="450" d:DesignWidth="800"
              Background="#1B1B1B">
     <Grid>
-        <StackPanel Margin="20">
+        <StackPanel>
+            <TextBlock Text="Settings" 
+                   FontWeight="Bold" 
+                   Foreground="#FFEDEDED" 
+                   Margin="20,20,0,0"
+                   FontSize="25" FontFamily="Yu Gothic UI" Width="770" />
+            <Separator Margin="22,6,0,0" 
+                       Height="1" 
+                       Foreground="#383838" 
+                       Width="680"
+                       HorizontalAlignment="Left" Background="#FF2B2B2B"/>
+        </StackPanel>
+
+        <StackPanel Margin="10,71,30,300">
             <TextBlock Text="Edit Download Path:" 
                        FontWeight="Bold" 
                        Foreground="White" 
-                       Margin="20,30,0,0"/>
-            
+                       Margin="20,0,0,0" FontFamily="Yu Gothic UI Semibold"/>
+
             <TextBox x:Name="DownloadPathTextBox"
                      Text="No Path Selected"
                      Margin="20,5,0,5" 
@@ -22,7 +35,7 @@
                      Foreground="White" 
                      Width="650" 
                      HorizontalAlignment="Left"/>
-            
+
             <Button Content="Select Path" 
                     Click="SelectDownloadPath_Click" 
                     HorizontalAlignment="Right" 
