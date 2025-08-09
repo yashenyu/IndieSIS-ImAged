@@ -10,11 +10,11 @@ none
 false
 DEBUG;TRACE
 C:\Users\Dre\Documents\GitHub\IndieSIS-ImAged\ImAged\App.xaml
-81194612899
+9824713824
 5734118977
-16-1438245098
+18-799778722
 291895317047
-MainWindow.xaml;MVVM\View\HomeView.xaml;MVVM\View\SettingsView.xaml;MVVM\View\ViewView.xaml;Theme\FilesExpanderTheme.xaml;Theme\MenuButtonTheme.xaml;Theme\WindowControlsTheme.xaml;Theme\TextboxTheme.xaml;
+MainWindow.xaml;MVVM\View\ConvertView.xaml;MVVM\View\HomeView.xaml;MVVM\View\SettingsView.xaml;MVVM\View\ViewView.xaml;Theme\FilesExpanderTheme.xaml;Theme\MenuButtonTheme.xaml;Theme\WindowControlsTheme.xaml;Theme\TextboxTheme.xaml;
 
 False
 

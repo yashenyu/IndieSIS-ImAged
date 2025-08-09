@@ -10,15 +10,17 @@ namespace ImAged.MVVM.ViewModel
 { 
     class MainViewModel : ObservableObject
     {
-        public RelayCommand HomeViewCommand { get; set; }
-        public RelayCommand ViewViewCommand { get; set; } //FAVORITES
-        public RelayCommand SettingsViewCommand { get; set; }
+        public RelayCommand HomeViewCommand { get; set; } // HOME
+        public RelayCommand ViewViewCommand { get; set; } // FAVORITES
+        public RelayCommand SettingsViewCommand { get; set; } // SETTINGS
+        public RelayCommand ConvertViewCommand { get; set; } // TOOLS / CONVERTER
         public RelayCommand CloseCommand { get; set; }
         public RelayCommand MinimizeCommand { get; set; }
 
         public HomeViewModel HomeVm  { get; set; }
         public ViewViewModel ViewVm { get; set; }
         public SettingsViewModel SettingVm { get; set; }
+        public ConvertViewModel ConvertVm { get; set; }
 
         private object _currentView;
 
@@ -37,6 +39,7 @@ namespace ImAged.MVVM.ViewModel
             HomeVm = new HomeViewModel();
             ViewVm = new ViewViewModel();
             SettingVm = new SettingsViewModel();
+            ConvertVm = new ConvertViewModel();
 
             CurrentView = HomeVm;
 
@@ -53,6 +56,11 @@ namespace ImAged.MVVM.ViewModel
             SettingsViewCommand = new RelayCommand(o =>
             {
                 CurrentView = SettingVm;
+            });
+
+            ConvertViewCommand = new RelayCommand(o =>
+            {
+                CurrentView = ConvertVm;
             });
 
             CloseCommand = new RelayCommand(o =>

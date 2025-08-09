@@ -125,6 +125,7 @@
                                              FontSize="11"
                                              Foreground="#AEAEAE"
                                              Style="{StaticResource MenuButtonTheme}"
+                                             Command = "{Binding ConvertViewCommand}"
                                              GroupName="MenuGroup"/>
                             </StackPanel>
                         </StackPanel>

@@ -26,6 +26,10 @@
                 <view:SettingsView/>
             </DataTemplate>
 
+            <DataTemplate DataType="{x:Type viewModel:ConvertViewModel}">
+                <view:ConvertView/>
+            </DataTemplate>
+
 
         </ResourceDictionary>
     </Application.Resources>
