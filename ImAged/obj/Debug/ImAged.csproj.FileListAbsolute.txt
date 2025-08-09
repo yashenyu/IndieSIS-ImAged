@@ -144,3 +144,5 @@ C:\Users\Dre\Documents\GitHub\IndieSIS-ImAged\ImAged\obj\Debug\ImAged.exe
 C:\Users\Dre\Documents\GitHub\IndieSIS-ImAged\ImAged\obj\Debug\ImAged.pdb
 C:\Users\Dre\Documents\GitHub\IndieSIS-ImAged\ImAged\obj\Debug\MVVM\View\ConvertView.g.cs
 C:\Users\Dre\Documents\GitHub\IndieSIS-ImAged\ImAged\obj\Debug\MVVM\View\ConvertView.baml
+C:\Users\Dre\Documents\GitHub\IndieSIS-ImAged\ImAged\obj\Debug\MVVM\View\FileView.g.cs
+C:\Users\Dre\Documents\GitHub\IndieSIS-ImAged\ImAged\obj\Debug\MVVM\View\FileView.baml

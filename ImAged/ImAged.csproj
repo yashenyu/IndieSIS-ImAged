@@ -98,9 +98,13 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="MVVM\ViewModel\ConvertViewModel.cs" />
+    <Compile Include="MVVM\ViewModel\FileViewModel.cs" />
     <Compile Include="MVVM\ViewModel\SettingsViewModel.cs" />
     <Compile Include="MVVM\View\ConvertView.xaml.cs">
       <DependentUpon>ConvertView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MVVM\View\FileView.xaml.cs">
+      <DependentUpon>FileView.xaml</DependentUpon>
     </Compile>
     <Compile Include="MVVM\View\SettingsView.xaml.cs">
       <DependentUpon>SettingsView.xaml</DependentUpon>
@@ -122,6 +126,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="MVVM\View\ConvertView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MVVM\View\FileView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace ImAged.MVVM.View
 {
     /// <summary>
-    /// Interaction logic for FilesView.xaml
+    /// Interaction logic for FileView.xaml
     /// </summary>
-    public partial class FilesView : UserControl
+    public partial class FileView : UserControl
     {
-        public FilesView()
+        public FileView()
         {
             InitializeComponent();
         }
