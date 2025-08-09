@@ -12,15 +12,18 @@ namespace ImAged.MVVM.ViewModel
     {
         public RelayCommand HomeViewCommand { get; set; } // HOME
         public RelayCommand ViewViewCommand { get; set; } // FAVORITES
-        public RelayCommand SettingsViewCommand { get; set; } // SETTINGS
+        public RelayCommand FileViewCommand { get; set; } // ALL FILES
         public RelayCommand ConvertViewCommand { get; set; } // TOOLS / CONVERTER
+        public RelayCommand SettingsViewCommand { get; set; } // SETTINGS
+
         public RelayCommand CloseCommand { get; set; }
         public RelayCommand MinimizeCommand { get; set; }
 
         public HomeViewModel HomeVm  { get; set; }
         public ViewViewModel ViewVm { get; set; }
-        public SettingsViewModel SettingVm { get; set; }
+        public FileViewModel FileVm { get; set; }
         public ConvertViewModel ConvertVm { get; set; }
+        public SettingsViewModel SettingVm { get; set; }
 
         private object _currentView;
 
@@ -40,6 +43,7 @@ namespace ImAged.MVVM.ViewModel
             ViewVm = new ViewViewModel();
             SettingVm = new SettingsViewModel();
             ConvertVm = new ConvertViewModel();
+            FileVm = new FileViewModel();
 
             CurrentView = HomeVm;
 
@@ -52,15 +56,20 @@ namespace ImAged.MVVM.ViewModel
             {
                 CurrentView = ViewVm;
             });
-
-            SettingsViewCommand = new RelayCommand(o =>
+            
+            FileViewCommand = new RelayCommand(o =>
             {
-                CurrentView = SettingVm;
+                CurrentView = FileVm;
             });
 
             ConvertViewCommand = new RelayCommand(o =>
             {
                 CurrentView = ConvertVm;
+            });
+
+            SettingsViewCommand = new RelayCommand(o =>
+            {
+                CurrentView = SettingVm;
             });
 
             CloseCommand = new RelayCommand(o =>
