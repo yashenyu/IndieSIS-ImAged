@@ -21,14 +21,19 @@
             <DataTemplate DataType="{x:Type viewModel:ViewViewModel}">
                 <view:ViewView/>
             </DataTemplate>
-
-            <DataTemplate DataType="{x:Type viewModel:SettingsViewModel}">
-                <view:SettingsView/>
+            
+             <DataTemplate DataType="{x:Type viewModel:FileViewModel}">
+                <view:FileView/>
             </DataTemplate>
-
+             
             <DataTemplate DataType="{x:Type viewModel:ConvertViewModel}">
                 <view:ConvertView/>
             </DataTemplate>
+            
+             <DataTemplate DataType="{x:Type viewModel:SettingsViewModel}">
+                <view:SettingsView/>
+            </DataTemplate>
+
 
 
         </ResourceDictionary>
