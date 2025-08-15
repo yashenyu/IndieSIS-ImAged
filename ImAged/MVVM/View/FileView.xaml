@@ -17,7 +17,7 @@
                  Width="250" 
                  Height="50" HorizontalAlignment="Left" 
                  VerticalAlignment="Top" 
-                 Margin="15,0,0,0"
+                 Margin="5,0,0,0"
                  Style="{StaticResource ModernTextbox}"/>
 
         <Button Background="{x:Null}" Grid.Column="0" Width="60" Height="45" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,0,195,0" BorderBrush="{x:Null}">
@@ -27,11 +27,22 @@
         </Button>
 
         <!--LEFT SIDE CONTENT-->
-        <StackPanel Grid.Column="0">
-            
-        </StackPanel>
-        
-        
+        <DataGrid AutoGenerateColumns="False"
+          HeadersVisibility="Column"
+          CanUserAddRows="False"
+          CanUserDeleteRows="False"
+          IsReadOnly="True"
+          Margin="10,60,10,13" Background="#FF131313" BorderBrush="#FF0C0C0C" Foreground="Black">
+
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="File Name" Binding="{Binding FileName}" Width="*" Foreground="Black"/>
+                <DataGridTextColumn Header="Type" Binding="{Binding FileType}" Width="100"/>
+                <DataGridTextColumn Header="Size" Binding="{Binding FileSize}" Width="100"/>
+                <DataGridTextColumn Header="Modified" Binding="{Binding ModifiedDate}" Width="150"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+
 
         <!--RIGHT SIDE CONTENT-->
         <StackPanel Grid.Column="2" Background="#FF232323">
