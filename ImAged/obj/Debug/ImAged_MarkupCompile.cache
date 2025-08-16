@@ -4,17 +4,17 @@
 winexe
 C#
 .cs
-C:\Users\Dre\Documents\GitHub\IndieSIS-ImAged\ImAged\obj\Debug\
+C:\Users\Mark\Desktop\IndieSIS-ImAged\ImAged\obj\Debug\
 ImAged
 none
 false
 DEBUG;TRACE
-C:\Users\Dre\Documents\GitHub\IndieSIS-ImAged\ImAged\App.xaml
-1050688436
-5734118977
-201189626524
-291895317047
-MainWindow.xaml;MVVM\View\ConvertView.xaml;MVVM\View\FileView.xaml;MVVM\View\HomeView.xaml;MVVM\View\SettingsView.xaml;MVVM\View\ViewView.xaml;Theme\FilesExpanderTheme.xaml;Theme\MenuButtonTheme.xaml;Theme\WindowControlsTheme.xaml;Theme\TextboxTheme.xaml;
+C:\Users\Mark\Desktop\IndieSIS-ImAged\ImAged\App.xaml
+13-902118024
+81926126028
+191683321748
+311338577313
+MainWindow.xaml;MVVM\View\ConvertView.xaml;MVVM\View\FileView.xaml;MVVM\View\HomeView.xaml;MVVM\View\SettingsView.xaml;MVVM\View\ViewView.xaml;Theme\ScrollBars.xaml;Theme\DateHeaders.xaml;Theme\ImageTiles.xaml;Theme\FilesExpanderTheme.xaml;Theme\MenuButtonTheme.xaml;Theme\WindowControlsTheme.xaml;Theme\TextboxTheme.xaml;
 
 False
 

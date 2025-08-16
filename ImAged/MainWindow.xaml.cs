@@ -15,19 +15,11 @@ using System.Windows.Shapes;
 
 namespace ImAged
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
         public MainWindow()
         {
             InitializeComponent();
-            RunSecureTest(); //test command for to check if integration works, check the output, should say Command executed succesfully...
-        }
-
-        private async void RunSecureTest() {
-            await TestSecureCommunication.TestBasicCommunication();
         }
     }
 }

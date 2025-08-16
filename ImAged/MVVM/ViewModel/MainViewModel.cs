@@ -1,10 +1,11 @@
-﻿using System;
+﻿using ImAged.Core;
+using ImAged.Services;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using ImAged.Core;
 
 namespace ImAged.MVVM.ViewModel
 { 
@@ -33,13 +34,15 @@ namespace ImAged.MVVM.ViewModel
             set 
             { 
                 _currentView = value;
-                onPropertyChanged();
+                OnPropertyChanged();
             }
         }
 
         public MainViewModel()
         {
-            HomeVm = new HomeViewModel();
+            var secureProcessManager = new SecureProcessManager();
+
+            HomeVm = new HomeViewModel(secureProcessManager);
             ViewVm = new ViewViewModel();
             SettingVm = new SettingsViewModel();
             ConvertVm = new ConvertViewModel();
@@ -83,6 +86,20 @@ namespace ImAged.MVVM.ViewModel
                 if (o is Window window)
                     window.WindowState = WindowState.Minimized;
             });
+
+            InitializeSecureBackendAsync(secureProcessManager);
+        }
+
+        private async void InitializeSecureBackendAsync(SecureProcessManager secureProcessManager)
+        {
+            try
+            {
+                await secureProcessManager.InitializeAsync();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to initialize secure backend: {ex.Message}");
+            }
         }
     }
 }

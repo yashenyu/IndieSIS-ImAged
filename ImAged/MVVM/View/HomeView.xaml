@@ -7,112 +7,70 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" 
              d:DesignWidth="800">
-    
-    <StackPanel>
-        <TextBlock Text="Recent"
-                   Foreground="White"
-                   FontSize="28"
-                   HorizontalAlignment="Left"
-                   Margin="0,0,0,20"/>
-        
-        <StackPanel Orientation="Horizontal"
-                    Margin="0,0,0,10">
-            
-            <Border Width="400"
-                    Height="200">
 
-                <Border.Background>
-                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,2">
-                        <GradientStop Color="#5bc3ff" Offset="0.0"/>
-                        <GradientStop Color="#3aa0ff" Offset="1"/>
-                    </LinearGradientBrush>
-                </Border.Background>
-
-                <Border.Clip>
-                    <RectangleGeometry RadiusX="10"
-                                       RadiusY="10"
-                                       Rect="0,0,400,200"/>
-                </Border.Clip>
-
-                <Grid>
-                    <StackPanel>
-                        <TextBlock Text="Image Name"
-                                   Foreground="White"
-                                   FontSize="28"
-                                   Margin="20,10,10,0"/>
-
-                        <TextBlock Text="06/07/2025"
-                                   Foreground="White"
-                                   FontSize="18"
-                                   Margin="20,10,10,0"/>
-                    </StackPanel>
-                </Grid>
-            </Border>
-            
-            <Border Width="200"
-                    Height="200"
-                    CornerRadius="10"
-                    Margin="45,0,0,0">
-
-                <Grid>
-                    <StackPanel>
-                        <TextBlock Text="Image Name"
-                   Foreground="White"
-                   FontSize="28"
-                   Margin="20,10,10,0"/>
-
-                        <TextBlock Text="06/07/2025"
-                   Foreground="White"
-                   FontSize="18"
-                   Margin="20,10,10,0"/>
-                    </StackPanel>
-                </Grid>
-
-                <Border.Background>
-                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,2">
-                        <GradientStop Color="#ffb3b3" Offset="0.0"/>
-                        <GradientStop Color="#ff8080" Offset="1"/>
-                    </LinearGradientBrush>
-                </Border.Background>
-                
-            </Border>
-        </StackPanel>
+    <ScrollViewer 
+                   VerticalScrollBarVisibility="Auto" 
+                   HorizontalScrollBarVisibility="Disabled">
 
         <StackPanel>
-            <StackPanel.Resources>
-                <Style TargetType="{x:Type Border}">
-                    <Setter Property="Margin" Value="15,0,0,0"/>
-                </Style>
-            </StackPanel.Resources>
-            
-            <TextBlock Text="Yesterday"
-                       Foreground="White"
-                       FontSize="20"
-                       HorizontalAlignment="Left"
-                       Margin="0,0,0,10"/>
+            <!-- Date Groups -->
+            <ItemsControl ItemsSource="{Binding DateGroups}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Style="{StaticResource DateHeaderContainerStyle}">
+                            <!-- Date Header -->
+                            <TextBlock Text="{Binding DisplayDate}" 
+                                       Style="{StaticResource DateHeaderTextStyle}"/>
 
-            <StackPanel Orientation="Horizontal">
-                <Border Width="150"
-                        Height="150"
-                        Background="#844eff"
-                        CornerRadius="10"
-                        Margin="0"/>
+                            <!-- Images Grid (4 columns) -->
+                            <ItemsControl ItemsSource="{Binding Files}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel Orientation="Horizontal"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
 
-                <Border Width="150"
-                        Height="150"
-                        Background="#4e99ff"
-                        CornerRadius="10"/>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Style="{StaticResource ImageTileHoverStyle}"
+                                                MouseLeftButtonDown="Border_MouseLeftButtonDown">
 
-                <Border Width="150"
-                        Height="150"
-                        Background="#4eff91"
-                        CornerRadius="10"/>
-                <Border Width="150"
-                        Height="150"
-                        Background="#ecff4e"
-                        CornerRadius="10"/>        
+                                            <!-- Set the image as the border background -->
+                                            <Border.Background>
+                                                <ImageBrush ImageSource="{Binding Thumbnail}" 
+                                                           Stretch="UniformToFill" 
+                                                           RenderOptions.BitmapScalingMode="HighQuality"/>
+                                            </Border.Background>
 
-            </StackPanel>
+                                            <!-- Overlays on top of the background image -->
+                                            <Grid>
+                                                <!-- Loading Overlay -->
+                                                <Border Style="{StaticResource LoadingOverlayStyle}">
+                                                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                                        <ProgressBar Style="{StaticResource LoadingProgressBarStyle}"/>
+                                                        <TextBlock Text="Loading..." 
+                                                                   Style="{StaticResource LoadingTextStyle}"/>
+                                                    </StackPanel>
+                                                </Border>
+
+                                                <!-- File Info Overlay -->
+                                                <Border Style="{StaticResource FileInfoOverlayStyle}">
+                                                    <StackPanel>
+                                                        <TextBlock Text="{Binding FileName}" 
+                                                                   Style="{StaticResource FileNameTextStyle}"/>
+                                                        <TextBlock Text="{Binding LastModified, StringFormat='{}{0:MM/dd/yyyy HH:mm}'}" 
+                                                                   Style="{StaticResource FileDateTextStyle}"/>
+                                                    </StackPanel>
+                                                </Border>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
         </StackPanel>
-    </StackPanel>
+    </ScrollViewer>
 </UserControl>

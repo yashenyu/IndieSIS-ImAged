@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ImAged.MVVM.ViewModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,14 +16,20 @@ using System.Windows.Shapes;
 
 namespace ImAged.MVVM.View
 {
-    /// <summary>
-    /// Interaction logic for HomeView.xaml
-    /// </summary>
     public partial class HomeView : UserControl
     {
         public HomeView()
         {
             InitializeComponent();
+        }
+
+        private void Border_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is Border border && border.DataContext is TtlFileInfo fileInfo)
+            {
+                var viewModel = DataContext as HomeViewModel;
+                viewModel?.OpenTtlFileCommand.Execute(fileInfo);
+            }
         }
     }
 }

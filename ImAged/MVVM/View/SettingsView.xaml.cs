@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Forms; 
-using System.IO;            // For saving path if needed
+using System.IO;
 using Forms = System.Windows.Forms;
 
 namespace ImAged.MVVM.View

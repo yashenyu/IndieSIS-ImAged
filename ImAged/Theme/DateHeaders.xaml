@@ -1,0 +1,63 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Date Header Container Style -->
+    <Style x:Key="DateHeaderContainerStyle" TargetType="StackPanel">
+        <Setter Property="Margin" Value="0,0,0,20"/>
+    </Style>
+
+    <!-- Date Header Text Style -->
+    <Style x:Key="DateHeaderTextStyle" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="#D4D4D4"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Margin" Value="0,0,0,10"/>
+        <Setter Property="FontFamily" Value="pack://application:,,,/ImAged;component/Fonts/#Poppins SemiBold"/>
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="Effect">
+            <Setter.Value>
+                <DropShadowEffect Color="#252525" 
+                                Direction="270" 
+                                ShadowDepth="1" 
+                                Opacity="0.5" 
+                                BlurRadius="2"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Date Header with Background Style -->
+    <Style x:Key="DateHeaderWithBackgroundStyle" TargetType="Border">
+        <Setter Property="Background" Value="#2D2D2D"/>
+        <Setter Property="Padding" Value="12,8"/>
+        <Setter Property="CornerRadius" Value="6"/>
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="Margin" Value="0,0,0,15"/>
+    </Style>
+
+    <!-- Date Header with Icon Style -->
+    <Style x:Key="DateHeaderWithIconStyle" TargetType="StackPanel">
+        <Setter Property="Orientation" Value="Horizontal"/>
+        <Setter Property="Margin" Value="0,0,0,15"/>
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+
+    <!-- Date Header Icon Style -->
+    <Style x:Key="DateHeaderIconStyle" TargetType="TextBlock">
+        <Setter Property="Text" Value="��"/>
+        <Setter Property="FontSize" Value="20"/>
+        <Setter Property="Margin" Value="0,0,8,0"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+
+    <!-- Date Header Separator Style -->
+    <Style x:Key="DateHeaderSeparatorStyle" TargetType="Rectangle">
+        <Setter Property="Height" Value="2"/>
+        <Setter Property="Fill" Value="#4CAF50"/>
+        <Setter Property="Margin" Value="0,0,0,15"/>
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="RadiusX" Value="1"/>
+        <Setter Property="RadiusY" Value="1"/>
+    </Style>
+
+</ResourceDictionary>

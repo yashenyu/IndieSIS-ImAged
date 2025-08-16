@@ -4,7 +4,7 @@ import threading
 import time
 import logging
 from typing import Optional, Tuple
-from PIL import Image
+from PIL import Image, ImageOps
 import io
 from aes_gcm import AES_GCM 
 
@@ -104,6 +104,106 @@ class SecureImageService:
             logging.error(error_message)
             print(error_message)
             return None
+            
+    def render_ttl_thumbnail_secure(self, ttl_path: str, max_size: int = 128) -> Optional[bytes]:
+        """
+        Render optimized TTL thumbnail with memory-efficient processing.
+        
+        Args:
+            ttl_path: Path to TTL file for thumbnail generation
+            max_size: Maximum dimension for thumbnail
+            
+        Returns:
+            Optimized thumbnail bytes, or None if processing fails
+        """
+        session_id = f"thumb_{hash(ttl_path)}_{int(time.time())}"
+        
+        total_start = time.time()
+        print(f"Starting secure TTL thumbnail generation")
+        logging.info(f"Starting secure TTL thumbnail generation")
+        
+        try:
+            # Load encrypted TTL file into memory
+            step_start = time.time()
+            encrypted_bytes = self._load_encrypted_ttl(ttl_path)
+            self._log_timing("Load encrypted TTL", step_start, len(encrypted_bytes))
+            
+            # Execute just-in-time decryption
+            step_start = time.time()
+            decrypted_bytes = self._decrypt_just_in_time_memory_only(encrypted_bytes)
+            self._log_timing("Decrypt TTL", step_start, len(decrypted_bytes))
+            
+            # Create optimized thumbnail
+            step_start = time.time()
+            thumbnail_bytes = self._create_optimized_thumbnail(decrypted_bytes, max_size)
+            self._log_timing("Create thumbnail", step_start, len(thumbnail_bytes))
+            
+            # Setup cleanup timer
+            step_start = time.time()
+            cleanup_timer = threading.Timer(
+                10,  # Shorter timeout for thumbnails
+                self._secure_cleanup_session, 
+                args=[session_id, decrypted_bytes]
+            )
+            cleanup_timer.start()
+            self._log_timing("Setup cleanup timer", step_start)
+            
+            # Track session
+            step_start = time.time()
+            with self._cleanup_lock:
+                self._active_sessions[session_id] = {
+                    'encrypted_bytes': encrypted_bytes,
+                    'timer': cleanup_timer,
+                    'created': time.time(),
+                    'ttl_path': ttl_path
+                }
+            self._log_timing("Track session", step_start)
+            
+            total_elapsed = time.time() - total_start
+            completion_message = f"Secure TTL thumbnail generation completed in {total_elapsed:.3f}s"
+            logging.info(completion_message)
+            print(completion_message)
+            
+            return thumbnail_bytes
+            
+        except Exception as e:
+            total_elapsed = time.time() - total_start
+            error_message = f"Secure TTL thumbnail generation failed after {total_elapsed:.3f}s: {e}"
+            logging.error(error_message)
+            print(error_message)
+            return None
+
+    def _create_optimized_thumbnail(self, image_bytes: bytes, max_size: int) -> bytes:
+        """
+        Create memory-efficient thumbnail from image bytes.
+        
+        Args:
+            image_bytes: Raw image bytes
+            max_size: Maximum dimension for thumbnail
+            
+        Returns:
+            Optimized thumbnail bytes
+        """
+        try:
+            # Load image from bytes
+            with Image.open(io.BytesIO(image_bytes)) as img:
+                # Convert to RGB if necessary
+                if img.mode in ('RGBA', 'LA', 'P'):
+                    img = img.convert('RGB')
+                
+                # Create thumbnail with memory optimization
+                img.thumbnail((max_size, max_size), Image.Resampling.LANCZOS)
+                
+                # Convert to optimized format
+                output = io.BytesIO()
+                img.save(output, format='JPEG', quality=85, optimize=True)
+                output.seek(0)
+                
+                return output.getvalue()
+                
+        except Exception as e:
+            logging.error(f"Error creating thumbnail: {e}")
+            raise
     
     def _load_encrypted_ttl(self, ttl_path: str) -> bytes:
         """
