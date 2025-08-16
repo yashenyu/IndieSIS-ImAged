@@ -1,118 +1,284 @@
 ﻿<UserControl x:Class="ImAged.MVVM.View.HomeView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:ImAged.MVVM.View"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" 
-             d:DesignWidth="800">
-    
-    <StackPanel>
-        <TextBlock Text="Recent"
-                   Foreground="White"
-                   FontSize="28"
-                   HorizontalAlignment="Left"
-                   Margin="0,0,0,20"/>
-        
-        <StackPanel Orientation="Horizontal"
-                    Margin="0,0,0,10">
-            
-            <Border Width="400"
-                    Height="200">
+             Background="#121212">
 
-                <Border.Background>
-                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,2">
-                        <GradientStop Color="#5bc3ff" Offset="0.0"/>
-                        <GradientStop Color="#3aa0ff" Offset="1"/>
-                    </LinearGradientBrush>
-                </Border.Background>
+    <UserControl.Resources>
+        <Style x:Key="FolderCardStyle"
+               TargetType="Border">
+            <Setter Property="Width"
+                    Value="205"/>
+            <Setter Property="Height"
+                    Value="190"/>
+            <Setter Property="CornerRadius"
+                    Value="16"/>
+            <Setter Property="Margin"
+                    Value="12"/>
+            <Setter Property="Background"
+                    Value="#35FFFFFF"/>
+            <Setter Property="Padding"
+                    Value="0"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect BlurRadius="20"
+                                      ShadowDepth="4"
+                                      Color="#66000000"
+                                      Opacity="0.6"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
 
-                <Border.Clip>
-                    <RectangleGeometry RadiusX="10"
-                                       RadiusY="10"
-                                       Rect="0,0,400,200"/>
-                </Border.Clip>
 
-                <Grid>
-                    <StackPanel>
-                        <TextBlock Text="Image Name"
-                                   Foreground="White"
-                                   FontSize="28"
-                                   Margin="20,10,10,0"/>
+        <Style x:Key="HeaderIconButton"
+               TargetType="Button">
+            <Setter Property="Width"
+                    Value="100"/>
+            <Setter Property="Height"
+                    Value="100"/>
+            <Setter Property="Foreground"
+                    Value="White"/>
+            <Setter Property="FontWeight"
+                    Value="SemiBold"/>
+            <Setter Property="FontSize"
+                    Value="14"/>
+            <Setter Property="Background"
+                    Value="#40FFFFFF"/>
+            <Setter Property="BorderThickness"
+                    Value="1"/>
+            <Setter Property="BorderBrush"
+                    Value="#80FFFFFF"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid>
+                            <Border x:Name="brd"
+                                    CornerRadius="12"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}">
+                                <Border.Effect>
+                                    <DropShadowEffect BlurRadius="12"
+                                                      ShadowDepth="0"
+                                                      Color="#55000000"
+                                                      Opacity="0.4"/>
+                                </Border.Effect>
+                            </Border>
+                            <StackPanel HorizontalAlignment="Center"
+                                        VerticalAlignment="Center">
+                                <TextBlock Text="{TemplateBinding Tag}"
+                                           FontSize="30"
+                                           Margin="0,0,0,4"
+                                           HorizontalAlignment="Center"/>
+                                <ContentPresenter HorizontalAlignment="Center"/>
+                            </StackPanel>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver"
+                                     Value="True">
+                                <Setter TargetName="brd"
+                                        Property="Background"
+                                        Value="#60FFFFFF"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed"
+                                     Value="True">
+                                <Setter TargetName="brd"
+                                        Property="Background"
+                                        Value="#80FFFFFF"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
 
-                        <TextBlock Text="06/07/2025"
-                                   Foreground="White"
-                                   FontSize="18"
-                                   Margin="20,10,10,0"/>
-                    </StackPanel>
-                </Grid>
-            </Border>
-            
-            <Border Width="200"
-                    Height="200"
-                    CornerRadius="10"
-                    Margin="45,0,0,0">
+    <Grid Margin="32">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-                <Grid>
-                    <StackPanel>
-                        <TextBlock Text="Image Name"
-                   Foreground="White"
-                   FontSize="28"
-                   Margin="20,10,10,0"/>
 
-                        <TextBlock Text="06/07/2025"
-                   Foreground="White"
-                   FontSize="18"
-                   Margin="20,10,10,0"/>
-                    </StackPanel>
-                </Grid>
-
-                <Border.Background>
-                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,2">
-                        <GradientStop Color="#ffb3b3" Offset="0.0"/>
-                        <GradientStop Color="#ff8080" Offset="1"/>
-                    </LinearGradientBrush>
-                </Border.Background>
-                
-            </Border>
+        <StackPanel Grid.Row="0"
+                    Orientation="Horizontal"
+                    Margin="0,0,0,24">
+            <Button Style="{StaticResource HeaderIconButton}"
+                    Content="New document"
+                    Tag="➕"
+                    Margin="0,0,16,0"
+                    Width="346"/>
+            <Button Style="{StaticResource HeaderIconButton}"
+                    Content="New project"
+                    Tag="📁"
+                    Margin="0,0,16,0"
+                    Width="318"/>
+            <Button Style="{StaticResource HeaderIconButton}"
+                    Content="Manage permissions"
+                    Tag="🔑"
+                    Margin="0,0,16,0"
+                    Width="312"/>
+            <Button Style="{StaticResource HeaderIconButton}"
+                    Content="Send file"
+                    Tag="📤"
+                    Width="337"/>
         </StackPanel>
 
-        <StackPanel>
-            <StackPanel.Resources>
-                <Style TargetType="{x:Type Border}">
-                    <Setter Property="Margin" Value="15,0,0,0"/>
-                </Style>
-            </StackPanel.Resources>
-            
-            <TextBlock Text="Yesterday"
-                       Foreground="White"
-                       FontSize="20"
-                       HorizontalAlignment="Left"
-                       Margin="0,0,0,10"/>
 
-            <StackPanel Orientation="Horizontal">
-                <Border Width="150"
-                        Height="150"
-                        Background="#844eff"
-                        CornerRadius="10"
-                        Margin="0"/>
+        <TextBlock Grid.Row="1"
+                   Text="All folders"
+                   Foreground="White"
+                   FontSize="22"
+                   FontWeight="SemiBold"
+                   Margin="0,0,0,12"/>
 
-                <Border Width="150"
-                        Height="150"
-                        Background="#4e99ff"
-                        CornerRadius="10"/>
 
-                <Border Width="150"
-                        Height="150"
-                        Background="#4eff91"
-                        CornerRadius="10"/>
-                <Border Width="150"
-                        Height="150"
-                        Background="#ecff4e"
-                        CornerRadius="10"/>        
-
-            </StackPanel>
+        <StackPanel Grid.Row="2"
+                    Orientation="Horizontal"
+                    Margin="0,0,0,16">
+            <Button Content="Recent"
+                    Width="100"
+                    Height="36"
+                    Margin="0,0,12,0"/>
+            <Button Content="Shared"
+                    Width="100"
+                    Height="36"
+                    Margin="0,0,12,0"/>
+            <Button Content="Archived"
+                    Width="100"
+                    Height="36"/>
         </StackPanel>
-    </StackPanel>
+
+        <ScrollViewer Grid.Row="3"
+                      HorizontalScrollBarVisibility="Disabled">
+            <WrapPanel>
+                <Border Style="{StaticResource FolderCardStyle}">
+                    <Grid>
+                        <Ellipse Width="30"
+                                 Height="30"
+                                 Fill="#55FFFFFF"
+                                 HorizontalAlignment="Right"
+                                 VerticalAlignment="Top"
+                                 Margin="8"/>
+                        <StackPanel VerticalAlignment="Bottom"
+                                    Margin="12">
+                            <TextBlock Text="Family Pictures"
+                                       Foreground="White"
+                                       FontWeight="SemiBold"
+                                       FontSize="16"/>
+                            <TextBlock Text="16 images · 92 MB"
+                                       Foreground="#DDDDDD"
+                                       FontSize="12"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <Border Style="{StaticResource FolderCardStyle}">
+                    <Grid>
+                        <Ellipse Width="30"
+                                 Height="30"
+                                 Fill="#55FFFFFF"
+                                 HorizontalAlignment="Right"
+                                 VerticalAlignment="Top"
+                                 Margin="8"/>
+                        <StackPanel VerticalAlignment="Bottom"
+                                    Margin="12">
+                            <TextBlock Text="Art"
+                                       Foreground="White"
+                                       FontWeight="SemiBold"
+                                       FontSize="16"/>
+                            <TextBlock Text="42 images · 140 MB"
+                                       Foreground="#DDDDDD"
+                                       FontSize="12"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <Border Style="{StaticResource FolderCardStyle}">
+                    <Grid>
+                        <Ellipse Width="30"
+                                 Height="30"
+                                 Fill="#55FFFFFF"
+                                 HorizontalAlignment="Right"
+                                 VerticalAlignment="Top"
+                                 Margin="8"/>
+                        <StackPanel VerticalAlignment="Bottom"
+                                    Margin="12">
+                            <TextBlock Text="Team Photos"
+                                       Foreground="White"
+                                       FontWeight="SemiBold"
+                                       FontSize="16"/>
+                            <TextBlock Text="23 images · 76 MB"
+                                       Foreground="#DDDDDD"
+                                       FontSize="12"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <Border Style="{StaticResource FolderCardStyle}">
+                    <Grid>
+                        <Ellipse Width="30"
+                                 Height="30"
+                                 Fill="#55FFFFFF"
+                                 HorizontalAlignment="Right"
+                                 VerticalAlignment="Top"
+                                 Margin="8"/>
+                        <StackPanel VerticalAlignment="Bottom"
+                                    Margin="12">
+                            <TextBlock Text="Account Information"
+                                       Foreground="White"
+                                       FontWeight="SemiBold"
+                                       FontSize="14"/>
+                            <TextBlock Text="11 files · 18 MB"
+                                       Foreground="#DDDDDD"
+                                       FontSize="12"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <Border Style="{StaticResource FolderCardStyle}">
+                    <Grid>
+                        <Ellipse Width="30"
+                                 Height="30"
+                                 Fill="#55FFFFFF"
+                                 HorizontalAlignment="Right"
+                                 VerticalAlignment="Top"
+                                 Margin="8"/>
+                        <StackPanel VerticalAlignment="Bottom"
+                                    Margin="12">
+                            <TextBlock Text="Design"
+                                       Foreground="White"
+                                       FontWeight="SemiBold"
+                                       FontSize="16"/>
+                            <TextBlock Text="34 images · 310 MB"
+                                       Foreground="#DDDDDD"
+                                       FontSize="12"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <Border Style="{StaticResource FolderCardStyle}">
+                    <Grid>
+                        <Ellipse Width="30"
+                                 Height="30"
+                                 Fill="#55FFFFFF"
+                                 HorizontalAlignment="Right"
+                                 VerticalAlignment="Top"
+                                 Margin="8"/>
+                        <StackPanel VerticalAlignment="Bottom"
+                                    Margin="12">
+                            <TextBlock Text="Presentations"
+                                       Foreground="White"
+                                       FontWeight="SemiBold"
+                                       FontSize="16"/>
+                            <TextBlock Text="8 files · 64 MB"
+                                       Foreground="#DDDDDD"
+                                       FontSize="12"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </WrapPanel>
+        </ScrollViewer>
+    </Grid>
 </UserControl>

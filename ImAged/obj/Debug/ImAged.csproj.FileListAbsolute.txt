@@ -146,3 +146,5 @@ C:\Users\Dre\Documents\GitHub\IndieSIS-ImAged\ImAged\obj\Debug\MVVM\View\Convert
 C:\Users\Dre\Documents\GitHub\IndieSIS-ImAged\ImAged\obj\Debug\MVVM\View\ConvertView.baml
 C:\Users\Dre\Documents\GitHub\IndieSIS-ImAged\ImAged\obj\Debug\MVVM\View\FileView.g.cs
 C:\Users\Dre\Documents\GitHub\IndieSIS-ImAged\ImAged\obj\Debug\MVVM\View\FileView.baml
+E:\IndieSIS-ImAged\ImAged\obj\Debug\ImAged.csproj.AssemblyReference.cache
+E:\IndieSIS-ImAged\ImAged\obj\Debug\ImAged.exe.config
