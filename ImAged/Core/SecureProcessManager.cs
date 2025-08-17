@@ -21,6 +21,8 @@ using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.OpenSsl;
 using Org.BouncyCastle.Security;
 using Org.BouncyCastle.Asn1.X509;
+using Newtonsoft.Json;
+
 
 namespace ImAged.Services
 {
@@ -174,7 +176,7 @@ namespace ImAged.Services
             await _ioLock.WaitAsync();
             try
             {
-                var commandJson = System.Text.Json.JsonSerializer.Serialize(command);
+                var commandJson = JsonConvert.SerializeObject(command);
                 var commandBytes = Encoding.UTF8.GetBytes(commandJson);
                 var encryptedCommand = EncryptData(commandBytes);
 
@@ -199,7 +201,7 @@ namespace ImAged.Services
 
                 System.Diagnostics.Debug.WriteLine($"Response JSON: {responseJson}");
 
-                return System.Text.Json.JsonSerializer.Deserialize<SecureResponse>(responseJson);
+                return JsonConvert.DeserializeObject<SecureResponse>(responseJson);
             }
             finally
             {
@@ -408,7 +410,7 @@ namespace ImAged.Services
             }
 
             var command = new SecureCommand("OPEN_TTL", parameters);
-            var commandJson = System.Text.Json.JsonSerializer.Serialize(command);
+            var commandJson = JsonConvert.SerializeObject(command);
             System.Diagnostics.Debug.WriteLine($"Command JSON: {commandJson}");
             
             var response = await SendCommandAsync(command);
@@ -467,7 +469,7 @@ namespace ImAged.Services
             };
 
             var command = new SecureCommand("OPEN_TTL", parameters);
-            var commandJson = System.Text.Json.JsonSerializer.Serialize(command);
+            var commandJson = JsonConvert.SerializeObject(command);
             var commandBytes = Encoding.UTF8.GetBytes(commandJson);
             var encryptedCommand = EncryptData(commandBytes);
             var payload = CreatePayload(encryptedCommand);
@@ -478,7 +480,8 @@ namespace ImAged.Services
             var metadataData = Convert.FromBase64String(metadataResponse);
             var decryptedMetadata = DecryptData(metadataData);
             var metadataJson = Encoding.UTF8.GetString(decryptedMetadata);
-            var metadata = System.Text.Json.JsonSerializer.Deserialize<StreamMetadata>(metadataJson);
+            var metadata = JsonConvert.DeserializeObject<StreamMetadata>(metadataJson);
+
 
             if (metadata.HasPayload)
             {
@@ -644,41 +647,6 @@ namespace ImAged.Services
             return bitmapImage;
         }
 
-        public async Task<string[]> BatchConvertImagesAsync(string[] imagePaths, int? expiryHours = null)
-        {
-            var parameters = new Dictionary<string, object>
-            {
-                { "input_paths", imagePaths }
-            };
-
-            if (expiryHours.HasValue)
-            {
-                var expiryTs = DateTimeOffset.UtcNow.AddHours(expiryHours.Value).ToUnixTimeSeconds();
-                parameters.Add("expiry_ts", expiryTs);
-            }
-
-            var command = new SecureCommand("BATCH_CONVERT", parameters);
-            var response = await SendCommandAsync(command);
-
-            if (response.Success)
-            {
-                if (response.Result is System.Text.Json.JsonElement jsonElement && jsonElement.ValueKind == System.Text.Json.JsonValueKind.Array)
-                {
-                    var paths = new List<string>();
-                    foreach (var item in jsonElement.EnumerateArray())
-                    {
-                        paths.Add(item.GetString());
-                    }
-                    return paths.ToArray();
-                }
-                return new string[0];
-            }
-            else
-            {
-                throw new Exception($"Batch conversion failed: {response.Error}");
-            }
-        }
-
 
         public async Task<Dictionary<string, object>> GetConfigurationAsync()
         {
@@ -687,10 +655,18 @@ namespace ImAged.Services
 
             if (response.Success)
             {
-                if (response.Result is System.Text.Json.JsonElement jsonElement)
+                if (response.Result != null)
                 {
-                    var configJson = jsonElement.GetRawText();
-                    return System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(configJson);
+                    try
+                    {
+                        var configJson = JsonConvert.SerializeObject(response.Result);
+                        return JsonConvert.DeserializeObject<Dictionary<string, object>>(configJson);
+                    }
+                    catch (JsonException ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"JSON deserialization error: {ex.Message}");
+                        return new Dictionary<string, object>();
+                    }
                 }
                 return new Dictionary<string, object>();
             }
@@ -731,40 +707,41 @@ namespace ImAged.Services
 
     public class SecureResponse
     {
-        [System.Text.Json.Serialization.JsonPropertyName("success")]
+        [JsonProperty("success")]
         public bool Success { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("result")]
+        [JsonProperty("result")]
         public object Result { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("error")]
+        [JsonProperty("error")]
         public string Error { get; set; }
     }
 
+
     public class StreamMetadata
     {
-        [System.Text.Json.Serialization.JsonPropertyName("success")]
+        [JsonProperty("success")]
         public bool Success { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("error")]
+        [JsonProperty("error")]
         public string Error { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("result")]
+        [JsonProperty("result")]
         public StreamResult Result { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("has_payload")]
+        [JsonProperty("has_payload")]
         public bool HasPayload { get; set; }
     }
 
     public class StreamResult
     {
-        [System.Text.Json.Serialization.JsonPropertyName("mime")]
+        [JsonProperty("mime")]
         public string Mime { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("size")]
+        [JsonProperty("size")]
         public int Size { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("fallback")]
+        [JsonProperty("fallback")]
         public bool Fallback { get; set; }
     }
 }
