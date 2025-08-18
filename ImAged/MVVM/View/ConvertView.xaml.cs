@@ -15,9 +15,7 @@ using System.Windows.Shapes;
 
 namespace ImAged.MVVM.View
 {
-    /// <summary>
-    /// Interaction logic for ConvertView.xaml
-    /// </summary>
+
     public partial class ConvertView : UserControl
     {
         public ConvertView()

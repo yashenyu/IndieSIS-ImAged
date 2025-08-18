@@ -25,7 +25,6 @@ class SecureBackend:
         logger.info("Secure backend initialized")
 
     def establish_secure_channel(self):
-        """Establish encrypted communication with C# frontend using RSA handshake"""
         try:
             self.private_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
             self.public_key = self.private_key.public_key()
@@ -60,7 +59,6 @@ class SecureBackend:
             sys.exit(1)
 
     def process_commands(self):
-        """Main command processing loop"""
         logger.info("Starting command processing loop")
 
         while True:
@@ -101,7 +99,6 @@ class SecureBackend:
                 sys.stdout.flush()
 
     def process_command(self, encrypted_payload):
-        """Process a single encrypted command"""
         try:
             cmd_length = struct.unpack('>I', encrypted_payload[:4])[0]
             encrypted_command = encrypted_payload[4:4+cmd_length]
@@ -138,7 +135,6 @@ class SecureBackend:
             }
 
     def handle_open_ttl(self, parameters):
-        """Handle TTL file opening command with memory optimization"""
         try:
             logger.info(f"Received parameters: {parameters}")
         
@@ -148,7 +144,7 @@ class SecureBackend:
         
             input_path = parameters.get('input_path')
             thumbnail_mode = parameters.get('thumbnail_mode', False)
-            max_size = parameters.get('max_size', 1024)  # Default max dimension
+            max_size = parameters.get('max_size', 1024)
             
             logger.info(f"Opening TTL file: {input_path} (thumbnail: {thumbnail_mode}, max_size: {max_size})")
         
@@ -156,19 +152,16 @@ class SecureBackend:
                 from secure_image_service import SecureImageService
                 service = SecureImageService()
             
-                # Get optimized image bytes
                 if thumbnail_mode:
                     payload_bytes = service.render_ttl_thumbnail_secure(input_path, max_size=max_size)
                 else:
                     payload_bytes = service.render_ttl_image_secure(input_path, max_display_time=30)
             
                 if payload_bytes:
-                    # Convert bytes to base64 string for JSON serialization
                     payload_base64 = base64.b64encode(payload_bytes).decode('utf-8')
                 
                     logger.info(f"Successfully converted {len(payload_bytes)} bytes to base64")
                     
-                    # Track memory usage
                     self._track_memory_usage(len(payload_bytes))
                     
                     return {"success": True, "error": None, "result": payload_base64}
@@ -188,35 +181,29 @@ class SecureBackend:
             return {"success": False, "error": str(e), "result": None}
 
     def _track_memory_usage(self, bytes_used):
-        """Track memory usage and trigger cleanup if needed"""
         try:
             import psutil
             process = psutil.Process()
             memory_mb = process.memory_info().rss / (1024 * 1024)
             
-            if memory_mb > 500:  # If memory usage exceeds 500MB
+            if memory_mb > 500: 
                 logger.warning(f"High memory usage detected: {memory_mb:.1f}MB, triggering cleanup")
                 self._force_memory_cleanup()
                 
         except ImportError:
-            # psutil not available, use basic cleanup
             self._force_memory_cleanup()
 
     def _force_memory_cleanup(self):
-        """Force memory cleanup when usage is high"""
         logger.info("Forcing memory cleanup")
         
-        # Clear any tracked objects
         self._memory_pool.clear()
         
-        # Force garbage collection
         for _ in range(3):
             gc.collect()
         
         logger.info("Memory cleanup completed")
 
     def handle_get_config(self, parameters):
-        """Handle get configuration command"""
         try:
             logger.info("Starting handle_get_config")
             from config import load_config
@@ -234,7 +221,6 @@ class SecureBackend:
 
 
     def handle_set_config(self, parameters):
-        """Handle set configuration command"""
         try:
             config_data = parameters.get('config')
             if not config_data:

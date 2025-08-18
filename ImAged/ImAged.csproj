@@ -11,7 +11,8 @@
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <LangVersion>latest</LangVersion>
     <FileAlignment>512</FileAlignment>
-    <ApplicationIcon>256.ico</ApplicationIcon>
+    <ApplicationIcon>
+    </ApplicationIcon>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -102,8 +103,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Content Include="pysrc\aes_gcm.py" />
-    <Content Include="pysrc\secure_image_service.py" />
     <Compile Include="Core\SecureProcessManager.cs" />
     <Compile Include="MVVM\ViewModel\ConvertViewModel.cs" />
     <Compile Include="MVVM\ViewModel\FileViewModel.cs" />
@@ -113,6 +112,9 @@
     </Compile>
     <Compile Include="MVVM\View\FileView.xaml.cs">
       <DependentUpon>FileView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MVVM\View\ImageViewWindow.xaml.cs">
+      <DependentUpon>ImageViewWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="MVVM\View\SettingsView.xaml.cs">
       <DependentUpon>SettingsView.xaml</DependentUpon>
@@ -138,6 +140,10 @@
     <Page Include="MVVM\View\FileView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MVVM\View\ImageViewWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="MVVM\View\HomeView.xaml">
       <SubType>Designer</SubType>
@@ -243,17 +249,20 @@
     <Resource Include="Images\32.ico" />
     <Resource Include="Images\48.ico" />
     <Resource Include="Images\64.ico" />
-    <Resource Include="256.ico" />
-    <Resource Include="128.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="MVVM\Model\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="pysrc\aes_gcm.py" />
     <Content Include="pysrc\config.py" />
     <Content Include="pysrc\crypto.py" />
     <Content Include="pysrc\file_manager.py" />
     <Content Include="pysrc\image_processor.py" />
+    <Content Include="pysrc\main.py" />
     <Content Include="pysrc\secure_backend.py" />
+    <Content Include="pysrc\secure_image_service.py" />
     <Content Include="pysrc\time_utils.py" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="MVVM\Model\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\CommunityToolkit.Mvvm.8.4.0\build\CommunityToolkit.Mvvm.targets" Condition="Exists('..\packages\CommunityToolkit.Mvvm.8.4.0\build\CommunityToolkit.Mvvm.targets')" />

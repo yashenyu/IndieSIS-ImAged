@@ -6,7 +6,8 @@
              xmlns:local="clr-namespace:ImAged.MVVM.View"
              mc:Ignorable="d" 
              d:DesignHeight="450" 
-             d:DesignWidth="800">
+             d:DesignWidth="800"
+             x:Name="Root">
 
     <ScrollViewer 
                    VerticalScrollBarVisibility="Auto" 
@@ -32,38 +33,41 @@
 
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <Border Style="{StaticResource ImageTileHoverStyle}"
-                                                MouseLeftButtonDown="Border_MouseLeftButtonDown">
+                                        <Button Command="{Binding DataContext.OpenTtlFileCommand,
+                                      ElementName=Root}"
+                                                CommandParameter="{Binding}"
+                                                Style="{StaticResource ImageButtonStyle}">
+                                            <Border Style="{StaticResource ImageTileHoverStyle}">
+                                                <!-- Set the image as the border background -->
+                                                <Border.Background>
+                                                    <ImageBrush ImageSource="{Binding Thumbnail}" 
+                                                               Stretch="UniformToFill" 
+                                                               RenderOptions.BitmapScalingMode="HighQuality"/>
+                                                </Border.Background>
 
-                                            <!-- Set the image as the border background -->
-                                            <Border.Background>
-                                                <ImageBrush ImageSource="{Binding Thumbnail}" 
-                                                           Stretch="UniformToFill" 
-                                                           RenderOptions.BitmapScalingMode="HighQuality"/>
-                                            </Border.Background>
+                                                <!-- Overlays on top of the background image -->
+                                                <Grid>
+                                                    <!-- Loading Overlay -->
+                                                    <Border Style="{StaticResource LoadingOverlayStyle}">
+                                                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                                            <ProgressBar Style="{StaticResource LoadingProgressBarStyle}"/>
+                                                            <TextBlock Text="Loading..." 
+                                                                       Style="{StaticResource LoadingTextStyle}"/>
+                                                        </StackPanel>
+                                                    </Border>
 
-                                            <!-- Overlays on top of the background image -->
-                                            <Grid>
-                                                <!-- Loading Overlay -->
-                                                <Border Style="{StaticResource LoadingOverlayStyle}">
-                                                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                                                        <ProgressBar Style="{StaticResource LoadingProgressBarStyle}"/>
-                                                        <TextBlock Text="Loading..." 
-                                                                   Style="{StaticResource LoadingTextStyle}"/>
-                                                    </StackPanel>
-                                                </Border>
-
-                                                <!-- File Info Overlay -->
-                                                <Border Style="{StaticResource FileInfoOverlayStyle}">
-                                                    <StackPanel>
-                                                        <TextBlock Text="{Binding FileName}" 
-                                                                   Style="{StaticResource FileNameTextStyle}"/>
-                                                        <TextBlock Text="{Binding LastModified, StringFormat='{}{0:MM/dd/yyyy HH:mm}'}" 
-                                                                   Style="{StaticResource FileDateTextStyle}"/>
-                                                    </StackPanel>
-                                                </Border>
-                                            </Grid>
-                                        </Border>
+                                                    <!-- File Info Overlay -->
+                                                    <Border Style="{StaticResource FileInfoOverlayStyle}">
+                                                        <StackPanel>
+                                                            <TextBlock Text="{Binding FileName}" 
+                                                                       Style="{StaticResource FileNameTextStyle}"/>
+                                                            <TextBlock Text="{Binding LastModified, StringFormat='{}{0:MM/dd/yyyy HH:mm}'}" 
+                                                                       Style="{StaticResource FileDateTextStyle}"/>
+                                                        </StackPanel>
+                                                    </Border>
+                                                </Grid>
+                                            </Border>
+                                        </Button>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>

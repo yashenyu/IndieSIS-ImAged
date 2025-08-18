@@ -6,9 +6,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media.Imaging;
 
 namespace ImAged.MVVM.ViewModel
-{ 
+{
     class MainViewModel : ObservableObject
     {
         public RelayCommand HomeViewCommand { get; set; } // HOME
@@ -20,7 +21,7 @@ namespace ImAged.MVVM.ViewModel
         public RelayCommand CloseCommand { get; set; }
         public RelayCommand MinimizeCommand { get; set; }
 
-        public HomeViewModel HomeVm  { get; set; }
+        public HomeViewModel HomeVm { get; set; }
         public ViewViewModel ViewVm { get; set; }
         public FileViewModel FileVm { get; set; }
         public ConvertViewModel ConvertVm { get; set; }
@@ -31,8 +32,8 @@ namespace ImAged.MVVM.ViewModel
         public object CurrentView
         {
             get { return _currentView; }
-            set 
-            { 
+            set
+            {
                 _currentView = value;
                 OnPropertyChanged();
             }
@@ -59,7 +60,7 @@ namespace ImAged.MVVM.ViewModel
             {
                 CurrentView = ViewVm;
             });
-            
+
             FileViewCommand = new RelayCommand(o =>
             {
                 CurrentView = FileVm;

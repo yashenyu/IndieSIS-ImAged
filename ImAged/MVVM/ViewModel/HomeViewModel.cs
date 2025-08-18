@@ -13,6 +13,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using ImAged.MVVM.View;
 
 
 namespace ImAged.MVVM.ViewModel
@@ -157,7 +158,7 @@ namespace ImAged.MVVM.ViewModel
         private readonly SecureProcessManager _secureProcessManager;
         private readonly List<string> _searchDirectories;
         private readonly List<FileSystemWatcher> _fileWatchers = new List<FileSystemWatcher>();
-        
+
         // Memory management
         private readonly SemaphoreSlim _thumbnailSemaphore = new SemaphoreSlim(2, 2); // Reduce to 2 concurrent
         private readonly Dictionary<string, SecureImageReference> _thumbnailCache = new Dictionary<string, SecureImageReference>();
@@ -166,7 +167,7 @@ namespace ImAged.MVVM.ViewModel
         private readonly DispatcherTimer _memoryCleanupTimer;
         private readonly int _maxCacheSize = 20;
         private readonly object _cacheLock = new object();
-        
+
         private BitmapSource _displayedImage;
         private bool _isDisposed = false;
         private int _totalImagesLoaded = 0;
@@ -188,7 +189,7 @@ namespace ImAged.MVVM.ViewModel
         public HomeViewModel(SecureProcessManager secureProcessManager)
         {
             _secureProcessManager = secureProcessManager;
-            
+
             // Initialize search directories
             _searchDirectories = new List<string>
             {
@@ -215,13 +216,13 @@ namespace ImAged.MVVM.ViewModel
         private void OnMemoryCleanupTimer(object sender, EventArgs e)
         {
             if (_isDisposed) return;
-            
+
             // More aggressive cleanup for security
             ForceSecureMemoryCleanup();
-            
+
             var process = System.Diagnostics.Process.GetCurrentProcess();
             var memoryMB = process.WorkingSet64 / (1024 * 1024);
-            
+
             if (memoryMB > 500) // Lower threshold for security
             {
                 System.Diagnostics.Debug.WriteLine($"High memory usage detected: {memoryMB}MB, forcing secure cleanup");
@@ -232,7 +233,7 @@ namespace ImAged.MVVM.ViewModel
         private void ForceSecureMemoryCleanup()
         {
             System.Diagnostics.Debug.WriteLine("Forcing secure memory cleanup");
-            
+
             // Securely dispose all cached images
             lock (_cacheLock)
             {
@@ -242,7 +243,7 @@ namespace ImAged.MVVM.ViewModel
                 }
                 _thumbnailCache.Clear();
             }
-            
+
             lock (_imagesLock)
             {
                 foreach (var secureRef in _activeImages)
@@ -251,12 +252,12 @@ namespace ImAged.MVVM.ViewModel
                 }
                 _activeImages.Clear();
             }
-            
+
             // Force immediate cleanup
             GC.Collect();
             GC.WaitForPendingFinalizers();
             GC.Collect();
-            
+
             System.Diagnostics.Debug.WriteLine("Secure memory cleanup completed");
         }
 
@@ -377,7 +378,7 @@ namespace ImAged.MVVM.ViewModel
                 });
 
                 await _thumbnailSemaphore.WaitAsync();
-                
+
                 try
                 {
                     if (_isDisposed) return;
@@ -389,7 +390,7 @@ namespace ImAged.MVVM.ViewModel
                     {
                         // Create secure reference with short timeout
                         var secureRef = new SecureImageReference(thumbnail, null, 15); // 15 second timeout
-                        
+
                         lock (_cacheLock)
                         {
                             if (_thumbnailCache.Count >= _maxCacheSize)
@@ -435,21 +436,20 @@ namespace ImAged.MVVM.ViewModel
         {
             if (parameter is TtlFileInfo fileInfo)
             {
+                System.Diagnostics.Debug.WriteLine("OpenTtlFileAsync called for: " + fileInfo.FilePath);
                 try
                 {
-                    // Load full image only when needed
-                    var bitmapSource = await _secureProcessManager.OpenTtlFileAsync(fileInfo.FilePath);
+                    var bitmapSource = await _secureProcessManager.OpenTtlFileAsync(
+                       fileInfo.FilePath, thumbnailMode: false);
 
-                    // Track the image for cleanup
-                    lock (_imagesLock)
+                    if (bitmapSource != null)
                     {
-                        _activeImages.Add(new SecureImageReference(bitmapSource, null));
+                        await Application.Current.Dispatcher.InvokeAsync(() =>
+                        {
+                            var win = new ImageViewWindow(bitmapSource, fileInfo.FilePath);   // pass path
+                            win.Show();
+                        });
                     }
-
-                    await Application.Current.Dispatcher.InvokeAsync(() =>
-                    {
-                        DisplayedImage = bitmapSource;
-                    });
                 }
                 catch (Exception ex)
                 {
@@ -612,21 +612,21 @@ namespace ImAged.MVVM.ViewModel
             });
         }
 
-         public void Dispose()
+        public void Dispose()
         {
             _isDisposed = true;
-            
+
             _memoryCleanupTimer?.Stop();
-            
+
             // Force secure cleanup
             ForceSecureMemoryCleanup();
-            
+
             foreach (var watcher in _fileWatchers)
             {
                 watcher?.Dispose();
             }
             _fileWatchers.Clear();
-            
+
             _thumbnailSemaphore?.Dispose();
         }
 
@@ -636,27 +636,27 @@ namespace ImAged.MVVM.ViewModel
             private byte[] _encryptedData; // Keep encrypted version
             private readonly Timer _cleanupTimer;
             private bool _disposed = false;
-            
+
             public SecureImageReference(BitmapSource image, byte[] encryptedData, int timeoutSeconds = 30)
             {
                 _image = image;
                 _encryptedData = encryptedData;
-                
+
                 // Setup immediate cleanup timer
                 _cleanupTimer = new Timer(_ => Dispose(), null, TimeSpan.FromSeconds(timeoutSeconds), Timeout.InfiniteTimeSpan);
             }
-            
+
             public BitmapSource GetImage()
             {
                 if (_disposed) return null;
                 return _image;
             }
-            
+
             public void Dispose()
             {
                 if (_disposed) return;
                 _disposed = true;
-                
+
                 // Securely clear the image from memory
                 if (_image != null)
                 {
@@ -672,10 +672,10 @@ namespace ImAged.MVVM.ViewModel
                         }
                     }
                     catch { /* Ignore errors during cleanup */ }
-                    
+
                     _image = null;
                 }
-                
+
                 // Securely clear encrypted data
                 if (_encryptedData != null)
                 {
@@ -685,9 +685,9 @@ namespace ImAged.MVVM.ViewModel
                     }
                     _encryptedData = null;
                 }
-                
+
                 _cleanupTimer?.Dispose();
-                
+
                 // Force immediate cleanup
                 GC.Collect();
             }

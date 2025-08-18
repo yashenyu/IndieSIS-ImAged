@@ -1,0 +1,50 @@
+﻿<Window x:Class="ImAged.MVVM.View.ImageViewWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Image View" Height="600" Width="900"
+        WindowStartupLocation="CenterScreen"
+        Background="#1E1E1E"
+        MouseWheel="Window_MouseWheel">
+    <!-- enable wheel-zoom -->
+    <DockPanel>
+
+        <!-- centred banner with file name -->
+        <TextBlock x:Name="FileNameText"
+                   DockPanel.Dock="Top"
+                   Text="file.jpg"
+                   Foreground="White"
+                   FontSize="16"
+                   FontWeight="Bold"
+                   HorizontalAlignment="Center"
+                   Margin="0,6"/>
+
+        <!-- status bar -->
+        <StatusBar DockPanel.Dock="Bottom" Background="#2c2c2c" Foreground="White">
+            <StatusBarItem>
+                <TextBlock x:Name="InfoText" Text="---"/>
+            </StatusBarItem>
+            <StatusBarItem HorizontalAlignment="Right">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Zoom:" Margin="0,0,6,0"/>
+                    <Slider x:Name="ZoomSlider" Width="120"
+                            Minimum="0.1" Maximum="5" Value="1"
+                            ValueChanged="ZoomSlider_ValueChanged"/>
+                </StackPanel>
+            </StatusBarItem>
+        </StatusBar>
+
+        <!-- scrollable canvas that keeps the bitmap at native resolution -->
+        <ScrollViewer x:Name="ImgScroll"
+                      HorizontalScrollBarVisibility="Auto"
+                      VerticalScrollBarVisibility="Auto">
+            <Image x:Name="FullImage"
+                   Stretch="None"
+                   RenderOptions.BitmapScalingMode="HighQuality">
+                <Image.RenderTransform>
+                    <ScaleTransform x:Name="ImageScale" ScaleX="1" ScaleY="1"/>
+                </Image.RenderTransform>
+            </Image>
+        </ScrollViewer>
+
+    </DockPanel>
+</Window>
