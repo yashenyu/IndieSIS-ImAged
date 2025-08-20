@@ -267,6 +267,7 @@
   <ItemGroup>
     <Resource Include="Images\256x256.ico" />
     <Resource Include="256x256.ico" />
+    <Resource Include="Images\base logo.png" />
     <Content Include="pysrc\aes_gcm.py" />
     <Content Include="pysrc\config.py" />
     <Content Include="pysrc\crypto.py" />
