@@ -21,5 +21,22 @@ namespace ImAged
         {
             InitializeComponent();
         }
+
+        private void WindowDrag(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.Left)
+            {
+                DragMove();
+                if (Top <= 0)
+                {
+                    WindowState = WindowState.Maximized;
+                }
+            }
+        }
+
+        private void Maximize_Click(object sender, RoutedEventArgs e)
+        {
+            WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
+        }
     }
 }

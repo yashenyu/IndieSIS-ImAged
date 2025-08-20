@@ -3,48 +3,66 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Image View" Height="600" Width="900"
         WindowStartupLocation="CenterScreen"
-        Background="#1E1E1E"
+        WindowStyle="None" ResizeMode="NoResize"
+        AllowsTransparency="True" Background="Transparent"
         MouseWheel="Window_MouseWheel">
-    <!-- enable wheel-zoom -->
-    <DockPanel>
+    <Border Background="#060606" CornerRadius="10" MouseLeftButtonDown="WindowDrag">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
-        <!-- centred banner with file name -->
-        <TextBlock x:Name="FileNameText"
-                   DockPanel.Dock="Top"
-                   Text="file.jpg"
-                   Foreground="White"
-                   FontSize="16"
-                   FontWeight="Bold"
-                   HorizontalAlignment="Center"
-                   Margin="0,6"/>
+            <!-- Window controls -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,5,5,0">
+                <Button Style="{StaticResource WindowControlButtonMinimize}" Click="Minimize_Click"/>
+                <Button Style="{StaticResource WindowControlButtonMinimize}" Content="⛶" FontSize="8" Click="Maximize_Click"/>
+                <Button Style="{StaticResource WindowControlButtonClose}" Click="Close_Click"/>
+            </StackPanel>
 
-        <!-- status bar -->
-        <StatusBar DockPanel.Dock="Bottom" Background="#2c2c2c" Foreground="White">
-            <StatusBarItem>
-                <TextBlock x:Name="InfoText" Text="---"/>
-            </StatusBarItem>
-            <StatusBarItem HorizontalAlignment="Right">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="Zoom:" Margin="0,0,6,0"/>
-                    <Slider x:Name="ZoomSlider" Width="120"
-                            Minimum="0.1" Maximum="5" Value="1"
-                            ValueChanged="ZoomSlider_ValueChanged"/>
-                </StackPanel>
-            </StatusBarItem>
-        </StatusBar>
+            <TextBlock x:Name="FileNameText"
+                       DockPanel.Dock="Top"
+                       Text="????"
+                       Foreground="#D4D4D4"
+                       FontSize="11"
+                       FontWeight="SemiBold"
+                       FontFamily="pack://application:,,,/ImAged;component/Fonts/Poppins/#Poppins Medium"
+                       HorizontalAlignment="Center"
+                       Margin="0,6"/>   
 
-        <!-- scrollable canvas that keeps the bitmap at native resolution -->
-        <ScrollViewer x:Name="ImgScroll"
-                      HorizontalScrollBarVisibility="Auto"
-                      VerticalScrollBarVisibility="Auto">
-            <Image x:Name="FullImage"
-                   Stretch="None"
-                   RenderOptions.BitmapScalingMode="HighQuality">
-                <Image.RenderTransform>
-                    <ScaleTransform x:Name="ImageScale" ScaleX="1" ScaleY="1"/>
-                </Image.RenderTransform>
-            </Image>
-        </ScrollViewer>
+            <!-- Main content below -->
+            <DockPanel Grid.Row="1">
 
-    </DockPanel>
+                <!-- status bar -->
+                <StatusBar DockPanel.Dock="Bottom" Background="#2c2c2c" Foreground="White">
+                    <StatusBarItem>
+                        <TextBlock x:Name="InfoText" Text="---"/>
+                    </StatusBarItem>
+                    <StatusBarItem HorizontalAlignment="Right">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Zoom:" Margin="0,0,6,0"/>
+                            <Slider x:Name="ZoomSlider" Width="120"
+                                    Minimum="0.1" Maximum="5" Value="1"
+                                    ValueChanged="ZoomSlider_ValueChanged"/>
+                        </StackPanel>
+                    </StatusBarItem>
+                </StatusBar>
+
+                <!-- scrollable canvas that keeps the bitmap at native resolution -->
+                <ScrollViewer x:Name="ImgScroll"
+                              HorizontalScrollBarVisibility="Disabled"
+                              VerticalScrollBarVisibility="Disabled">
+                    <Image x:Name="FullImage"
+                           Stretch="None"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"
+                           RenderOptions.BitmapScalingMode="HighQuality">
+                        <Image.RenderTransform>
+                            <ScaleTransform x:Name="ImageScale" ScaleX="1" ScaleY="1"/>
+                        </Image.RenderTransform>
+                    </Image>
+                </ScrollViewer>
+
+            </DockPanel>
+        </Grid>
+    </Border>
 </Window>

@@ -18,7 +18,7 @@
         <viewModel:MainViewModel/>
     </Window.DataContext>
 
-    <Border Background="#060606" CornerRadius="10">
+    <Border Background="#060606" CornerRadius="10" MouseLeftButtonDown="WindowDrag">
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="213"/>
@@ -59,7 +59,7 @@
                                              Command="{Binding HomeViewCommand}"
                                              GroupName="MenuGroup"/>
 
-                                <RadioButton Content="Favorites"
+                                <RadioButton Content="All Folders"
                                              Height="35"
                                              FontSize="11"
                                              Foreground="#AEAEAE"
@@ -115,7 +115,7 @@
 
                                 <Separator Margin="12,8" Height="0.3" Foreground="#383838"/>
 
-                                <RadioButton Content="All Folders"
+                                <RadioButton Content="All Files"
                                              Height="35"
                                              FontSize="11"
                                              Foreground="#AEAEAE"
@@ -166,6 +166,7 @@
                         <Button Style="{StaticResource WindowControlButtonMinimize}"
                                 Command="{Binding MinimizeCommand}"
                                 CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"/>
+                        <Button Style="{StaticResource WindowControlButtonMinimize}" Content="⛶" FontSize="8" Click="Maximize_Click"/>
                         <Button Style="{StaticResource WindowControlButtonClose}"
                                 Command="{Binding CloseCommand}"
                                 CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"/>
