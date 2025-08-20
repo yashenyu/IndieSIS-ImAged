@@ -3,9 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Image View" Height="600" Width="900"
         WindowStartupLocation="CenterScreen"
-        WindowStyle="None" ResizeMode="NoResize"
-        AllowsTransparency="True" Background="Transparent"
-        MouseWheel="Window_MouseWheel">
+        WindowStyle="None" ResizeMode="CanResize"
+        AllowsTransparency="True" Background="Transparent">
     <Border Background="#060606" CornerRadius="10" MouseLeftButtonDown="WindowDrag">
         <Grid>
             <Grid.RowDefinitions>
@@ -31,38 +30,15 @@
                        Margin="0,6"/>   
 
             <!-- Main content below -->
-            <DockPanel Grid.Row="1">
-
-                <!-- status bar -->
-                <StatusBar DockPanel.Dock="Bottom" Background="#2c2c2c" Foreground="White">
-                    <StatusBarItem>
-                        <TextBlock x:Name="InfoText" Text="---"/>
-                    </StatusBarItem>
-                    <StatusBarItem HorizontalAlignment="Right">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Zoom:" Margin="0,0,6,0"/>
-                            <Slider x:Name="ZoomSlider" Width="120"
-                                    Minimum="0.1" Maximum="5" Value="1"
-                                    ValueChanged="ZoomSlider_ValueChanged"/>
-                        </StackPanel>
-                    </StatusBarItem>
-                </StatusBar>
-
-                <!-- scrollable canvas that keeps the bitmap at native resolution -->
-                <ScrollViewer x:Name="ImgScroll"
-                              HorizontalScrollBarVisibility="Disabled"
-                              VerticalScrollBarVisibility="Disabled">
+            <Grid Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Border x:Name="ImageContainer" Background="#060606">
                     <Image x:Name="FullImage"
-                           Stretch="None"
-                           HorizontalAlignment="Center" VerticalAlignment="Center"
-                           RenderOptions.BitmapScalingMode="HighQuality">
-                        <Image.RenderTransform>
-                            <ScaleTransform x:Name="ImageScale" ScaleX="1" ScaleY="1"/>
-                        </Image.RenderTransform>
-                    </Image>
-                </ScrollViewer>
-
-            </DockPanel>
+                           Stretch="Uniform"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           RenderOptions.BitmapScalingMode="HighQuality"/>
+                </Border>
+            </Grid>
         </Grid>
     </Border>
 </Window>
