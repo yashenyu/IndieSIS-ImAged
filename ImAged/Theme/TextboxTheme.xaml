@@ -5,14 +5,15 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type TextBox}">
-                    <Border CornerRadius="10"
+                    <Border CornerRadius="5"
                         Background="#252525"
-                        Width="240" Height="33"
+                        Width="{TemplateBinding Width}"
+                        Height="33"
                         Margin="0,0,0,5">
                         <Grid>
                             <Rectangle StrokeThickness="1"/>
                             <TextBox Margin="3,1,1,1"
-                                 Text="{TemplateBinding Text}"
+                                 Text="{Binding Path=Text, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                  BorderThickness="0"
                                  Background="Transparent"
                                  VerticalAlignment="Center"

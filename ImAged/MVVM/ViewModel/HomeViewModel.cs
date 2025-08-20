@@ -168,6 +168,22 @@ namespace ImAged.MVVM.ViewModel
         private readonly int _maxCacheSize = 20;
         private readonly object _cacheLock = new object();
 
+        // NEW: master list & search text for filtering
+        private readonly List<DateGroup> _allDateGroups = new List<DateGroup>();
+
+        private string _searchText;
+        public string SearchText
+        {
+            get => _searchText;
+            set
+            {
+                if (_searchText == value) return;
+                _searchText = value;
+                OnPropertyChanged(nameof(SearchText));
+                ApplyFilter();
+            }
+        }
+
         private BitmapSource _displayedImage;
         private bool _isDisposed = false;
         private int _totalImagesLoaded = 0;
@@ -341,6 +357,13 @@ namespace ImAged.MVVM.ViewModel
                         DateGroups.Add(dateGroup);
                     });
                 }
+
+                // NEW: keep a copy of all groups for search filtering
+                _allDateGroups.Clear();
+                _allDateGroups.AddRange(DateGroups);
+
+                // Apply filter in case user typed before scan finished
+                ApplyFilter();
             }
             catch (Exception ex)
             {
@@ -610,6 +633,46 @@ namespace ImAged.MVVM.ViewModel
                     }
                 }
             });
+        }
+
+        private void ApplyFilter()
+        {
+            if (string.IsNullOrWhiteSpace(_searchText))
+            {
+                SyncUi(() =>
+                {
+                    DateGroups.Clear();
+                    foreach (var g in _allDateGroups) DateGroups.Add(g);
+                });
+                return;
+            }
+
+            var term = _searchText.Trim();
+            var filtered = _allDateGroups
+                .Select(g =>
+                {
+                    var matches = g.Files.Where(f => f.FileName.IndexOf(term, StringComparison.OrdinalIgnoreCase) >= 0).ToList();
+                    if (matches.Count == 0) return null;
+                    return new DateGroup
+                    {
+                        Date = g.Date,
+                        ImageCount = matches.Count,
+                        Files = new ObservableCollection<TtlFileInfo>(matches)
+                    };
+                })
+                .Where(g => g != null)
+                .ToList();
+
+            SyncUi(() =>
+            {
+                DateGroups.Clear();
+                foreach (var g in filtered) DateGroups.Add(g);
+            });
+        }
+
+        private static void SyncUi(Action action)
+        {
+            Application.Current.Dispatcher.Invoke(action);
         }
 
         public void Dispose()

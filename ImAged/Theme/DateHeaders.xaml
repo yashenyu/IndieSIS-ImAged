@@ -3,7 +3,7 @@
 
     <!-- Date Header Container Style -->
     <Style x:Key="DateHeaderContainerStyle" TargetType="StackPanel">
-        <Setter Property="Margin" Value="0,0,0,20"/>
+        <Setter Property="Margin" Value="0,0,0,10"/>
     </Style>
 
     <!-- Date Header Text Style -->

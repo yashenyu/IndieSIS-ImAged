@@ -9,72 +9,113 @@
              d:DesignWidth="800"
              x:Name="Root">
 
-    <ScrollViewer 
-                   VerticalScrollBarVisibility="Auto" 
-                   HorizontalScrollBarVisibility="Disabled">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="5"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-        <StackPanel>
-            <!-- Date Groups -->
-            <ItemsControl ItemsSource="{Binding DateGroups}">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Style="{StaticResource DateHeaderContainerStyle}">
-                            <!-- Date Header -->
-                            <TextBlock Text="{Binding DisplayDate}" 
+        <StackPanel Grid.Row ="0" 
+                    Orientation="Horizontal" 
+                    Margin="0,0,0,0" 
+                    Height="40" 
+                    Grid.ColumnSpan="2">
+
+            <TextBlock Text="Gallery"
+               Foreground="White"
+               FontFamily="pack://application:,,,/ImAged;component/Fonts/Poppins/#Poppins Bold"
+               FontSize="20"
+               Height="34"
+               Width="181"
+               Margin="0,0,28,0"/>
+
+            <TextBox Width="500"
+             VerticalContentAlignment="Center"
+             Margin="0,0,0,0"
+             Style="{StaticResource ModernTextbox}"
+             Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"/>
+
+        </StackPanel>
+
+        <Separator Grid.Row ="1" Margin="0,0,0,0" Foreground="#383838" RenderTransformOrigin="0.5,0.5">
+            <Separator.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform ScaleY="-1"/>
+                    <SkewTransform/>
+                    <RotateTransform/>
+                    <TranslateTransform/>
+                </TransformGroup>
+            </Separator.RenderTransform>
+        </Separator>
+
+        <ScrollViewer  Grid.Row="2"
+                   VerticalScrollBarVisibility="Auto" 
+                   HorizontalScrollBarVisibility="Disabled" Margin="0,10,0,0" Grid.RowSpan="2">
+
+            <StackPanel>
+                <!-- Date Groups -->
+                <ItemsControl ItemsSource="{Binding DateGroups}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Style="{StaticResource DateHeaderContainerStyle}">
+                                <!-- Date Header -->
+                                <TextBlock Text="{Binding DisplayDate}" 
                                        Style="{StaticResource DateHeaderTextStyle}"/>
 
-                            <!-- Images Grid (4 columns) -->
-                            <ItemsControl ItemsSource="{Binding Files}">
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <WrapPanel Orientation="Horizontal"/>
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
+                                <!-- Images Grid (4 columns) -->
+                                <ItemsControl ItemsSource="{Binding Files}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel Orientation="Horizontal"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
 
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Button Command="{Binding DataContext.OpenTtlFileCommand,
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Button Command="{Binding DataContext.OpenTtlFileCommand,
                                       ElementName=Root}"
                                                 CommandParameter="{Binding}"
                                                 Style="{StaticResource ImageButtonStyle}">
-                                            <Border Style="{StaticResource ImageTileHoverStyle}">
-                                                <!-- Set the image as the border background -->
-                                                <Border.Background>
-                                                    <ImageBrush ImageSource="{Binding Thumbnail}" 
+                                                <Border Style="{StaticResource ImageTileHoverStyle}">
+                                                    <!-- Set the image as the border background -->
+                                                    <Border.Background>
+                                                        <ImageBrush ImageSource="{Binding Thumbnail}" 
                                                                Stretch="UniformToFill" 
                                                                RenderOptions.BitmapScalingMode="HighQuality"/>
-                                                </Border.Background>
+                                                    </Border.Background>
 
-                                                <!-- Overlays on top of the background image -->
-                                                <Grid>
-                                                    <!-- Loading Overlay -->
-                                                    <Border Style="{StaticResource LoadingOverlayStyle}">
-                                                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                                                            <ProgressBar Style="{StaticResource LoadingProgressBarStyle}"/>
-                                                            <TextBlock Text="Loading..." 
+                                                    <!-- Overlays on top of the background image -->
+                                                    <Grid>
+                                                        <!-- Loading Overlay -->
+                                                        <Border Style="{StaticResource LoadingOverlayStyle}">
+                                                            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                                                <ProgressBar Style="{StaticResource LoadingProgressBarStyle}"/>
+                                                                <TextBlock Text="Loading..." 
                                                                        Style="{StaticResource LoadingTextStyle}"/>
-                                                        </StackPanel>
-                                                    </Border>
+                                                            </StackPanel>
+                                                        </Border>
 
-                                                    <!-- File Info Overlay -->
-                                                    <Border Style="{StaticResource FileInfoOverlayStyle}">
-                                                        <StackPanel>
-                                                            <TextBlock Text="{Binding FileName}" 
+                                                        <!-- File Info Overlay -->
+                                                        <Border Style="{StaticResource FileInfoOverlayStyle}">
+                                                            <StackPanel>
+                                                                <TextBlock Text="{Binding FileName}" 
                                                                        Style="{StaticResource FileNameTextStyle}"/>
-                                                            <TextBlock Text="{Binding LastModified, StringFormat='{}{0:MM/dd/yyyy HH:mm}'}" 
+                                                                <TextBlock Text="{Binding LastModified, StringFormat='{}{0:MM/dd/yyyy HH:mm}'}" 
                                                                        Style="{StaticResource FileDateTextStyle}"/>
-                                                        </StackPanel>
-                                                    </Border>
-                                                </Grid>
-                                            </Border>
-                                        </Button>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </StackPanel>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </StackPanel>
-    </ScrollViewer>
+                                                            </StackPanel>
+                                                        </Border>
+                                                    </Grid>
+                                                </Border>
+                                            </Button>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
 </UserControl>

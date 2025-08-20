@@ -6,7 +6,7 @@
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="Padding" Value="0"/>
-        <Setter Property="Margin" Value="5"/>
+        <Setter Property="Margin" Value="0"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
@@ -18,8 +18,8 @@
 
     <!-- Base style for image tiles -->
     <Style x:Key="ImageTileBaseStyle" TargetType="Border">
-        <Setter Property="Width" Value="155"/>
-        <Setter Property="Height" Value="110"/>
+        <Setter Property="Width" Value="170"/>
+        <Setter Property="Height" Value="120"/>
         <Setter Property="Margin" Value="0,0,10,10"/>
         <Setter Property="Background" Value="#2D2D2D"/>
         <Setter Property="BorderBrush" Value="#404040"/>
