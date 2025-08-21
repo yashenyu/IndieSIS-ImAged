@@ -12,6 +12,15 @@ namespace ImAged.MVVM.View
 {
     public partial class ImageViewWindow : Window
     {
+        private const double ZoomFactor = 1.2; // step factor per wheel delta
+        private const double MinScale = 1;     // don't allow smaller than original fit
+        private const double MaxScale = 15;    // arbitrary upper bound
+
+        // fields for drag panning
+        private bool _isDragging;
+        private Point _dragStart;
+        private double _startX;
+        private double _startY;
 
         public ImageViewWindow(BitmapSource image, string filePath)
         {
@@ -41,7 +50,107 @@ namespace ImAged.MVVM.View
             // banner
             FileNameText.Text = Path.GetFileName(filePath);
 
+            // status bar info
+            try
+            {
+                var fi = new FileInfo(filePath);
+                string sizeStr = fi.Exists ? (fi.Length / 1024d / 1024d).ToString("0.##") + " MB" : "N/A";
+                string resolutionStr = $"{image.PixelWidth}×{image.PixelHeight}";
+                string dateStr = fi.Exists ? fi.CreationTime.ToString("yyyy-MM-dd HH:mm") : "N/A";
+                StatusText.Text = $"{sizeStr}   •   {resolutionStr}   •   {dateStr}";
+            }
+            catch { /* ignore */ }
+
             // optionally store file info if needed later
+        
+            // init transforms (defined in XAML)
+            if (ImageScaleTransform != null)
+            {
+                ImageScaleTransform.ScaleX = 1;
+                ImageScaleTransform.ScaleY = 1;
+            }
+        }
+
+        // handle wheel over image for zoom
+        private void FullImage_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            if (FullImage.Source == null) return;
+
+            // determine zoom center relative to image
+            Point cursorPosition = e.GetPosition(FullImage);
+
+            double scale = e.Delta > 0 ? ZoomFactor : 1 / ZoomFactor;
+
+            // compute new scale within bounds
+            double newScale = ImageScaleTransform.ScaleX * scale;
+            newScale = Math.Max(MinScale, Math.Min(MaxScale, newScale));
+
+            // if trying to zoom out beyond min just clamp and recentre
+            scale = newScale / ImageScaleTransform.ScaleX;
+
+            // apply scaling around cursor
+            var group = FullImage.RenderTransform as TransformGroup;
+            if (group == null) return; // safety
+
+            // translate cursor point to origin, scale, then translate back
+            ImageTranslateTransform.X -= cursorPosition.X;
+            ImageTranslateTransform.Y -= cursorPosition.Y;
+
+            ImageTranslateTransform.X *= scale;
+            ImageTranslateTransform.Y *= scale;
+
+            ImageScaleTransform.ScaleX = newScale;
+            ImageScaleTransform.ScaleY = newScale;
+
+            // moved clamping to after final translation
+            ImageTranslateTransform.X += cursorPosition.X;
+            ImageTranslateTransform.Y += cursorPosition.Y;
+
+            ClampTranslation();
+
+            // if we reached minimum scale reset translation (fit view)
+            if (Math.Abs(ImageScaleTransform.ScaleX - MinScale) < 0.001)
+            {
+                ImageTranslateTransform.X = 0;
+                ImageTranslateTransform.Y = 0;
+            }
+
+            e.Handled = true;
+        }
+
+        // ---------------- Drag pan logic ----------------
+        private void FullImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (ImageScaleTransform.ScaleX <= MinScale + 0.001) return; // don't pan when image fits
+
+            _isDragging = true;
+            _dragStart = e.GetPosition(this);
+            _startX = ImageTranslateTransform.X;
+            _startY = ImageTranslateTransform.Y;
+
+            FullImage.CaptureMouse();
+            e.Handled = true;
+        }
+
+        private void FullImage_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (!_isDragging) return;
+            _isDragging = false;
+            FullImage.ReleaseMouseCapture();
+            e.Handled = true;
+        }
+
+        private void FullImage_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (!_isDragging) return;
+
+            Point current = e.GetPosition(this);
+            Vector delta = current - _dragStart;
+
+            ImageTranslateTransform.X = _startX + delta.X;
+            ImageTranslateTransform.Y = _startY + delta.Y;
+
+            ClampTranslation();
         }
 
         // no zoom/scroll logic required anymore
@@ -106,6 +215,59 @@ namespace ImAged.MVVM.View
             }
 
             // no extra fit logic necessary – Stretch="Uniform" handles it automatically
+        }
+
+        // maintain vertical clipping (allow horizontal overflow)
+        private void ImageHost_Loaded(object sender, RoutedEventArgs e)
+        {
+            UpdateImageHostClip();
+        }
+
+        private void ImageHost_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            UpdateImageHostClip();
+        }
+
+        private void UpdateImageHostClip()
+        {
+            if (ImageHost == null) return;
+            double extra = 20000; // large value to cover horizontal overflow
+            ImageHost.Clip = new RectangleGeometry(new Rect(-extra/2, 0, ImageHost.ActualWidth + extra, ImageHost.ActualHeight));
+        }
+
+        private void ClampTranslation()
+        {
+            if (FullImage.Source == null) return;
+            double hostW = ImageContainer.ActualWidth > 0 ? ImageContainer.ActualWidth : ImageHost.ActualWidth;
+            double hostH = ImageContainer.ActualHeight > 0 ? ImageContainer.ActualHeight : ImageHost.ActualHeight;
+
+            double imgW = FullImage.ActualWidth * ImageScaleTransform.ScaleX;
+            double imgH = FullImage.ActualHeight * ImageScaleTransform.ScaleY;
+
+            // if image smaller than viewport, center it (translation towards 0)
+            double minX, maxX, minY, maxY;
+            if (imgW <= hostW)
+            {
+                minX = maxX = (hostW - imgW) / 2.0;
+            }
+            else
+            {
+                minX = hostW - imgW;
+                maxX = 0;
+            }
+
+            if (imgH <= hostH)
+            {
+                minY = maxY = (hostH - imgH) / 2.0;
+            }
+            else
+            {
+                minY = hostH - imgH;
+                maxY = 0;
+            }
+
+            ImageTranslateTransform.X = Math.Max(minX, Math.Min(maxX, ImageTranslateTransform.X));
+            ImageTranslateTransform.Y = Math.Max(minY, Math.Min(maxY, ImageTranslateTransform.Y));
         }
     }
 }

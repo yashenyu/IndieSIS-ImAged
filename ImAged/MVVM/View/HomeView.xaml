@@ -32,6 +32,7 @@
 
             <TextBox Width="500"
              VerticalContentAlignment="Center"
+             HorizontalAlignment="Center"
              Margin="0,0,0,0"
              Style="{StaticResource ModernTextbox}"
              Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"/>
