@@ -38,7 +38,7 @@ namespace ImAged.Core
 
                 textBoxControl.TextChanged -= TextBoxControl_TextChanged;
                 textBoxControl.TextChanged += TextBoxControl_TextChanged;
-                
+
                 textBoxControl.GotFocus -= TextBoxControl_GotFocus;
                 textBoxControl.GotFocus += TextBoxControl_GotFocus;
 
@@ -188,7 +188,7 @@ namespace ImAged.Core
         #region PlaceholderAdorner
         public class PlaceholderAdorner : Adorner
         {
-            public PlaceholderAdorner(TextBox textBox) : base(textBox) 
+            public PlaceholderAdorner(TextBox textBox) : base(textBox)
             {
                 this.IsHitTestVisible = false;
             }
@@ -213,7 +213,7 @@ namespace ImAged.Core
                                  textBoxControl.FontWeight,
                                  textBoxControl.FontStretch),
                     textBoxControl.FontSize,
-                    new SolidColorBrush(Color.FromRgb(158, 158, 158)), 
+                    new SolidColorBrush(Color.FromRgb(158, 158, 158)),
                     VisualTreeHelper.GetDpi(textBoxControl).PixelsPerDip);
 
                 double availableWidth = textBoxControl.ActualWidth;
@@ -222,15 +222,15 @@ namespace ImAged.Core
                 if (textBoxControl.Template.FindName("PART_ContentHost", textBoxControl) is FrameworkElement contentHost)
                 {
                     Point contentHostPosition = contentHost.TransformToAncestor(textBoxControl).Transform(new Point(0, 0));
-                    
+
                     availableWidth = contentHost.ActualWidth;
                     availableHeight = contentHost.ActualHeight;
-                    
+
                     Point renderingOffset = new Point(contentHostPosition.X, contentHostPosition.Y);
-                    
+
                     double textWidth = Math.Min(text.Width, availableWidth);
                     double textHeight = Math.Min(text.Height, availableHeight);
-                    
+
                     renderingOffset.X += (availableWidth - textWidth) / 2;
                     renderingOffset.Y += (availableHeight - textHeight) / 2;
 

@@ -6,6 +6,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ImAged.MVVM.View"
              xmlns:core="clr-namespace:ImAged.Core"
+
              mc:Ignorable="d" 
              d:DesignHeight="800" 
              d:DesignWidth="800">
@@ -226,7 +227,7 @@
             <Grid Grid.Column="2" Grid.Row="0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="150"/>
                 </Grid.RowDefinitions>
                 
                 <TextBlock Text="Status Logs" 
@@ -243,7 +244,23 @@
                         Background="Transparent"
                         Padding="10">
 
-                    <TextBlock Text="No conversion logs shown." Foreground="#9E9E9E" TextWrapping="Wrap"/>
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" 
+                                  HorizontalScrollBarVisibility="Disabled"
+                                  Background="Transparent"
+                                  Margin="0,5,0,0">
+                        <ItemsControl ItemsSource="{Binding ConversionLogs}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding}" 
+                                       Foreground="#D4D4D4" 
+                                       TextWrapping="Wrap" 
+                                       Margin="0,2,0,2"
+                                       FontFamily="pack://application:,,,/ImAged;component/Fonts/Poppins/#Poppins Medium"
+                                       FontSize="11"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
 
                 </Border>
             </Grid>

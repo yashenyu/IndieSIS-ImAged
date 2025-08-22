@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -24,6 +25,8 @@ namespace ImAged.MVVM.ViewModel
         private bool _isPm;
 
         // ---------------- Properties ----------------
+        public ObservableCollection<string> ConversionLogs { get; } = new ObservableCollection<string>();
+
         public string SelectedFile
         {
             get => _selectedFile;
@@ -63,10 +66,22 @@ namespace ImAged.MVVM.ViewModel
                 if (string.IsNullOrEmpty(SelectedFile))
                     return "+  Select File";
 
-                return $"{System.IO.Path.GetFileName(SelectedFile)}";
+                var fileName = System.IO.Path.GetFileName(SelectedFile);
+
+                // If filename is longer than 20 characters, truncate it
+                if (fileName.Length > 20)
+                {
+                    var extension = System.IO.Path.GetExtension(fileName);
+                    var nameWithoutExt = System.IO.Path.GetFileNameWithoutExtension(fileName);
+
+                    // Keep first 8 characters + "..." + extension
+                    var truncatedName = nameWithoutExt.Substring(0, 8) + "..." + extension;
+                    return truncatedName;
+                }
+
+                return fileName;
             }
         }
-
 
         public string StatusMessage
         {
@@ -90,18 +105,36 @@ namespace ImAged.MVVM.ViewModel
         }
 
         // ---------------- Methods ----------------
+        private void AddLog(string message)
+        {
+            var timestamp = DateTime.Now.ToString("HH:mm:ss");
+            var logEntry = $"[{timestamp}] {message}";
+            
+            // Add to the beginning to show newest first
+            ConversionLogs.Insert(0, logEntry);
+            
+            // Keep only the last 20 logs
+            if (ConversionLogs.Count > 20)
+            {
+                ConversionLogs.RemoveAt(ConversionLogs.Count - 1);
+            }
+        }
+
         private void ExecuteSelectFile()
         {
             var dlg = new OpenFileDialog { Filter = "Images|*.jpg;*.jpeg;*.png", Multiselect = false };
             if (dlg.ShowDialog() == true)
             {
                 SelectedFile = dlg.FileName;
+                AddLog($"File selected: {System.IO.Path.GetFileName(SelectedFile)}");
             }
         }
 
         private async Task ExecuteConvertAsync()
         {
             System.Diagnostics.Debug.WriteLine($"Trying to convert");
+            AddLog("Starting conversion process...");
+            
             try
             {
                 if (!int.TryParse(Year, out int yy) ||
@@ -110,7 +143,9 @@ namespace ImAged.MVVM.ViewModel
                     !int.TryParse(Hour, out int hh) ||
                     !int.TryParse(Minute, out int min))
                 {
-                    StatusMessage = "Invalid date/time input.";
+                    var errorMsg = "Invalid date/time input.";
+                    AddLog($"ERROR: {errorMsg}");
+                    StatusMessage = errorMsg;
                     return;
                 }
 
@@ -123,7 +158,9 @@ namespace ImAged.MVVM.ViewModel
                     hh < 0 || hh > 23 ||
                     min < 0 || min > 59)
                 {
-                    StatusMessage = "Invalid date/time values.";
+                    var errorMsg = "Invalid date/time values.";
+                    AddLog($"ERROR: {errorMsg}");
+                    StatusMessage = errorMsg;
                     return;
                 }
 
@@ -134,7 +171,9 @@ namespace ImAged.MVVM.ViewModel
                 }
                 catch
                 {
-                    StatusMessage = "Invalid date/time values.";
+                    var errorMsg = "Invalid date/time values.";
+                    AddLog($"ERROR: {errorMsg}");
+                    StatusMessage = errorMsg;
                     return;
                 }
 
@@ -142,22 +181,32 @@ namespace ImAged.MVVM.ViewModel
 
                 if (hoursDiff <= 0)
                 {
-                    StatusMessage = "Expiration must be in the future.";
+                    var errorMsg = "Expiration must be in the future.";
+                    AddLog($"ERROR: {errorMsg}");
+                    StatusMessage = errorMsg;
                     return;
                 }
 
                 if (hoursDiff > 24 * 365 * 5)
                 {
-                    StatusMessage = "Expiration too far in the future.";
+                    var errorMsg = "Expiration too far in the future.";
+                    AddLog($"ERROR: {errorMsg}");
+                    StatusMessage = errorMsg;
                     return;
                 }
 
+                AddLog($"Converting image with expiration: {expiry:yyyy-MM-dd HH:mm}");
+                
                 var ttlPath = await _secureManager.ConvertImageToTtlAsync(SelectedFile, hoursDiff);
-                StatusMessage = $"Converted → {ttlPath}";
+                var successMsg = $"SUCCESS: Converted → {System.IO.Path.GetFileName(ttlPath)}";
+                AddLog(successMsg);
+                StatusMessage = successMsg;
             }
             catch (Exception ex)
             {
-                StatusMessage = $"Error: {ex.Message}";
+                var errorMsg = $"ERROR: Conversion failed - {ex.Message}";
+                AddLog(errorMsg);
+                StatusMessage = errorMsg;
             }
             System.Diagnostics.Debug.WriteLine($"Convert ran");
         }

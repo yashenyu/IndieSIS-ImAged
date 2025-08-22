@@ -20,6 +20,31 @@ namespace ImAged
         public MainWindow()
         {
             InitializeComponent();
+            StateChanged += MainWindow_StateChanged;
+        }
+
+        private void MainWindow_StateChanged(object sender, EventArgs e)
+        {
+            UpdateCornerRadius();
+        }
+
+        private void UpdateCornerRadius()
+        {
+            // Get the main border only
+            var mainBorder = this.FindName("MainBorder") as Border;
+
+            if (WindowState == WindowState.Maximized)
+            {
+                // Remove rounded corners from main border only when maximized
+                if (mainBorder != null)
+                    mainBorder.CornerRadius = new CornerRadius(0);
+            }
+            else
+            {
+                // Restore rounded corners on main border when not maximized
+                if (mainBorder != null)
+                    mainBorder.CornerRadius = new CornerRadius(10);
+            }
         }
 
         private void WindowDrag(object sender, MouseButtonEventArgs e)
