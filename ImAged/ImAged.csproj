@@ -170,6 +170,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Theme\DataGrid.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Theme\ScrollBars.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

@@ -7,11 +7,13 @@
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <ResourceDictionary>
+            <!--THEMES-->
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Theme/MenuButtonTheme.xaml"/>
                 <ResourceDictionary Source="Theme/TextboxTheme.xaml"/>
                 <ResourceDictionary Source="Theme/FilesExpanderTheme.xaml"/>
                 <ResourceDictionary Source="Theme/WindowControlsTheme.xaml"/>
+                <ResourceDictionary Source="Theme/DataGrid.xaml"/>
                 <ResourceDictionary Source="Theme/ImageTiles.xaml"/>
                 <ResourceDictionary Source="Theme/DateHeaders.xaml"/>
                 <ResourceDictionary Source="Theme/ScrollBars.xaml"/>
