@@ -9,8 +9,13 @@ namespace ImAged.MVVM.Model
     public class FileItem
     {
         public string FileName { get; set; }
+        public string FileType { get; set; }
+        public double FileSize { get; set; } // KB
+        public string FilePath { get; set; }
         public DateTime Created { get; set; }
-        public string Status { get; set; }
+        public string State { get; set; } //  (e.g., "Active", "Expired")
+
+        public string ImagePath { get; set; }
     }
 
 }
