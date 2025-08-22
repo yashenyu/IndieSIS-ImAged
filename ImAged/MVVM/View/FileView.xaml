@@ -77,7 +77,7 @@
                         <TextBlock Text="Type: " Foreground="Gray"/>
                         <TextBlock Text="File Size: " Foreground="Gray" Margin="0,5,0,0"/>
                         <TextBlock Text="Location: " Foreground="Gray" Margin="0,5,0,0"/>
-                        <TextBlock Text="Modified: " Foreground="Gray" Margin="0,6,0,0"/>
+                        <TextBlock Text="Created: " Foreground="Gray" Margin="0,6,0,0"/>
                         <TextBlock Text="State: " Foreground="Gray" Margin="0,5,0,0"/>
                     </StackPanel>
 
