@@ -180,6 +180,34 @@ class SecureBackend:
             logger.error(f"Error in open_ttl: {e}")
             return {"success": False, "error": str(e), "result": None}
 
+    def handle_convert_to_ttl(self, parameters):
+        """Convert an image to a TTL container via TTLFileManager"""
+        try:
+            logger.info(f"handle_convert_to_ttl called with params: {parameters}")
+
+            if parameters is None:
+                return {"success": False, "error": "Parameters is None", "result": None}
+
+            input_path = parameters.get('input_path')
+            expiry_ts = parameters.get('expiry_ts')
+            output_path = parameters.get('output_path')
+
+            if not input_path or not os.path.isfile(input_path):
+                return {"success": False, "error": "input_path missing or file not found", "result": None}
+
+            try:
+                from file_manager import TTLFileManager
+                manager = TTLFileManager()
+                ttl_path = manager.create_ttl_file(input_path, expiry_ts, output_path)
+                logger.info(f"TTL file created at {ttl_path}")
+                return {"success": True, "error": None, "result": ttl_path}
+            except Exception as e:
+                logger.error(f"TTL creation failed: {e}")
+                return {"success": False, "error": str(e), "result": None}
+        except Exception as e:
+            logger.error(f"Error in handle_convert_to_ttl: {e}")
+            return {"success": False, "error": str(e), "result": None}
+
     def _track_memory_usage(self, bytes_used):
         try:
             import psutil

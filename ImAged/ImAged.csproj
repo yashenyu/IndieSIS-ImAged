@@ -116,6 +116,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Core\SecureProcessManager.cs" />
+    <Compile Include="Core\TextBoxHelper.cs" />
     <Compile Include="MVVM\ViewModel\ConvertViewModel.cs" />
     <Compile Include="MVVM\ViewModel\FileViewModel.cs" />
     <Compile Include="MVVM\ViewModel\SettingsViewModel.cs" />

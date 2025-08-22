@@ -1,16 +1,283 @@
 ﻿<UserControl x:Class="ImAged.MVVM.View.ConvertView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:ImAged.MVVM.ViewModel"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ImAged.MVVM.View"
+             xmlns:core="clr-namespace:ImAged.Core"
              mc:Ignorable="d" 
-             d:DesignHeight="450" 
+             d:DesignHeight="800" 
              d:DesignWidth="800">
+
+    <UserControl.DataContext>
+        <vm:ConvertViewModel/>
+    </UserControl.DataContext>
+
+    <UserControl.Resources>
+        <!-- Modern Button style -->
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#d4d4d4"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontFamily" Value="pack://application:,,,/ImAged;component/Fonts/Poppins/#Poppins Medium"/>
+            <Setter Property="BorderBrush" Value="#252525"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="Padding" Value="12,0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Cursor" Value="Hand"/>
+
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border 
+                    x:Name="border"
+                    CornerRadius="6"
+                    Background="{TemplateBinding Background}"
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}">
+                            <ContentPresenter 
+                        HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                        VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                        RecognizesAccessKey="True"/>
+                        </Border>
+
+                        <!-- Triggers for hover/press states -->
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#333333"/>
+                                <Setter Property="Foreground" Value="#d4d4d4"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#1E1E1E"/>
+                                <Setter Property="Foreground" Value="#d4d4d4"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="border" Property="Background" Value="#2B2B2B"/>
+                                <Setter Property="BorderBrush" Value="#3c3c3c"/>
+                                <Setter Property="Foreground" Value="#666"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Modern TextBox style -->
+        <Style TargetType="TextBox">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#d4d4d4"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontFamily" Value="pack://application:,,,/ImAged;component/Fonts/Poppins/#Poppins Medium"/>
+            <Setter Property="BorderBrush" Value="#252525"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Height" Value="53"/>
+            <Setter Property="Width" Value="63"/>
+            <Setter Property="CaretBrush" Value="White"/>
+
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border 
+                    CornerRadius="6"
+                    Background="{TemplateBinding Background}"
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}">
+
+                            <ScrollViewer x:Name="PART_ContentHost"
+                                  VerticalAlignment="Center"
+                                  HorizontalAlignment="Center"
+                                  Foreground="{TemplateBinding Foreground}"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+       
+    </UserControl.Resources>
+
     <Grid>
-        <StackPanel>
-            <TextBlock Foreground="White" Margin="0,20,0,0"> Converter Page</TextBlock>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="8"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Height="40" VerticalAlignment="Center">
+            <TextBlock Text="Tools"
+                       Foreground="White"
+                       FontFamily="pack://application:,,,/ImAged;component/Fonts/Poppins/#Poppins Bold"
+                       FontSize="24"
+                       Margin="0,0,28,0"/>
         </StackPanel>
 
+        <Separator Grid.Row="1" Foreground="#383838"/>
+
+        <!-- Main content grid -->
+        <Grid Grid.Row="2" Margin="0,0,5,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="350"/>
+                <ColumnDefinition Width="12"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="12"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Converter panel -->
+            <Grid Grid.Column="0" Grid.Row="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Header text -->
+                <TextBlock Text="Converter" 
+                           Foreground="#D4D4D4" 
+                           FontSize="14" 
+                           FontWeight="SemiBold"
+                           FontFamily="pack://application:,,,/ImAged;component/Fonts/Poppins/#Poppins Medium"
+                           Margin="0,0,0,0"/>
+
+                <Border Grid.Row="1"
+                        CornerRadius="7"
+                        BorderBrush="#252525"
+                        BorderThickness="1"
+                        Background="Transparent"
+                        Height="150"
+                        >
+                    
+                    <StackPanel Orientation="Horizontal">
+                        
+                        <StackPanel Orientation="Vertical">
+                            <Button Content="{Binding SelectFileButtonText}" Height="90" Width="120" Margin="8,8,0,1" Background="#1e1e1e" Command="{Binding SelectFileCommand}" />
+                            <Button Content="Convert" Height="35" Width="120" Margin="8,7,0,0" Background="#1e1e1e" Command="{Binding ConvertCommand}"/>
+                        </StackPanel>
+
+                        <!-- Right expiration inputs -->
+                        <StackPanel Orientation="Vertical" Margin="10,7,0,0">
+                            <TextBlock Text="Set Expiration Time" 
+                                       Foreground="#D4D4D4" 
+                                       FontSize="12" Height="20"
+                                       FontFamily="pack://application:,,,/ImAged;component/Fonts/Poppins/#Poppins Medium"/>
+                            
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox x:Name="DayTextBox" 
+                                         Margin="0,0,6,0" 
+                                         Text="{Binding Day, UpdateSourceTrigger=PropertyChanged}" 
+                                         MaxLength="2"
+                                         core:TextBoxHelper.Placeholder="DD"
+                                         core:TextBoxHelper.AutoFocusNext="True"
+                                         PreviewTextInput="DateTextBox_PreviewTextInput"/>
+                                
+                                <TextBox x:Name="MonthTextBox" 
+                                         Margin="0,0,6,0" 
+                                         Text="{Binding Month, UpdateSourceTrigger=PropertyChanged}" 
+                                         MaxLength="2"
+                                         core:TextBoxHelper.Placeholder="MM"
+                                         core:TextBoxHelper.AutoFocusNext="True"
+                                         PreviewTextInput="DateTextBox_PreviewTextInput"/>
+                                
+                                <TextBox x:Name="YearTextBox" 
+                                         Text="{Binding Year, UpdateSourceTrigger=PropertyChanged}" 
+                                         MaxLength="4"
+                                         core:TextBoxHelper.Placeholder="YY"
+                                         core:TextBoxHelper.AutoFocusNext="True"
+                                         PreviewTextInput="DateTextBox_PreviewTextInput"/>
+                                
+                            </StackPanel>
+                            
+                            <StackPanel Orientation="Horizontal" Margin="0,6,0,10">
+                                <TextBox x:Name="HourTextBox" 
+                                         Margin="0,0,6,0" 
+                                         Text="{Binding Hour, UpdateSourceTrigger=PropertyChanged}" 
+                                         MaxLength="2"
+                                         core:TextBoxHelper.Placeholder="HR"
+                                         core:TextBoxHelper.AutoFocusNext="True"
+                                         PreviewTextInput="DateTextBox_PreviewTextInput"/>
+                                
+                                <TextBox x:Name="MinuteTextBox" 
+                                         Margin="0,0,6,0" 
+                                         Text="{Binding Minute, UpdateSourceTrigger=PropertyChanged}" 
+                                         MaxLength="2"
+                                         core:TextBoxHelper.Placeholder="MN"
+                                         core:TextBoxHelper.AutoFocusNext="True"
+                                         PreviewTextInput="DateTextBox_PreviewTextInput"/>
+                                
+                                <Button Content="{Binding AmPmLabel}" Command="{Binding ToggleAmPmCommand}" Width="63" Height="53" Background="Transparent" BorderBrush="#252525"/>
+
+                            </StackPanel>
+                            
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+            </Grid>
+            
+            <!-- Status logs -->
+            <Grid Grid.Column="2" Grid.Row="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                
+                <TextBlock Text="Status Logs" 
+                           Foreground="#D4D4D4" 
+                           FontSize="14" 
+                           FontWeight="SemiBold"
+                           FontFamily="pack://application:,,,/ImAged;component/Fonts/Poppins/#Poppins Medium"
+                           Margin="0,0,0,0"/>
+
+                <Border Grid.Row="1"
+                        CornerRadius="7"
+                        BorderBrush="#252525"
+                        BorderThickness="1"
+                        Background="Transparent"
+                        Padding="10">
+
+                    <TextBlock Text="No conversion logs shown." Foreground="#9E9E9E" TextWrapping="Wrap"/>
+
+                </Border>
+            </Grid>
+
+            <!-- Simulation area -->
+            <Grid Grid.Row="2" 
+                  Grid.Column="0" 
+                  Grid.ColumnSpan="3">
+                
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Text="Simulation" 
+                           Foreground="#D4D4D4" 
+                           FontSize="14" 
+                           FontWeight="SemiBold"
+                           FontFamily="pack://application:,,,/ImAged;component/Fonts/Poppins/#Poppins Medium"
+                           Margin="0,0,0,0"/>
+
+                <Border Grid.Row="1"
+                        CornerRadius="7" 
+                        Padding="10"
+                        BorderBrush="#252525"
+                        BorderThickness="1">
+                    <Grid>
+                        <!-- Nav arrows -->
+                        <Button Content="◀" HorizontalAlignment="Left" VerticalAlignment="Center" Width="30" Height="30"/>
+                        <Button Content="▶" HorizontalAlignment="Right" VerticalAlignment="Center" Width="30" Height="30"/>
+                    </Grid>
+                </Border>
+                
+            </Grid>
+        </Grid>
     </Grid>
 </UserControl>

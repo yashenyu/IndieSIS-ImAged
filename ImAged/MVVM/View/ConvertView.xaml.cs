@@ -22,5 +22,23 @@ namespace ImAged.MVVM.View
         {
             InitializeComponent();
         }
+
+        private void DateTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            if (!e.Text.All(char.IsDigit))
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void DayTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+        }
+
+        private void DayTextBox_TextChanged_1(object sender, TextChangedEventArgs e)
+        {
+
+        }
     }
 }
