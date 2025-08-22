@@ -1,27 +1,59 @@
 ﻿using ImAged.MVVM.Model;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel;
+using System.IO;
 
 namespace ImAged.MVVM.ViewModel
 {
-    public class FileViewModel
+    public class FileViewModel : INotifyPropertyChanged
     {
-        // This collection will be bound to your DataGrid/ListView
+        private FileItem _selectedFile;
+        public FileItem SelectedFile
+        {
+            get => _selectedFile;
+            set
+            {
+                if (_selectedFile != value)
+                {
+                    _selectedFile = value;
+                    OnPropertyChanged(nameof(SelectedFile));
+                }
+            }
+        }
         public ObservableCollection<FileItem> Files { get; set; }
 
         public FileViewModel()
         {
-            // Temporary test data (replace later with real logic)
-            Files = new ObservableCollection<FileItem>
+            Files = new ObservableCollection<FileItem>();
+            LoadFiles();
+        }
+        private void LoadFiles()
+        {
+            string folderPath = @"C:\Users\Dre\Desktop";
+
+            if (Directory.Exists(folderPath))
             {
-                new FileItem { FileName = "image1.png", Created = DateTime.Now.AddDays(-1), Status = "Encrypted" },
-                new FileItem { FileName = "image2.jpg", Created = DateTime.Now.AddHours(-5), Status = "Decrypted" },
-                new FileItem { FileName = "document.pdf", Created = DateTime.Now.AddMinutes(-30), Status = "Pending" }
-            };
+                foreach (var path in Directory.GetFiles(folderPath, "*.ttl"))
+                {
+                    var info = new FileInfo(path);
+                    Files.Add(new FileItem
+                    {
+                        FileName = info.Name,
+                        FileType = info.Extension,
+                        FileSize = info.Length / 1024d, // in KB
+                        FilePath = info.FullName,
+                        Created = info.CreationTime,
+                        State = "Converted",
+                        ImagePath = "Images/256x256.ico" // generic icon
+                    });
+                }
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }
