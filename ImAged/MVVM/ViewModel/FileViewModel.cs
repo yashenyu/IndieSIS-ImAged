@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ImAged.MVVM.Model;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -7,15 +8,20 @@ using System.Threading.Tasks;
 
 namespace ImAged.MVVM.ViewModel
 {
-    public ObservableCollection<FileItem> Files { get; set; }
-
-    public FileViewModel()
+    public class FileViewModel
     {
-        // Mock data for now
-        Files = new ObservableCollection<FileItem>
+        // This collection will be bound to your DataGrid/ListView
+        public ObservableCollection<FileItem> Files { get; set; }
+
+        public FileViewModel()
         {
-            new FileItem { FileName = "image1.jpg", Modified = DateTime.Now, Status = "Active" },
-            new FileItem { FileName = "doc1.pdf", Modified = DateTime.Now.AddDays(-1), Status = "Archived" }
-        };
+            // Temporary test data (replace later with real logic)
+            Files = new ObservableCollection<FileItem>
+            {
+                new FileItem { FileName = "image1.png", Created = DateTime.Now.AddDays(-1), Status = "Encrypted" },
+                new FileItem { FileName = "image2.jpg", Created = DateTime.Now.AddHours(-5), Status = "Decrypted" },
+                new FileItem { FileName = "document.pdf", Created = DateTime.Now.AddMinutes(-30), Status = "Pending" }
+            };
+        }
     }
 }
