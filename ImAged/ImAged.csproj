@@ -115,6 +115,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Core\BooleanToVisibilityConverter.cs" />
+    <Compile Include="Core\DynamicTextBlock.cs" />
     <Compile Include="Core\SecureProcessManager.cs" />
     <Compile Include="Core\TextBoxHelper.cs" />
     <Compile Include="MVVM\ViewModel\ConvertViewModel.cs" />

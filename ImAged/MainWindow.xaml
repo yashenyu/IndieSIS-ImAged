@@ -20,13 +20,34 @@
 
     <Border x:Name="MainBorder" Background="#060606" CornerRadius="10">
         <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="75"/>
+                <!-- Header -->
+                <RowDefinition/>
+                <!-- Body -->
+            </Grid.RowDefinitions>
+            
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="213"/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
 
+            <!-- TOP SECTION -->
+            <Grid Grid.Row="0" Grid.ColumnSpan="2" Background="Transparent" MouseLeftButtonDown="WindowDrag">
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,5,5,0">
+                    <Button Style="{StaticResource WindowControlButtonMinimize}"
+                Command="{Binding MinimizeCommand}"
+                CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"/>
+                    <Button Style="{StaticResource WindowControlButtonMinimize}" Content="⛶" FontSize="8" Click="Maximize_Click"/>
+                    <Button Style="{StaticResource WindowControlButtonClose}"
+                Command="{Binding CloseCommand}"
+                CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"/>
+                </StackPanel>
+            </Grid>
+
             <!-- SIDEBAR -->
-            <Border Grid.Column="0" Background="#1E1E1E" CornerRadius="9" Margin="5,6,5,5">
+            <Border Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" Background="#1E1E1E" CornerRadius="9" Margin="5,6,5,5">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -153,26 +174,10 @@
             </Border>
 
             <!-- MAIN CONTENT AREA -->
-            <Grid Grid.Column="1">
+            <Grid Grid.Row="0" Grid.Column="1" Grid.RowSpan="2">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="75"/>
-                    <RowDefinition/>
+                    <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-
-                <!-- TOP SECTION -->
-                <Grid Grid.Row="0" Background="Transparent" MouseLeftButtonDown="WindowDrag">
-
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,5,5,0">
-                        <Button Style="{StaticResource WindowControlButtonMinimize}"
-                                Command="{Binding MinimizeCommand}"
-                                CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"/>
-                        <Button Style="{StaticResource WindowControlButtonMinimize}" Content="⛶" FontSize="8" Click="Maximize_Click"/>
-                        <Button Style="{StaticResource WindowControlButtonClose}"
-                                Command="{Binding CloseCommand}"
-                                CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"/>
-                    </StackPanel>
-                </Grid>
-
 
 
                 <!-- VIEW CONTENT -->

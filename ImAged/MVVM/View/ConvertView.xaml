@@ -16,6 +16,10 @@
     </UserControl.DataContext>
 
     <UserControl.Resources>
+        <!-- Converters -->
+        <core:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <core:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter"/>
+
         <!-- Modern Button style -->
         <Style TargetType="Button">
             <Setter Property="Background" Value="Transparent"/>
@@ -99,7 +103,7 @@
             </Setter>
         </Style>
 
-       
+
     </UserControl.Resources>
 
     <Grid>
@@ -127,7 +131,7 @@
                 <ColumnDefinition Width="12"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            
+
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="12"/>
@@ -156,9 +160,9 @@
                         Background="Transparent"
                         Height="150"
                         >
-                    
+
                     <StackPanel Orientation="Horizontal">
-                        
+
                         <StackPanel Orientation="Vertical">
                             <Button Content="{Binding SelectFileButtonText}" Height="90" Width="120" Margin="8,8,0,1" Background="#1e1e1e" Command="{Binding SelectFileCommand}" />
                             <Button Content="Convert" Height="35" Width="120" Margin="8,7,0,0" Background="#1e1e1e" Command="{Binding ConvertCommand}"/>
@@ -170,7 +174,7 @@
                                        Foreground="#D4D4D4" 
                                        FontSize="12" Height="20"
                                        FontFamily="pack://application:,,,/ImAged;component/Fonts/Poppins/#Poppins Medium"/>
-                            
+
                             <StackPanel Orientation="Horizontal">
                                 <TextBox x:Name="DayTextBox" 
                                          Margin="0,0,6,0" 
@@ -179,7 +183,7 @@
                                          core:TextBoxHelper.Placeholder="DD"
                                          core:TextBoxHelper.AutoFocusNext="True"
                                          PreviewTextInput="DateTextBox_PreviewTextInput"/>
-                                
+
                                 <TextBox x:Name="MonthTextBox" 
                                          Margin="0,0,6,0" 
                                          Text="{Binding Month, UpdateSourceTrigger=PropertyChanged}" 
@@ -187,16 +191,16 @@
                                          core:TextBoxHelper.Placeholder="MM"
                                          core:TextBoxHelper.AutoFocusNext="True"
                                          PreviewTextInput="DateTextBox_PreviewTextInput"/>
-                                
+
                                 <TextBox x:Name="YearTextBox" 
                                          Text="{Binding Year, UpdateSourceTrigger=PropertyChanged}" 
                                          MaxLength="4"
                                          core:TextBoxHelper.Placeholder="YY"
                                          core:TextBoxHelper.AutoFocusNext="True"
                                          PreviewTextInput="DateTextBox_PreviewTextInput"/>
-                                
+
                             </StackPanel>
-                            
+
                             <StackPanel Orientation="Horizontal" Margin="0,6,0,10">
                                 <TextBox x:Name="HourTextBox" 
                                          Margin="0,0,6,0" 
@@ -205,7 +209,7 @@
                                          core:TextBoxHelper.Placeholder="HR"
                                          core:TextBoxHelper.AutoFocusNext="True"
                                          PreviewTextInput="DateTextBox_PreviewTextInput"/>
-                                
+
                                 <TextBox x:Name="MinuteTextBox" 
                                          Margin="0,0,6,0" 
                                          Text="{Binding Minute, UpdateSourceTrigger=PropertyChanged}" 
@@ -213,23 +217,23 @@
                                          core:TextBoxHelper.Placeholder="MN"
                                          core:TextBoxHelper.AutoFocusNext="True"
                                          PreviewTextInput="DateTextBox_PreviewTextInput"/>
-                                
+
                                 <Button Content="{Binding AmPmLabel}" Command="{Binding ToggleAmPmCommand}" Width="63" Height="53" Background="Transparent" BorderBrush="#252525"/>
 
                             </StackPanel>
-                            
+
                         </StackPanel>
                     </StackPanel>
                 </Border>
             </Grid>
-            
+
             <!-- Status logs -->
             <Grid Grid.Column="2" Grid.Row="0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="150"/>
                 </Grid.RowDefinitions>
-                
+
                 <TextBlock Text="Status Logs" 
                            Foreground="#D4D4D4" 
                            FontSize="14" 
@@ -269,7 +273,7 @@
             <Grid Grid.Row="2" 
                   Grid.Column="0" 
                   Grid.ColumnSpan="3">
-                
+
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
@@ -287,13 +291,219 @@
                         Padding="10"
                         BorderBrush="#252525"
                         BorderThickness="1">
+
                     <Grid>
-                        <!-- Nav arrows -->
-                        <Button Content="◀" HorizontalAlignment="Left" VerticalAlignment="Center" Width="30" Height="30"/>
-                        <Button Content="▶" HorizontalAlignment="Right" VerticalAlignment="Center" Width="30" Height="30"/>
+                        <!-- Initial state - show centered message -->
+                        <TextBlock Text="Convert a file to show simulation..."
+                                   Foreground="#666666"
+                                   FontSize="14"
+                                   FontFamily="pack://application:,,,/ImAged;component/Fonts/Poppins/#Poppins Medium"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   Visibility="{Binding ShowSimulationContent, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
+
+                        <!-- Simulation content -->
+                        <Grid Visibility="{Binding ShowSimulationContent, Converter={StaticResource BooleanToVisibilityConverter}}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Left navigation button -->
+                            <Button Content="◀"
+                                    Grid.Column="0"
+                                    VerticalAlignment="Center"
+                                    Width="30" Height="30"
+                                    Margin="0,0,10,0"
+                                    Command="{Binding PreviousStepCommand}"/>
+
+                            <!-- File comparison area -->
+                            <Grid Grid.Column="1">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+
+                                <!-- Header row -->
+                                <Grid Grid.Row="0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Text="Original File:" 
+                                               Grid.Column="0"
+                                               Foreground="#D4D4D4" 
+                                               FontSize="14" 
+                                               FontWeight="SemiBold"
+                                               FontFamily="pack://application:,,,/ImAged;component/Fonts/Poppins/#Poppins Medium"
+                                               Margin="0,0,15,5"/>
+
+                                    <TextBlock Text="Converted TTL File:" 
+                                               Grid.Column="1"
+                                               Foreground="#D4D4D4" 
+                                               FontSize="14" 
+                                               FontWeight="SemiBold"
+                                               FontFamily="pack://application:,,,/ImAged;component/Fonts/Poppins/#Poppins Medium"
+                                               Margin="15,0,0,5"/>
+                                </Grid>
+
+                                <!-- Content row -->
+                                <Grid Grid.Row="1">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- Original File -->
+                                    <Border Grid.Column="0"
+                                            CornerRadius="7" 
+                                            Margin="0,0,15,0"
+                                            BorderBrush="#252525"
+                                            BorderThickness="1"
+                                            Background="Transparent"
+                                            Padding="10">
+
+                                        <ScrollViewer VerticalScrollBarVisibility="Auto" 
+                                                      HorizontalScrollBarVisibility="Disabled"
+                                                      VerticalAlignment="Stretch"
+                                                      HorizontalAlignment="Stretch">
+                                            <ItemsControl ItemsSource="{Binding OriginalFileParts}"
+                                                          HorizontalAlignment="Stretch"
+                                                          VerticalAlignment="Top">
+                                                <ItemsControl.ItemsPanel>
+                                                    <ItemsPanelTemplate>
+                                                        <StackPanel Orientation="Vertical" 
+                                                                    VerticalAlignment="Top"/>
+                                                    </ItemsPanelTemplate>
+                                                </ItemsControl.ItemsPanel>
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Border CornerRadius="7" 
+                                                                Background="#2A2A2A" 
+                                                                BorderBrush="#383838" 
+                                                                BorderThickness="1" 
+                                                                Margin="0,0,0,8" 
+                                                                Padding="10,8"
+                                                                MinHeight="40">
+                                                            <Grid>
+                                                                <Grid.RowDefinitions>
+                                                                    <RowDefinition Height="Auto"/>
+                                                                    <RowDefinition Height="Auto"/>
+                                                                </Grid.RowDefinitions>
+                                                                <TextBlock Text="{Binding Name}" 
+                                                                           Grid.Row="0"
+                                                                           Foreground="#D4D4D4" 
+                                                                           FontSize="11" 
+                                                                           FontWeight="SemiBold"
+                                                                           FontFamily="pack://application:,,,/ImAged;component/Fonts/Poppins/#Poppins Medium"
+                                                                           Margin="0,0,0,4"/>
+                                                                <TextBlock Text="{Binding Data}" 
+                                                                           Grid.Row="1"
+                                                                           Foreground="#D4D4D4" 
+                                                                           FontSize="10" 
+                                                                           FontFamily="Consolas"
+                                                                           TextWrapping="Wrap"
+                                                                           HorizontalAlignment="Left"
+                                                                           TextTrimming="None"/>
+                                                            </Grid>
+                                                        </Border>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </ScrollViewer>
+                                    </Border>
+
+                                    <!-- Converted File -->
+                                    <Border Grid.Column="1"
+                                            CornerRadius="7" 
+                                            Margin="15,0,0,0"
+                                            BorderBrush="#252525"
+                                            BorderThickness="1"
+                                            Background="Transparent"
+                                            Padding="10">
+
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="*"/>
+                                            </Grid.RowDefinitions>
+
+                                            <!-- Step indicator -->
+                                            <TextBlock Text="{Binding CurrentStepText}" 
+                                                       Grid.Row="0"
+                                                       Foreground="#D4D4D4" 
+                                                       FontSize="12" 
+                                                       FontWeight="SemiBold"
+                                                       FontFamily="pack://application:,,,/ImAged;component/Fonts/Poppins/#Poppins Medium"
+                                                       Margin="0,0,0,8"/>
+
+                                            <!-- Converted file parts -->
+                                            <ScrollViewer Grid.Row="1" 
+                                                          VerticalScrollBarVisibility="Auto"
+                                                          HorizontalScrollBarVisibility="Disabled"
+                                                          VerticalAlignment="Stretch"
+                                                          HorizontalAlignment="Stretch">
+                                                <ItemsControl ItemsSource="{Binding CurrentStepParts}"
+                                                              HorizontalAlignment="Stretch"
+                                                              VerticalAlignment="Top">
+                                                    <ItemsControl.ItemsPanel>
+                                                        <ItemsPanelTemplate>
+                                                            <StackPanel Orientation="Vertical" 
+                                                                        VerticalAlignment="Top"/>
+                                                        </ItemsPanelTemplate>
+                                                    </ItemsControl.ItemsPanel>
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <Border CornerRadius="7" 
+                                                                    Background="#2A2A2A" 
+                                                                    BorderBrush="#383838" 
+                                                                    BorderThickness="1" 
+                                                                    Margin="0,0,0,8" 
+                                                                    Padding="10,8"
+                                                                    MinHeight="40">
+                                                                <Grid>
+                                                                    <Grid.RowDefinitions>
+                                                                        <RowDefinition Height="Auto"/>
+                                                                        <RowDefinition Height="Auto"/>
+                                                                    </Grid.RowDefinitions>
+                                                                    <TextBlock Text="{Binding Name}" 
+                                                                               Grid.Row="0"
+                                                                               Foreground="#D4D4D4" 
+                                                                               FontSize="11" 
+                                                                               FontWeight="SemiBold"
+                                                                               FontFamily="pack://application:,,,/ImAged;component/Fonts/Poppins/#Poppins Medium"
+                                                                               Margin="0,0,0,4"/>
+                                                                    <TextBlock Text="{Binding Data}" 
+                                                                               Grid.Row="1"
+                                                                               Foreground="#D4D4D4" 
+                                                                               FontSize="10" 
+                                                                               FontFamily="Consolas"
+                                                                               TextWrapping="Wrap"
+                                                                               HorizontalAlignment="Left"
+                                                                               TextTrimming="None"/>
+                                                                </Grid>
+                                                            </Border>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                            </ScrollViewer>
+                                        </Grid>
+                                    </Border>
+                                </Grid>
+                            </Grid>
+
+                            <!-- Right navigation button -->
+                            <Button Content="▶"
+                                    Grid.Column="2"
+                                    VerticalAlignment="Center"
+                                    Width="30" Height="30"
+                                    Margin="10,0,0,0"
+                                    Command="{Binding NextStepCommand}"/>
+                        </Grid>
                     </Grid>
                 </Border>
-                
             </Grid>
         </Grid>
     </Grid>
