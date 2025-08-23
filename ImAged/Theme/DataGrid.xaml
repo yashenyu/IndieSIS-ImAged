@@ -29,18 +29,19 @@
     </Style>
 
     <!-- DataGrid Row Style -->
-    <Style TargetType="DataGridRow">
-        <Setter Property="SnapsToDevicePixels" Value="True"/>
-        <Setter Property="Validation.ErrorTemplate" Value="{x:Null}"/>
-        <Setter Property="Background" Value="Transparent"/>
+    <Style TargetType="DataGridCell">
+        <Setter Property="Background" Value="#FF1F1F1F"/>
+        <Setter Property="Foreground" Value="#FFADADAD"/>
         <Setter Property="BorderBrush" Value="Transparent"/>
         <Setter Property="BorderThickness" Value="0"/>
-        <Setter Property="Padding" Value="4"/>
         <Style.Triggers>
+            <!-- Hover effect -->
             <Trigger Property="IsMouseOver" Value="True">
                 <Setter Property="Background" Value="#FF131313"/>
                 <Setter Property="Foreground" Value="#FFADADAD"/>
             </Trigger>
+
+            <!-- Selected effect -->
             <Trigger Property="IsSelected" Value="True">
                 <Setter Property="Background" Value="#FF464646"/>
                 <Setter Property="Foreground" Value="Black"/>

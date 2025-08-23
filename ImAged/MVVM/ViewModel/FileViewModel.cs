@@ -2,12 +2,15 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
+using System.Windows.Data;
 
 namespace ImAged.MVVM.ViewModel
 {
     public class FileViewModel : INotifyPropertyChanged
     {
         private FileItem _selectedFile;
+        private string _searchText;
+
         public FileItem SelectedFile
         {
             get => _selectedFile;
@@ -20,13 +23,33 @@ namespace ImAged.MVVM.ViewModel
                 }
             }
         }
+
         public ObservableCollection<FileItem> Files { get; set; }
+        public ICollectionView FilesView { get; set; }
+
+        public string SearchText
+        {
+            get => _searchText;
+            set
+            {
+                if (_searchText != value)
+                {
+                    _searchText = value;
+                    OnPropertyChanged(nameof(SearchText));
+                    FilesView.Refresh(); // apply filter when search text changes
+                }
+            }
+        }
 
         public FileViewModel()
         {
             Files = new ObservableCollection<FileItem>();
+            FilesView = CollectionViewSource.GetDefaultView(Files);
+            FilesView.Filter = FilterFiles;
+
             LoadFiles();
         }
+
         private void LoadFiles()
         {
             string folderPath = @"C:\Users\Dre\Desktop";
@@ -48,6 +71,19 @@ namespace ImAged.MVVM.ViewModel
                     });
                 }
             }
+        }
+
+        private bool FilterFiles(object obj)
+        {
+            if (obj is FileItem file)
+            {
+                if (string.IsNullOrWhiteSpace(SearchText))
+                    return true;
+
+                return file.FileName.IndexOf(SearchText, System.StringComparison.OrdinalIgnoreCase) >= 0 ||
+                       file.FileType.IndexOf(SearchText, System.StringComparison.OrdinalIgnoreCase) >= 0;
+            }
+            return false;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

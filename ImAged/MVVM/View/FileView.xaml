@@ -14,39 +14,56 @@
             <!-- File Details -->
         </Grid.ColumnDefinitions>
 
-        <!-- ✅ File List -->
-        <DataGrid ItemsSource="{Binding Files}"
-                  Grid.Column="0"
+        <!-- Left Panel: Search + DataGrid -->
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <!-- Search box row -->
+                <RowDefinition Height="*"/>
+                <!-- DataGrid row -->
+            </Grid.RowDefinitions>
+
+            <!-- 🔎 Search Box -->
+            <TextBox Grid.Row="0"
+                 Width="301"
+                 Margin="15,10,0,5"
+                 VerticalContentAlignment="Center"
+                 Style="{StaticResource ModernTextbox}"
+                 Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left"/>
+
+            <!-- ✅ File List -->
+            <DataGrid Grid.Row="1"
+                  ItemsSource="{Binding FilesView}"
                   AutoGenerateColumns="False"
                   IsReadOnly="True"
                   SelectionMode="Single"
                   SelectedItem="{Binding SelectedFile, Mode=TwoWay}"
                   Style="{StaticResource GridTheme}"
-                  Margin="10,89,10,10">
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="File Name" Binding="{Binding FileName}" Width="*" />
-                <DataGridTextColumn Header="Type" Binding="{Binding FileType}" Width="100" />
-                <DataGridTextColumn Header="Size (KB)" Binding="{Binding FileSize, StringFormat={}{0:N2}}" Width="100" />
-                <DataGridTextColumn Header="Created" Binding="{Binding Created}" Width="150" />
-            </DataGrid.Columns>
-        </DataGrid>
+                  Margin="10,0,10,10">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="File Name" Binding="{Binding FileName}" Width="*" />
+                    <DataGridTextColumn Header="Type" Binding="{Binding FileType}" Width="100" />
+                    <DataGridTextColumn Header="Size (KB)" Binding="{Binding FileSize, StringFormat={}{0:N2}}" Width="100" />
+                    <DataGridTextColumn Header="Created" Binding="{Binding Created}" Width="150" />
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
 
         <!-- ✅ File Details Panel -->
         <StackPanel Grid.Column="1" Margin="10">
             <Image Source="{Binding SelectedFile.ImagePath}"
-                   Width="200" Height="140"
-                   Stretch="Uniform"
-                   Margin="0,0,0,10"/>
+               Width="200" Height="140"
+               Stretch="Uniform"
+               Margin="0,0,0,5"/>
             <Separator/>
 
-            <TextBlock Text="File Details" FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
-
-            <TextBlock Text="{Binding SelectedFile.FileName, StringFormat='Name: {0}'}" Margin="0,5,0,0"/>
-            <TextBlock Text="{Binding SelectedFile.FileType, StringFormat='Type: {0}'}" Margin="0,5,0,0"/>
-            <TextBlock Text="{Binding SelectedFile.FileSize, StringFormat='Size: {0:N2} KB'}" Margin="0,5,0,0"/>
-            <TextBlock Text="{Binding SelectedFile.FilePath, StringFormat='Location: {0}'}" Margin="0,5,0,0"/>
-            <TextBlock Text="{Binding SelectedFile.Created, StringFormat='Created: {0:MM/dd/yyyy HH:mm}'}" Margin="0,5,0,0"/>
-            <TextBlock Text="{Binding SelectedFile.State, StringFormat='State: {0}'}" Margin="0,5,0,0"/>
+            <TextBlock Text="File Details" FontWeight="Bold" FontSize="16" Foreground="White" Margin="0,0,0,10"/>
+            <TextBlock Text="{Binding SelectedFile.FileName, StringFormat='Name: {0}'}" Foreground="#FF909090" Margin="0,0,0,5" TextWrapping="Wrap"/>
+            <TextBlock Text="{Binding SelectedFile.FileType, StringFormat='Type: {0}'}" Foreground="#FF909090" Margin="0,0,0,5"/>
+            <TextBlock Text="{Binding SelectedFile.FileSize, StringFormat='Size: {0:N2} KB'}" Foreground="#FF909090" Margin="0,0,0,5"/>
+            <TextBlock Text="{Binding SelectedFile.FilePath, StringFormat='Location: {0}'}" Foreground="#FF909090" Margin="0,0,0,5" TextWrapping="Wrap"/>
+            <TextBlock Text="{Binding SelectedFile.Created, StringFormat='Created: {0:MM/dd/yyyy HH:mm}'}" Foreground="#FF909090" Margin="0,0,0,5"/>
+            <TextBlock Text="{Binding SelectedFile.State, StringFormat='State: {0}'}" Foreground="#FF909090" Margin="0,0,0,5"/>
         </StackPanel>
     </Grid>
 </UserControl>
