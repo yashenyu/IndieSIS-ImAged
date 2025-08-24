@@ -4,7 +4,7 @@
     <Style x:Key="GridTheme" TargetType="DataGrid">
         <Setter Property="Background" Value="#FF1F1F1F"/>
         <Setter Property="Foreground" Value="#FF9E9E9E"/>
-        <Setter Property="BorderBrush" Value="#DDDDDD"/>
+        <Setter Property="BorderBrush" Value="#FF212121"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="RowBackground" Value="#FFFFFF"/>
         <Setter Property="AlternatingRowBackground" Value="#F7F7F7"/>
@@ -16,6 +16,11 @@
         <Setter Property="Margin" Value="10"/>
         <Setter Property="SnapsToDevicePixels" Value="True"/>
     </Style>
+    
+    <Style TargetType="DataGridRowHeader">
+        <Setter Property="Background" Value="#FF121212"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+    </Style>
 
     <!-- DataGrid Column Header Style -->
     <Style TargetType="DataGridColumnHeader">
@@ -23,7 +28,7 @@
         <Setter Property="Foreground" Value="#FF969696"/>
         <Setter Property="FontWeight" Value="SemiBold"/>
         <Setter Property="BorderThickness" Value="0,0,1,1"/>
-        <Setter Property="BorderBrush" Value="#FFEDEDED"/>
+        <Setter Property="BorderBrush" Value="#FF212121"/>
         <Setter Property="Padding" Value="10,4"/>
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
     </Style>
@@ -34,6 +39,8 @@
         <Setter Property="Foreground" Value="#FFADADAD"/>
         <Setter Property="BorderBrush" Value="Transparent"/>
         <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="TextBlock.TextTrimming" Value="CharacterEllipsis"/>
+        <Setter Property="TextBlock.TextWrapping" Value="NoWrap"/>
         <Style.Triggers>
             <!-- Hover effect -->
             <Trigger Property="IsMouseOver" Value="True">

@@ -67,7 +67,7 @@ namespace ImAged.MVVM.ViewModel
                         FilePath = info.FullName,
                         Created = info.CreationTime,
                         State = "Converted",
-                        ImagePath = "Images/256x256.ico" // generic icon
+                        ImagePath = "256x256.ico" // generic icon
                     });
                 }
             }
