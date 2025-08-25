@@ -103,6 +103,7 @@
     <Compile Include="MVVM\View\ConvertView.xaml.cs">
       <DependentUpon>ConvertView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="MVVM\View\EqualsConverter.cs" />
     <Compile Include="MVVM\View\FileView.xaml.cs">
       <DependentUpon>FileView.xaml</DependentUpon>
     </Compile>

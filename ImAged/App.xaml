@@ -19,7 +19,7 @@
             </DataTemplate>
 
             <DataTemplate DataType="{x:Type viewModel:ViewViewModel}">
-                <view:ViewView/>
+                <view:View/>
             </DataTemplate>
             
              <DataTemplate DataType="{x:Type viewModel:FileViewModel}">
