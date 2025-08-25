@@ -86,7 +86,11 @@
                  HorizontalAlignment="Left"
                  Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
                  Style="{StaticResource SearchTextBoxStyle}"
+<<<<<<< Updated upstream
                  Margin="850,23,0,48" Grid.RowSpan="2"/>
+=======
+                 Margin="841,23,0,48" Grid.RowSpan="2"/>
+>>>>>>> Stashed changes
 
         <!-- Title and Separator -->
         <StackPanel Grid.Row="1" Margin="0,0,0,10">
