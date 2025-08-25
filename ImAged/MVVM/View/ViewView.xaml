@@ -12,10 +12,15 @@
              Background="#121212">
 
     <UserControl.Resources>
+<<<<<<< Updated upstream
         <!-- The ViewModel is instantiated here and set as the DataContext -->
         <viewModel:MainViewModel x:Key="MainViewModel"/>
 
         <!-- Tab button style -->
+=======
+        <viewModel:MainViewModel x:Key="MainViewModel"/>
+
+>>>>>>> Stashed changes
         <Style x:Key="TabRadioButtonStyle" TargetType="RadioButton">
             <Setter Property="Foreground" Value="#9CA3AF"/>
             <Setter Property="Padding" Value="14,8"/>
@@ -46,7 +51,10 @@
             </Setter>
         </Style>
 
+<<<<<<< Updated upstream
         <!-- Search TextBox style -->
+=======
+>>>>>>> Stashed changes
         <Style x:Key="SearchTextBoxStyle" TargetType="TextBox">
             <Setter Property="Background" Value="#1E1E1E"/>
             <Setter Property="Foreground" Value="White"/>
@@ -64,12 +72,18 @@
             </Setter>
         </Style>
 
+<<<<<<< Updated upstream
         <!-- A simple converter to check if a value equals a parameter -->
+=======
+>>>>>>> Stashed changes
         <local:EqualsConverter x:Key="EqualsConverter"/>
 
     </UserControl.Resources>
 
+<<<<<<< Updated upstream
     <!-- Set the DataContext for the entire Grid to your MainViewModel -->
+=======
+>>>>>>> Stashed changes
     <Grid Margin="20" DataContext="{StaticResource MainViewModel}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -78,7 +92,10 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
+<<<<<<< Updated upstream
         <!-- Search box (top-left) -->
+=======
+>>>>>>> Stashed changes
         <TextBox Grid.Row="0"
                  x:Name="SearchBox"
                  Width="300"
@@ -87,12 +104,17 @@
                  Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
                  Style="{StaticResource SearchTextBoxStyle}"
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
                  Margin="850,23,0,48" Grid.RowSpan="2"/>
 =======
                  Margin="841,23,0,48" Grid.RowSpan="2"/>
 >>>>>>> Stashed changes
 
         <!-- Title and Separator -->
+=======
+                 Margin="841,23,0,48" Grid.RowSpan="2"/>
+
+>>>>>>> Stashed changes
         <StackPanel Grid.Row="1" Margin="0,0,0,10">
             <TextBlock
                 Text="Folders"
@@ -107,9 +129,13 @@
                 HorizontalAlignment="Stretch"/>
         </StackPanel>
 
+<<<<<<< Updated upstream
         <!-- Tabs -->
         <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,0,0,20">
             <!-- Bind to the ChangeTabCommand and pass the tab name as a parameter -->
+=======
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,0,0,20">
+>>>>>>> Stashed changes
             <RadioButton GroupName="FolderTabs"
                          Content="Recent"
                          IsChecked="{Binding CurrentTab, Converter={StaticResource EqualsConverter}, ConverterParameter=Recent}"
@@ -125,6 +151,7 @@
                          CommandParameter="Archived"/>
         </StackPanel>
 
+<<<<<<< Updated upstream
         <!-- Folder grid -->
         <ScrollViewer Grid.Row="3"
                       VerticalScrollBarVisibility="Auto"
@@ -173,5 +200,58 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
         </ScrollViewer>
+=======
+        <ItemsControl Grid.Row="3" ItemsSource="{Binding Folders}" VirtualizingPanel.IsVirtualizingWhenGrouping="True" ScrollViewer.CanContentScroll="True">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel IsItemsHost="True"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+
+            <ItemsControl.Template>
+                <ControlTemplate TargetType="{x:Type ItemsControl}">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                        <ItemsPresenter/>
+                    </ScrollViewer>
+                </ControlTemplate>
+            </ItemsControl.Template>
+
+            <VirtualizingPanel.IsVirtualizing>True</VirtualizingPanel.IsVirtualizing>
+            <VirtualizingPanel.VirtualizationMode>Recycling</VirtualizingPanel.VirtualizationMode>
+            <ScrollViewer.IsDeferredScrollingEnabled>True</ScrollViewer.IsDeferredScrollingEnabled>
+
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Button Background="Transparent" BorderBrush="Transparent" Padding="0" Margin="10"
+                            Command="{Binding FolderClickedCommand}">
+                        <Border Width="260" Height="180"
+                                Background="#1E1E1E"
+                                CornerRadius="8">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <Border Grid.Row="0" Margin="6" CornerRadius="6" ClipToBounds="True">
+                                    <Image Source="{Binding Thumbnail}"
+                                           Stretch="UniformToFill"/>
+                                </Border>
+
+                                <StackPanel Grid.Row="1" Margin="10,6,10,10">
+                                    <TextBlock Text="{Binding Name}"
+                                               Foreground="White"
+                                               FontWeight="Bold"/>
+                                    <TextBlock Text="{Binding Info}"
+                                               Foreground="#9CA3AF"
+                                               FontSize="12"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </Button>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+>>>>>>> Stashed changes
     </Grid>
 </UserControl>

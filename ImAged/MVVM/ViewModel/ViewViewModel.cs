@@ -1,6 +1,8 @@
-﻿using System;
+﻿using ImAged.Core;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+<<<<<<< Updated upstream
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -11,6 +13,22 @@ namespace ImAged.MVVM.ViewModel
 {
     // The ViewModel must implement INotifyPropertyChanged to notify the UI of property changes
     public class MainViewModel : INotifyPropertyChanged
+=======
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Input;
+using System.Windows.Media.Imaging;
+using System.Windows.Threading;
+using System.Diagnostics;
+using ImAged.Services;
+using System.Threading;
+
+namespace ImAged.MVVM.ViewModel
+{
+    public class ViewViewModel : ObservableObject
+>>>>>>> Stashed changes
     {
         private string _searchText;
         public string SearchText
@@ -20,11 +38,19 @@ namespace ImAged.MVVM.ViewModel
             {
                 _searchText = value;
                 OnPropertyChanged();
+<<<<<<< Updated upstream
                 FilterFolders(); // Call the filter method when search text changes
             }
         }
 
         private string _currentTab = "Recent"; // Default tab
+=======
+                ScheduleFilter();
+            }
+        }
+
+        private string _currentTab = "Recent";
+>>>>>>> Stashed changes
         public string CurrentTab
         {
             get { return _currentTab; }
@@ -32,6 +58,7 @@ namespace ImAged.MVVM.ViewModel
             {
                 _currentTab = value;
                 OnPropertyChanged();
+<<<<<<< Updated upstream
                 FilterFolders(); // Call the filter method when the tab changes
             }
         }
@@ -63,6 +90,68 @@ namespace ImAged.MVVM.ViewModel
             // Initialize the UI-bound collection by filtering
             Folders = new ObservableCollection<FolderModel>();
             FilterFolders();
+=======
+                ScheduleFilter();
+            }
+        }
+
+        private ObservableCollection<FolderModel> _allFolders;
+        public ObservableCollection<FolderModel> AllFolders
+        {
+            get => _allFolders;
+            set
+            {
+                _allFolders = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private BulkObservableCollection<FolderModel> _folders;
+        public BulkObservableCollection<FolderModel> Folders
+        {
+            get { return _folders; }
+            set
+            {
+                _folders = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public ICommand ChangeTabCommand { get; set; }
+        private CancellationTokenSource _filterCts;
+        private readonly TimeSpan _filterDebounce = TimeSpan.FromMilliseconds(200);
+
+        public ViewViewModel()
+        {
+            ChangeTabCommand = new RelayCommand(ChangeTab);
+            Folders = new BulkObservableCollection<FolderModel>();
+        }
+
+        public async Task InitializeFoldersAsync()
+        {
+            // Only load data if it hasn't been loaded before
+            if (AllFolders != null)
+                return;
+
+            AllFolders = new ObservableCollection<FolderModel>();
+
+            await Task.Run(() =>
+            {
+                for (int i = 0; i < 5000; i++)
+                {
+                    var folder = new FolderModel
+                    {
+                        Name = $"Folder {i}",
+                        Info = $"File count: {i * 10}",
+                        ImagePath = "C:/path/to/image.png", // Use a real or dummy path here
+                        IsArchived = i % 2 == 0 // Archive half the folders
+                    };
+                    AllFolders.Add(folder);
+                }
+            });
+
+            ScheduleFilter();
+>>>>>>> Stashed changes
         }
 
         private void ChangeTab(object parameter)
@@ -73,6 +162,7 @@ namespace ImAged.MVVM.ViewModel
             }
         }
 
+<<<<<<< Updated upstream
         private void FilterFolders()
         {
             // First, filter by the selected tab
@@ -150,4 +240,53 @@ namespace ImAged.MVVM.ViewModel
         public bool CanExecute(object parameter) => _canExecute == null || _canExecute(parameter);
         public void Execute(object parameter) => _execute(parameter);
     }
+=======
+        private void ScheduleFilter()
+        {
+            _filterCts?.Cancel();
+            var cts = new CancellationTokenSource();
+            _filterCts = cts;
+            _ = FilterFoldersAsync(cts.Token);
+        }
+
+        private async Task FilterFoldersAsync(CancellationToken cancellationToken)
+        {
+            string currentTab = CurrentTab;
+            string searchText = SearchText;
+
+            // Ensure AllFolders is initialized before filtering
+            if (AllFolders == null)
+            {
+                await InitializeFoldersAsync();
+            }
+
+            try
+            {
+                await Task.Delay(_filterDebounce, cancellationToken);
+            }
+            catch (TaskCanceledException)
+            {
+                return;
+            }
+
+            var newFilteredList = await Task.Run(() =>
+            {
+                return AllFolders
+                    .Where(f => currentTab == "Archived" ? f.IsArchived : !f.IsArchived)
+                    .Where(f => string.IsNullOrWhiteSpace(searchText) || f.Name.IndexOf(searchText, StringComparison.OrdinalIgnoreCase) >= 0)
+                    .ToList();
+            }, cancellationToken);
+
+            if (cancellationToken.IsCancellationRequested)
+            {
+                return;
+            }
+
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                Folders.Reset(newFilteredList);
+            });
+        }
+    }
+>>>>>>> Stashed changes
 }
