@@ -119,6 +119,7 @@
     <Compile Include="Core\DynamicTextBlock.cs" />
     <Compile Include="Core\SecureProcessManager.cs" />
     <Compile Include="Core\TextBoxHelper.cs" />
+    <Compile Include="MVVM\Model\FileItem.cs" />
     <Compile Include="MVVM\ViewModel\ConvertViewModel.cs" />
     <Compile Include="MVVM\ViewModel\FileViewModel.cs" />
     <Compile Include="MVVM\ViewModel\SettingsViewModel.cs" />
@@ -169,6 +170,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="MVVM\View\ViewView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Theme\DataGrid.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -264,13 +269,12 @@
     <Resource Include="Images\48.ico" />
     <Resource Include="Images\64.ico" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="MVVM\Model\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Resource Include="Images\256x256.ico" />
     <Resource Include="256x256.ico" />
     <Resource Include="Images\base logo.png" />
+    <Resource Include="Images\dre.jpg" />
     <Content Include="pysrc\aes_gcm.py" />
     <Content Include="pysrc\config.py" />
     <Content Include="pysrc\crypto.py" />

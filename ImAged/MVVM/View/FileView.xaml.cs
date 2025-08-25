@@ -1,5 +1,7 @@
-﻿using System;
+﻿using ImAged.MVVM.ViewModel;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,14 +17,12 @@ using System.Windows.Shapes;
 
 namespace ImAged.MVVM.View
 {
-    /// <summary>
-    /// Interaction logic for FileView.xaml
-    /// </summary>
     public partial class FileView : UserControl
     {
         public FileView()
         {
             InitializeComponent();
+            DataContext = new FileViewModel(); 
         }
     }
 }

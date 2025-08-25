@@ -7,41 +7,145 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" 
              d:DesignWidth="800">
-    <Grid>
-        <StackPanel>
-            <TextBlock Text="Settings" 
-                   FontWeight="Bold" 
-                   Foreground="#FFEDEDED" 
-                   Margin="20,20,0,0"
-                   FontSize="25" FontFamily="Yu Gothic UI" Width="770" />
-            <Separator Margin="22,6,0,0" 
-                       Height="1" 
-                       Foreground="#383838" 
-                       Width="680"
-                       HorizontalAlignment="Left" Background="#FF2B2B2B"/>
-        </StackPanel>
 
-        <StackPanel Margin="10,71,30,300">
-            <TextBlock Text="Edit Download Path:" 
-                       FontWeight="Bold" 
-                       Foreground="White" 
-                       Margin="20,0,0,0" FontFamily="Yu Gothic UI Semibold"/>
+    <ScrollViewer VerticalScrollBarVisibility="Auto" 
+                  HorizontalScrollBarVisibility="Disabled">
+        <Grid Margin="30,90,50,50">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
 
-            <TextBox x:Name="DownloadPathTextBox"
-                     Text="No Path Selected"
-                     Margin="20,5,0,5" 
-                     IsReadOnly="True" 
-                     Background="#FF2B2B2B" 
-                     Foreground="White" 
-                     Width="650" 
-                     HorizontalAlignment="Left"/>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
 
-            <Button Content="Select Path" 
-                    
-                    HorizontalAlignment="Right" 
-                    Width="80" 
-                    Margin="0,10,30,0"/>
-        </StackPanel>
+            <TextBlock Text="INDIESIS" 
+               HorizontalAlignment="Left" 
+               VerticalAlignment="Top" 
+               FontSize="36" 
+               Foreground="White" 
+               FontFamily="Bahnschrift Light" 
+               Height="41" 
+               Margin="252,-67,0,0" 
+               Grid.ColumnSpan="2"/>
 
-    </Grid>
+            <!-- Top Left -->
+            <Border Grid.Row="0" Grid.Column="0" 
+            CornerRadius="20" 
+            Background="#FF121212" 
+            Margin="10">
+                <StackPanel>
+                    <Image Source="/Images/dre.jpg" 
+                   Width="380"
+                   Height="198" 
+                   HorizontalAlignment="Stretch"
+                   Stretch="Uniform" 
+                   Margin="0,20,0,0"/>
+                    <TextBlock Text="Dayrit, Mark Aaron B." 
+                       HorizontalAlignment="Center"
+                       Foreground="White"
+                       FontSize="14"
+                       Margin="0,12,0,0"/>
+                    <TextBlock Text="4th Computer Science Student" 
+                       HorizontalAlignment="Center"
+                       Foreground="White"
+                       FontSize="10"/>
+                    <TextBlock Text="Holy Angel University" 
+                       HorizontalAlignment="Center"
+                       Foreground="White"
+                       FontSize="10"
+                       Margin="0,0,0,26"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Top Right -->
+            <Border Grid.Row="0" Grid.Column="1" 
+            CornerRadius="20" 
+            Background="#FF121212" 
+            Margin="10">
+                <StackPanel>
+                    <Image Source="/Images/dre.jpg" 
+                   Width="380" 
+                   Height="198" 
+                   HorizontalAlignment="Stretch" 
+                   Stretch="Uniform" 
+                   Margin="0,20,0,0"/>
+                    <TextBlock Text="Pangan, Ric Chrisitian B." 
+                       HorizontalAlignment="Center"
+                       Foreground="White"
+                       FontSize="14"
+                       Margin="0,12,0,0"/>
+                    <TextBlock Text="4th Computer Science Student" 
+                       HorizontalAlignment="Center"
+                       Foreground="White"
+                       FontSize="10"/>
+                    <TextBlock Text="Holy Angel University" 
+                       HorizontalAlignment="Center"
+                       Foreground="White"
+                       FontSize="10"
+                       Margin="0,0,0,26"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Bottom Left -->
+            <Border Grid.Row="1" Grid.Column="0" 
+            CornerRadius="20" 
+            Background="#FF121212" 
+            Margin="10">
+                <StackPanel>
+                    <Image Source="/Images/dre.jpg" 
+                   Width="380" 
+                   Height="198" 
+                   HorizontalAlignment="Stretch" 
+                   Stretch="Uniform" 
+                   Margin="0,20,0,0"/>
+                    <TextBlock Text="Quizon, Andre Thomas M." 
+                       HorizontalAlignment="Center"
+                       Foreground="White"
+                       FontSize="14"
+                       Margin="0,12,0,0"/>
+                    <TextBlock Text="4th Computer Science Student" 
+                       HorizontalAlignment="Center"
+                       Foreground="White"
+                       FontSize="10"/>
+                    <TextBlock Text="Holy Angel University" 
+                       HorizontalAlignment="Center"
+                       Foreground="White"
+                       FontSize="10"
+                       Margin="0,0,0,26"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Bottom Right -->
+            <Border Grid.Row="1" Grid.Column="1" 
+            CornerRadius="20" 
+            Background="#FF121212" 
+            Margin="10">
+                <StackPanel>
+                    <Image Source="/Images/dre.jpg" 
+                   Width="380"
+                   Height="198" 
+                   HorizontalAlignment="Stretch"
+                   Stretch="Uniform" 
+                   Margin="0,20,0,0"/>
+                    <TextBlock Text="Siron, Carlo S." 
+                       HorizontalAlignment="Center" 
+                       Foreground="White"
+                       FontSize="14" 
+                       Margin="0,12,0,0"/>
+                    <TextBlock Text="4th Computer Science Student" 
+                       HorizontalAlignment="Center"
+                       Foreground="White"
+                       FontSize="10"/>
+                    <TextBlock Text="Holy Angel University" 
+                       HorizontalAlignment="Center"
+                       Foreground="White"
+                       FontSize="10" 
+                       Margin="0,0,0,26"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </ScrollViewer>
 </UserControl>
