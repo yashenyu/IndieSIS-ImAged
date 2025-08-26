@@ -160,7 +160,7 @@ namespace ImAged.MVVM.ViewModel
         private readonly List<FileSystemWatcher> _fileWatchers = new List<FileSystemWatcher>();
 
         // Memory management
-        private readonly SemaphoreSlim _thumbnailSemaphore = new SemaphoreSlim(2, 2); // Reduce to 2 concurrent
+        private readonly SemaphoreSlim _thumbnailSemaphore = new SemaphoreSlim(4, 4);
         private readonly Dictionary<string, SecureImageReference> _thumbnailCache = new Dictionary<string, SecureImageReference>();
         private readonly List<SecureImageReference> _activeImages = new List<SecureImageReference>();
         private readonly object _imagesLock = new object();
@@ -214,7 +214,9 @@ namespace ImAged.MVVM.ViewModel
                 Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads")
             };
 
-            OpenTtlFileCommand = new RelayCommand(async (param) => await OpenTtlFileAsync(param));
+            OpenTtlFileCommand = new RelayCommand(
+                async (param) => await OpenTtlFileAsync(param),
+                (param) => param is TtlFileInfo);
 
             // Setup memory cleanup timer
             _memoryCleanupTimer = new DispatcherTimer
@@ -455,6 +457,13 @@ namespace ImAged.MVVM.ViewModel
                         {
                             var win = new ImageViewWindow(bitmapSource, fileInfo.FilePath);
                             win.Show();
+                        });
+                    }
+                    else
+                    {
+                        await Application.Current.Dispatcher.InvokeAsync(() =>
+                        {
+                            MessageBox.Show("Unable to open this TTL image. The secure backend returned no data.", "Open Image", MessageBoxButton.OK, MessageBoxImage.Information);
                         });
                     }
                 }
