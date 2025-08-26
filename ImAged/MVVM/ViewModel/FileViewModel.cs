@@ -71,6 +71,7 @@ namespace ImAged.MVVM.ViewModel
         private void OpenFolder()
         {
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
             // This is where you would put the logic to navigate to the selected folder,
             // or perform some other action.
             Debug.WriteLine($"Folder '{Name}' was clicked!");
@@ -81,9 +82,25 @@ namespace ImAged.MVVM.ViewModel
                     continue;
 
                 try
+=======
+            var searchDirectories = new[]
+            {
+                Environment.GetFolderPath(Environment.SpecialFolder.MyPictures),
+                Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads"),
+                Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
+            };
+
+            foreach (var folderPath in searchDirectories)
+            {
+                if (!Directory.Exists(folderPath)) continue;
+
+                foreach (var path in Directory.GetFiles(folderPath, "*.ttl", SearchOption.AllDirectories))
+>>>>>>> Stashed changes
                 {
                     foreach (var path in Directory.EnumerateFiles(folderPath, "*.ttl", SearchOption.AllDirectories))
                     {
+<<<<<<< Updated upstream
                         FileInfo info;
                         try
                         {
@@ -113,6 +130,16 @@ namespace ImAged.MVVM.ViewModel
                 catch (IOException)
                 {
                     // Skip problematic folders
+=======
+                        FileName = info.Name,
+                        FileType = info.Extension,
+                        FileSize = info.Length / 1024d, // in KB
+                        FilePath = info.FullName,
+                        Created = info.CreationTime,
+                        State = "Converted",
+                        ImagePath = "256x256.ico"
+                    });
+>>>>>>> Stashed changes
                 }
             }
         }
