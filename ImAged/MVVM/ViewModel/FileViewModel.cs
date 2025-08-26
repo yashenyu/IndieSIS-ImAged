@@ -1,4 +1,6 @@
 ﻿using ImAged.MVVM.Model;
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
@@ -52,27 +54,35 @@ namespace ImAged.MVVM.ViewModel
 
         private void LoadFiles()
         {
-            string folderPath = @"C:\Users\Dre\Desktop";
-
-            if (Directory.Exists(folderPath))
+            // Folders to search
+            var targetFolders = new List<string>
             {
-                foreach (var path in Directory.GetFiles(folderPath, "*.ttl"))
+                Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads"),
+                Environment.GetFolderPath(Environment.SpecialFolder.MyPictures)
+            };
+
+            foreach (var folderPath in targetFolders)
+            {
+                if (Directory.Exists(folderPath))
                 {
-                    var info = new FileInfo(path);
-                    Files.Add(new FileItem
+                    foreach (var path in Directory.GetFiles(folderPath, "*.ttl"))
                     {
-                        FileName = info.Name,
-                        FileType = info.Extension,
-                        FileSize = info.Length / 1024d, // in KB
-                        FilePath = info.FullName,
-                        Created = info.CreationTime,
-                        State = "Converted",
-                        ImagePath = "256x256.ico" // generic icon
-                    });
+                        var info = new FileInfo(path);
+                        Files.Add(new FileItem
+                        {
+                            FileName = info.Name,
+                            FileType = info.Extension,
+                            FileSize = info.Length / 1024d, // in KB
+                            FilePath = info.FullName,
+                            Created = info.CreationTime,
+                            State = "Converted",
+                            ImagePath = "256x256.ico" // generic icon
+                        });
+                    }
                 }
             }
         }
-
         private bool FilterFiles(object obj)
         {
             if (obj is FileItem file)
@@ -80,8 +90,8 @@ namespace ImAged.MVVM.ViewModel
                 if (string.IsNullOrWhiteSpace(SearchText))
                     return true;
 
-                return file.FileName.IndexOf(SearchText, System.StringComparison.OrdinalIgnoreCase) >= 0 ||
-                       file.FileType.IndexOf(SearchText, System.StringComparison.OrdinalIgnoreCase) >= 0;
+                return file.FileName.IndexOf(SearchText, StringComparison.OrdinalIgnoreCase) >= 0 ||
+                       file.FileType.IndexOf(SearchText, StringComparison.OrdinalIgnoreCase) >= 0;
             }
             return false;
         }
