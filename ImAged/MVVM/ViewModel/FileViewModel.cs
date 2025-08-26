@@ -1,146 +1,76 @@
-<<<<<<< Updated upstream
-﻿using System;
-=======
 ﻿using ImAged.MVVM.Model;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
->>>>>>> Stashed changes
 using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using System.Windows.Input;
-using System.Diagnostics;
+using System.IO;
+using System.Windows.Data;
 
 namespace ImAged.MVVM.ViewModel
 {
-    // This ViewModel represents a single folder item in the ItemsControl.
     public class FileViewModel : INotifyPropertyChanged
     {
-        private string _name;
-        public string Name
+        private FileItem _selectedFile;
+        private string _searchText;
+
+        public FileItem SelectedFile
         {
-            get => _name;
+            get => _selectedFile;
             set
             {
-                if (_name != value)
+                if (_selectedFile != value)
                 {
-                    _name = value;
-                    OnPropertyChanged();
+                    _selectedFile = value;
+                    OnPropertyChanged(nameof(SelectedFile));
                 }
             }
         }
 
-        private string _info;
-        public string Info
+        public ObservableCollection<FileItem> Files { get; set; }
+        public ICollectionView FilesView { get; set; }
+
+        public string SearchText
         {
-            get => _info;
+            get => _searchText;
             set
             {
-                if (_info != value)
+                if (_searchText != value)
                 {
-                    _info = value;
-                    OnPropertyChanged();
+                    _searchText = value;
+                    OnPropertyChanged(nameof(SearchText));
+                    FilesView.Refresh(); // apply filter when search text changes
                 }
             }
         }
-
-        private string _thumbnail;
-        public string Thumbnail
-        {
-            get => _thumbnail;
-            set
-            {
-                if (_thumbnail != value)
-                {
-                    _thumbnail = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        // This command can be used to handle a click event on the folder.
-        public ICommand FolderClickedCommand { get; }
 
         public FileViewModel()
         {
-            // The RelayCommand now takes a method to execute (OpenFolder)
-            // and an optional canExecute parameter.
-            FolderClickedCommand = new RelayCommand(param => OpenFolder());
+            Files = new ObservableCollection<FileItem>();
+            FilesView = CollectionViewSource.GetDefaultView(Files);
+            FilesView.Filter = FilterFiles;
+
+            LoadFiles();
         }
 
-        private void OpenFolder()
+        private void LoadFiles()
         {
-<<<<<<< Updated upstream
-            // This is where you would put the logic to navigate to the selected folder,
-            // or perform some other action.
-            Debug.WriteLine($"Folder '{Name}' was clicked!");
-=======
-            foreach (var folderPath in GetCandidateFolders())
-            {
-                if (!Directory.Exists(folderPath))
-                    continue;
+            string folderPath = @"C:\Users\Dre\Desktop";
 
-                try
+            if (Directory.Exists(folderPath))
+            {
+                foreach (var path in Directory.GetFiles(folderPath, "*.ttl"))
                 {
-                    foreach (var path in Directory.EnumerateFiles(folderPath, "*.ttl", SearchOption.AllDirectories))
+                    var info = new FileInfo(path);
+                    Files.Add(new FileItem
                     {
-                        FileInfo info;
-                        try
-                        {
-                            info = new FileInfo(path);
-                        }
-                        catch
-                        {
-                            continue;
-                        }
-
-                        Files.Add(new FileItem
-                        {
-                            FileName = info.Name,
-                            FileType = info.Extension,
-                            FileSize = info.Length / 1024d, // in KB
-                            FilePath = info.FullName,
-                            Created = info.CreationTime,
-                            State = "Converted",
-                            ImagePath = "256x256.ico"
-                        });
-                    }
-                }
-                catch (UnauthorizedAccessException)
-                {
-                    // Skip folders we cannot access
-                }
-                catch (IOException)
-                {
-                    // Skip problematic folders
+                        FileName = info.Name,
+                        FileType = info.Extension,
+                        FileSize = info.Length / 1024d, // in KB
+                        FilePath = info.FullName,
+                        Created = info.CreationTime,
+                        State = "Converted",
+                        ImagePath = "256x256.ico" // generic icon
+                    });
                 }
             }
-        }
-
-        private IEnumerable<string> GetCandidateFolders()
-        {
-            var folders = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-            string desktop = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
-            string documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            string pictures = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
-            string userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            string downloads = string.IsNullOrEmpty(userProfile) ? null : Path.Combine(userProfile, "Downloads");
-
-            if (!string.IsNullOrWhiteSpace(desktop)) folders.Add(desktop);
-            if (!string.IsNullOrWhiteSpace(documents)) folders.Add(documents);
-            if (!string.IsNullOrWhiteSpace(pictures)) folders.Add(pictures);
-            if (!string.IsNullOrWhiteSpace(downloads)) folders.Add(downloads);
-
-            // Also consider the application's base directory
-            try
-            {
-                string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-                if (!string.IsNullOrWhiteSpace(baseDir)) folders.Add(baseDir);
-            }
-            catch { }
-
-            return folders;
         }
 
         private bool FilterFiles(object obj)
@@ -154,39 +84,12 @@ namespace ImAged.MVVM.ViewModel
                        file.FileType.IndexOf(SearchText, System.StringComparison.OrdinalIgnoreCase) >= 0;
             }
             return false;
->>>>>>> Stashed changes
         }
 
-        #region INotifyPropertyChanged Implementation
         public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        protected void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-        #endregion
-    }
-
-    // A simple ICommand implementation to handle button clicks.
-    // This is a generic version that can handle commands with and without a parameter.
-    public class RelayCommand : ICommand
-    {
-        private readonly Action<object> _execute;
-        private readonly Func<object, bool> _canExecute;
-
-        public event EventHandler CanExecuteChanged
-        {
-            add { CommandManager.RequerySuggested += value; }
-            remove { CommandManager.RequerySuggested -= value; }
-        }
-
-        public RelayCommand(Action<object> execute, Func<object, bool> canExecute = null)
-        {
-            _execute = execute ?? throw new ArgumentNullException(nameof(execute));
-            _canExecute = canExecute;
-        }
-
-        public bool CanExecute(object parameter) => _canExecute == null || _canExecute(parameter);
-
-        public void Execute(object parameter) => _execute(parameter);
     }
 }

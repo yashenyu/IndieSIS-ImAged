@@ -24,7 +24,7 @@
             </DataTemplate>
 
             <DataTemplate DataType="{x:Type viewModel:ViewViewModel}">
-                <view:View/>
+                <view:ViewView/>
             </DataTemplate>
 
             <DataTemplate DataType="{x:Type viewModel:FileViewModel}">

@@ -16,13 +16,13 @@ using System.Windows.Shapes;
 namespace ImAged.MVVM.View
 {
     /// <summary>
-    /// Interaction logic for View.xaml
+    /// Interaction logic for ViewView.xaml
     /// </summary>
-    public partial class View : UserControl
+    public partial class ViewView : UserControl
     {
-        public View()
+        public ViewView()
         {
-            this.InitializeComponent();
+            InitializeComponent();
         }
     }
 }
