@@ -199,7 +199,7 @@ namespace ImAged.Services
                 var decryptedResponse = DecryptData(responseData);
                 var responseJson = Encoding.UTF8.GetString(decryptedResponse);
 
-                System.Diagnostics.Debug.WriteLine($"Response JSON: {responseJson}");
+                System.Diagnostics.Debug.WriteLine($"Response JSON: Success");
 
                 return JsonConvert.DeserializeObject<SecureResponse>(responseJson);
             }
@@ -577,13 +577,38 @@ namespace ImAged.Services
                         IntPtr.Zero,
                         Int32Rect.Empty,
                         BitmapSizeOptions.FromEmptyOptions());
+                    
+                    // Freeze the BitmapSource to make it cross-thread accessible and improve performance
                     source.Freeze();
+                    
+                    // Clear the original bytes to help with memory cleanup
+                    Array.Clear(imageBytes, 0, imageBytes.Length);
+                    
                     return source;
                 }
                 finally
                 {
+                    // Always delete the GDI handle to prevent memory leaks
                     DeleteObject(hBitmap);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Forces cleanup of any remaining GDI handles and memory
+        /// </summary>
+        public void ForceMemoryCleanup()
+        {
+            try
+            {
+                // Force garbage collection to clean up any remaining BitmapSource objects
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                GC.Collect();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error during memory cleanup: {ex.Message}");
             }
         }
 

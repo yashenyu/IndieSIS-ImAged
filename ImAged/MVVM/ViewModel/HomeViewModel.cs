@@ -203,12 +203,12 @@ namespace ImAged.MVVM.ViewModel
         private readonly List<FileSystemWatcher> _fileWatchers = new List<FileSystemWatcher>();
 
         // Memory management
-        private readonly SemaphoreSlim _thumbnailSemaphore = new SemaphoreSlim(2, 2); // Reduce to 2 concurrent
+        private readonly SemaphoreSlim _thumbnailSemaphore = new SemaphoreSlim(10, 10); // Reduce to 2 concurrent
         private readonly Dictionary<string, SecureImageReference> _thumbnailCache = new Dictionary<string, SecureImageReference>();
         private readonly List<SecureImageReference> _activeImages = new List<SecureImageReference>();
         private readonly object _imagesLock = new object();
         private readonly DispatcherTimer _memoryCleanupTimer;
-        private readonly int _maxCacheSize = 20;
+        private readonly int _maxCacheSize = 100;
         private readonly object _cacheLock = new object();
 
         // NEW: master list & search text for filtering
@@ -311,6 +311,9 @@ namespace ImAged.MVVM.ViewModel
         {
             if (_isDisposed) return;
 
+            // Check memory usage and force cleanup if needed
+            CheckMemoryUsageAndCleanup();
+
             try
             {
                 var expiredFiles = new List<TtlFileInfo>();
@@ -339,6 +342,26 @@ namespace ImAged.MVVM.ViewModel
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Error in expiration timer: {ex.Message}");
+            }
+        }
+
+        private void CheckMemoryUsageAndCleanup()
+        {
+            try
+            {
+                var currentProcess = System.Diagnostics.Process.GetCurrentProcess();
+                var memoryUsageMB = currentProcess.WorkingSet64 / 1024 / 1024;
+                
+                // If memory usage is over 500MB, force cleanup
+                if (memoryUsageMB > 500)
+                {
+                    System.Diagnostics.Debug.WriteLine($"High memory usage detected: {memoryUsageMB} MB. Forcing cleanup...");
+                    ForceSecureMemoryCleanup();
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error checking memory usage: {ex.Message}");
             }
         }
 
@@ -484,8 +507,28 @@ namespace ImAged.MVVM.ViewModel
         {
             lock (_windowsLock)
             {
-                _openWindows.Remove(e.FilePath);
+                if (_openWindows.ContainsKey(e.FilePath))
+                {
+                    var window = _openWindows[e.FilePath];
+                    _openWindows.Remove(e.FilePath);
+                    
+                    // Ensure the window is properly disposed
+                    try
+                    {
+                        if (window != null && !window.IsDisposed)
+                        {
+                            window.Dispose();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"Error disposing window: {ex.Message}");
+                    }
+                }
             }
+            
+            // Force garbage collection to free up memory
+            GC.Collect();
         }
 
         private void ForceSecureMemoryCleanup()
@@ -509,6 +552,16 @@ namespace ImAged.MVVM.ViewModel
                     secureRef?.Dispose();
                 }
                 _activeImages.Clear();
+            }
+
+            // Force cleanup in the secure process manager
+            try
+            {
+                _secureProcessManager?.ForceMemoryCleanup();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error during secure process manager cleanup: {ex.Message}");
             }
 
             GC.Collect();

@@ -10,7 +10,7 @@ using System.Linq;
 
 namespace ImAged.MVVM.View
 {
-    public partial class ImageViewWindow : Window
+    public partial class ImageViewWindow : Window, IDisposable
     {
         private const double ZoomFactor = 1.2; // step factor per wheel delta
         private const double MinScale = 1;     // don't allow smaller than original fit
@@ -27,11 +27,16 @@ namespace ImAged.MVVM.View
         public static event EventHandler<ImageViewWindowEventArgs> WindowClosed;
 
         public string FilePath { get; private set; }
+        private BitmapSource _currentImage;
+        private bool _disposed = false;
+
+        public bool IsDisposed => _disposed;
 
         public ImageViewWindow(BitmapSource image, string filePath)
         {
             InitializeComponent();
             FilePath = filePath;
+            _currentImage = image;
 
             // enforce minimum window size
             MinWidth = 1080;
@@ -75,6 +80,7 @@ namespace ImAged.MVVM.View
             this.Closed += (sender, e) =>
             {
                 WindowClosed?.Invoke(this, new ImageViewWindowEventArgs(filePath, this));
+                Dispose();
             };
 
             // optionally store file info if needed later
@@ -284,6 +290,44 @@ namespace ImAged.MVVM.View
 
             ImageTranslateTransform.X = Math.Max(minX, Math.Min(maxX, ImageTranslateTransform.X));
             ImageTranslateTransform.Y = Math.Max(minY, Math.Min(maxY, ImageTranslateTransform.Y));
+        }
+
+        public void Dispose()
+        {
+            if (_disposed) return;
+            _disposed = true;
+
+            try
+            {
+                // Clear the image source from UI elements
+                if (FullImage != null)
+                {
+                    FullImage.Source = null;
+                }
+
+                // Dispose of the BitmapSource if it's a WriteableBitmap
+                if (_currentImage is WriteableBitmap writeableBitmap)
+                {
+                    try
+                    {
+                        writeableBitmap.Lock();
+                        // Clear the pixels to free memory
+                        var pixels = new byte[writeableBitmap.PixelWidth * writeableBitmap.PixelHeight * 4];
+                        writeableBitmap.WritePixels(new Int32Rect(0, 0, writeableBitmap.PixelWidth, writeableBitmap.PixelHeight), 
+                                                  pixels, writeableBitmap.PixelWidth * 4, 0);
+                        writeableBitmap.Unlock();
+                    }
+                    catch { /* Ignore errors during cleanup */ }
+                }
+
+                // Clear the reference
+                _currentImage = null;
+
+                // Force garbage collection for this object
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+            }
+            catch { /* Ignore errors during cleanup */ }
         }
     }
 }
