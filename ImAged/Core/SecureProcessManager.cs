@@ -362,21 +362,16 @@ namespace ImAged.Services
             }
         }
 
-        public async Task<string> ConvertImageToTtlAsync(string imagePath, int? expiryHours = null)
+        public async Task<string> ConvertImageToTtlAsync(string imagePath, DateTimeOffset expiryUtc)
         {
             if (!File.Exists(imagePath))
                 throw new FileNotFoundException($"Image file not found: {imagePath}");
 
             var parameters = new Dictionary<string, object>
             {
-                { "input_path", imagePath }
+                { "input_path", imagePath },
+                { "expiry_ts", expiryUtc.ToUnixTimeSeconds() }
             };
-
-            if (expiryHours.HasValue)
-            {
-                var expiryTs = DateTimeOffset.UtcNow.AddHours(expiryHours.Value).ToUnixTimeSeconds();
-                parameters.Add("expiry_ts", expiryTs);
-            }
 
             var command = new SecureCommand("CONVERT_TO_TTL", parameters);
             var response = await SendCommandAsync(command);

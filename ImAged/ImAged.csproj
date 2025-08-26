@@ -122,6 +122,7 @@
     <Compile Include="MVVM\Model\FileItem.cs" />
     <Compile Include="MVVM\ViewModel\ConvertViewModel.cs" />
     <Compile Include="MVVM\ViewModel\FileViewModel.cs" />
+    <Compile Include="MVVM\ViewModel\ImageItemViewModel.cs" />
     <Compile Include="MVVM\ViewModel\SettingsViewModel.cs" />
     <Compile Include="MVVM\View\ConvertView.xaml.cs">
       <DependentUpon>ConvertView.xaml</DependentUpon>

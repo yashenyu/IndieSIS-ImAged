@@ -99,7 +99,7 @@
         <Setter Property="Visibility" Value="Collapsed"/>
         <Style.Triggers>
             <!-- Show when parent Border (tile) is hovered -->
-            <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=Border}}" Value="True">
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Border, AncestorLevel=1}, Path=IsMouseOver}" Value="True">
                 <Setter Property="Visibility" Value="Visible"/>
             </DataTrigger>
         </Style.Triggers>
@@ -118,6 +118,30 @@
         <Setter Property="Foreground" Value="#CCCCCC"/>
         <Setter Property="FontSize" Value="9"/>
         <Setter Property="FontWeight" Value="Normal"/>
+    </Style>
+
+    <!-- Expiration Date and Remaining Time Style -->
+    <Style x:Key="ExpirationDateTimeStyle" TargetType="StackPanel">
+        <Setter Property="Orientation" Value="Horizontal"/>
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        <Setter Property="Margin" Value="0,4,0,0"/>
+    </Style>
+
+    <!-- Expiration Date Text Style -->
+    <Style x:Key="ExpirationDateTextStyle" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="#9CA3AF"/>
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Text" Value="Expires: {Binding ExpirationDate, StringFormat='yyyy-MM-dd'}"/>
+    </Style>
+
+    <!-- Remaining Time Text Style -->
+    <Style x:Key="RemainingTimeTextStyle" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="#9CA3AF"/>
+        <Setter Property="HorizontalAlignment" Value="Right"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Margin" Value="0,0,0,0"/>
+        <Setter Property="Text" Value="{Binding EstimatedRemainingTime}"/>
     </Style>
 
 </ResourceDictionary>

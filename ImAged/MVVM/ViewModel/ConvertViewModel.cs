@@ -390,7 +390,7 @@ namespace ImAged.MVVM.ViewModel
         {
             System.Diagnostics.Debug.WriteLine($"Trying to convert");
             AddLog("Starting conversion process...");
-            
+
             try
             {
                 if (!int.TryParse(Year, out int yy) ||
@@ -433,9 +433,11 @@ namespace ImAged.MVVM.ViewModel
                     return;
                 }
 
-                var hoursDiff = (int)Math.Ceiling((expiry - DateTime.Now).TotalHours);
+                // Use precise expiry (no hour ceiling)
+                var now = new DateTimeOffset(DateTime.Now);
+                var expiryOffset = new DateTimeOffset(expiry);
 
-                if (hoursDiff <= 0)
+                if (expiryOffset <= now)
                 {
                     var errorMsg = "Expiration must be in the future.";
                     AddLog($"ERROR: {errorMsg}");
@@ -443,7 +445,7 @@ namespace ImAged.MVVM.ViewModel
                     return;
                 }
 
-                if (hoursDiff > 24 * 365 * 5)
+                if (expiryOffset > now.AddYears(5))
                 {
                     var errorMsg = "Expiration too far in the future.";
                     AddLog($"ERROR: {errorMsg}");
@@ -452,22 +454,23 @@ namespace ImAged.MVVM.ViewModel
                 }
 
                 AddLog($"Converting image with expiration: {expiry:yyyy-MM-dd HH:mm}");
-                
+
                 // Read original file bytes for simulation
                 _originalFileBytes = File.ReadAllBytes(SelectedFile);
                 UpdateOriginalFileParts();
-                
-                var ttlPath = await _secureManager.ConvertImageToTtlAsync(SelectedFile, hoursDiff);
-                
+
+                // Pass exact UTC expiry to backend
+                var ttlPath = await _secureManager.ConvertImageToTtlAsync(SelectedFile, expiryOffset.ToUniversalTime());
+
                 // Read converted TTL file bytes for simulation
                 _convertedTtlPath = ttlPath;
                 _convertedTtlBytes = File.ReadAllBytes(ttlPath);
-                
+
                 // Enable simulation
                 HasConvertedFile = true;
                 CurrentStep = 1;
                 UpdateStepParts();
-                
+
                 var successMsg = $"SUCCESS: Converted → {System.IO.Path.GetFileName(ttlPath)}";
                 AddLog(successMsg);
                 StatusMessage = successMsg;

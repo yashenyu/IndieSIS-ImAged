@@ -9,6 +9,101 @@
              d:DesignWidth="800"
              x:Name="Root">
 
+    <UserControl.Resources>
+        <!-- ContextMenu Style -->
+        <Style TargetType="ContextMenu">
+            <Setter Property="Background" Value="#2B2B2B"/>
+            <Setter Property="BorderBrush" Value="#444"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="2"/>
+            <Setter Property="SnapsToDevicePixels" Value="True"/>
+            <Setter Property="OverridesDefaultStyle" Value="True"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ContextMenu">
+                        <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="6"
+                            SnapsToDevicePixels="True">
+                            <StackPanel IsItemsHost="True"
+                                    KeyboardNavigation.DirectionalNavigation="Cycle"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="DeleteMenuItemStyle" TargetType="MenuItem" BasedOn="{StaticResource {x:Type MenuItem}}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="MenuItem">
+                        <Border x:Name="border"
+                        Background="{TemplateBinding Background}"
+                        Padding="{TemplateBinding Padding}">
+                            <ContentPresenter VerticalAlignment="Center"
+                                      RecognizesAccessKey="True"
+                                      ContentSource="Header"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <!-- Normal hover becomes red -->
+                            <Trigger Property="IsHighlighted" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#FF4444"/>
+                            </Trigger>
+                            <!-- Disabled gray -->
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Foreground" Value="#777"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="MenuItem">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Padding" Value="10,6"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="MenuItem">
+                        <Border x:Name="border"
+                        Background="Transparent"
+                        Padding="{TemplateBinding Padding}"
+                        CornerRadius="4"
+                        SnapsToDevicePixels="True"
+                        ClipToBounds="True">
+                            <ContentPresenter VerticalAlignment="Center"
+                                      RecognizesAccessKey="True"
+                                      ContentSource="Header"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <!-- Normal Hover -->
+                            <Trigger Property="IsHighlighted" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#444"/>
+                            </Trigger>
+
+                            <!-- Destructive Hover -->
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsHighlighted" Value="True"/>
+                                    <Condition Property="Tag" Value="Destructive"/>
+                                </MultiTrigger.Conditions>
+                                <Setter TargetName="border" Property="Background" Value="#FF4444"/>
+                                <Setter Property="Foreground" Value="White"/>
+                            </MultiTrigger>
+
+                            <!-- Disabled -->
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Foreground" Value="#777"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="40"/>
@@ -74,6 +169,20 @@
                                                 CommandParameter="{Binding}"
                                                 Style="{StaticResource ImageButtonStyle}">
                                                 <Border Style="{StaticResource ImageTileHoverStyle}">
+
+                                                    <Border.ContextMenu>
+                                                        <ContextMenu DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                                                            <MenuItem Header="Open in Folder Location"
+                                                                      Command="{Binding OpenInFolderCommand}"
+                                                                      CommandParameter="{Binding}" />
+                                                            <MenuItem Header="Delete Image File"
+                                                                      Command="{Binding DeleteImageCommand}"
+                                                                      CommandParameter="{Binding}" 
+                                                                      Tag="Destructive"/>
+                                                            
+                                                        </ContextMenu>
+                                                    </Border.ContextMenu>
+
                                                     <Border.Background>
                                                         <ImageBrush ImageSource="{Binding Thumbnail}" 
                                                                Stretch="UniformToFill" 
@@ -90,12 +199,35 @@
                                                         </Border>
 
                                                         <Border Style="{StaticResource FileInfoOverlayStyle}">
-                                                            <StackPanel>
-                                                                <TextBlock Text="{Binding FileName}" 
-                                                                       Style="{StaticResource FileNameTextStyle}"/>
-                                                                <TextBlock Text="{Binding LastModified, StringFormat='{}{0:MM/dd/yyyy HH:mm}'}" 
-                                                                       Style="{StaticResource FileDateTextStyle}"/>
-                                                            </StackPanel>
+                                                            <Grid>
+                                                                <Grid.RowDefinitions>
+                                                                    <RowDefinition Height="Auto"/>
+                                                                    <RowDefinition Height="Auto"/>
+                                                                </Grid.RowDefinitions>
+
+                                                                <!-- Row 0: File name -->
+                                                                <TextBlock Grid.Row="0"
+                                                                           Text="{Binding FileName}"
+                                                                           Style="{StaticResource FileNameTextStyle}"/>
+
+                                                                <!-- Row 1: Expiry left, Remaining time right -->
+                                                                <Grid Grid.Row="1">
+                                                                    <Grid.ColumnDefinitions>
+                                                                        <ColumnDefinition Width="*"/>
+                                                                        <ColumnDefinition Width="Auto"/>
+                                                                    </Grid.ColumnDefinitions>
+
+                                                                    <TextBlock Grid.Column="0"
+                                                                               Text="{Binding ExpirationLocal, StringFormat='{}{0:MM-dd hh:mm tt}'}"
+                                                                               Foreground="#9CA3AF"
+                                                                               VerticalAlignment="Center"/>
+
+                                                                    <TextBlock Grid.Column="1"
+                                                                               Text="{Binding EstimatedRemainingTime}"
+                                                                               Foreground="#9CA3AF"
+                                                                               VerticalAlignment="Center"/>
+                                                                </Grid>
+                                                            </Grid>
                                                         </Border>
                                                     </Grid>
                                                 </Border>

@@ -22,9 +22,16 @@ namespace ImAged.MVVM.View
         private double _startX;
         private double _startY;
 
+        // Static event for window lifecycle tracking
+        public static event EventHandler<ImageViewWindowEventArgs> WindowOpened;
+        public static event EventHandler<ImageViewWindowEventArgs> WindowClosed;
+
+        public string FilePath { get; private set; }
+
         public ImageViewWindow(BitmapSource image, string filePath)
         {
             InitializeComponent();
+            FilePath = filePath;
 
             // enforce minimum window size
             MinWidth = 1080;
@@ -60,6 +67,15 @@ namespace ImAged.MVVM.View
                 StatusText.Text = $"{sizeStr}   •   {resolutionStr}   •   {dateStr}";
             }
             catch { /* ignore */ }
+
+            // Notify that window was opened
+            WindowOpened?.Invoke(this, new ImageViewWindowEventArgs(filePath, this));
+
+            // Handle window closing
+            this.Closed += (sender, e) =>
+            {
+                WindowClosed?.Invoke(this, new ImageViewWindowEventArgs(filePath, this));
+            };
 
             // optionally store file info if needed later
         
@@ -269,5 +285,18 @@ namespace ImAged.MVVM.View
             ImageTranslateTransform.X = Math.Max(minX, Math.Min(maxX, ImageTranslateTransform.X));
             ImageTranslateTransform.Y = Math.Max(minY, Math.Min(maxY, ImageTranslateTransform.Y));
         }
+    }
+}
+
+// Move the EventArgs class outside the namespace to make it globally accessible
+public class ImageViewWindowEventArgs : EventArgs
+{
+    public string FilePath { get; }
+    public ImAged.MVVM.View.ImageViewWindow Window { get; }
+
+    public ImageViewWindowEventArgs(string filePath, ImAged.MVVM.View.ImageViewWindow window)
+    {
+        FilePath = filePath;
+        Window = window;
     }
 }

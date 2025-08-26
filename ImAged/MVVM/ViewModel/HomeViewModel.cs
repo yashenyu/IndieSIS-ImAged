@@ -76,11 +76,54 @@ namespace ImAged.MVVM.ViewModel
             }
         }
 
+        private DateTimeOffset? _expirationUtc;
+        public DateTimeOffset? ExpirationUtc
+        {
+            get => _expirationUtc;
+            set { _expirationUtc = value; OnPropertyChanged(nameof(ExpirationUtc)); OnPropertyChanged(nameof(EstimatedRemainingTime)); }
+        }
+
+        public DateTime? ExpirationLocal
+        {
+            get => ExpirationUtc?.LocalDateTime;
+        }
+
+        public string EstimatedRemainingTime
+        {
+            get
+            {
+                if (ExpirationUtc == null) return "";
+                var remaining = ExpirationUtc.Value - DateTimeOffset.UtcNow;
+                if (remaining <= TimeSpan.Zero) return "Expired";
+                
+                var days = (int)remaining.TotalDays;
+                var hours = remaining.Hours;
+                var minutes = remaining.Minutes;
+                
+                if (days > 0)
+                    return $"{days}d";           // Only show days when > 1 day
+                else if (hours > 0)
+                    return $"{hours}h {minutes}m"; // Show hours and minutes when < 1 day
+                else
+                    return $"{minutes}m";          // Show only minutes when < 1 hour
+            }
+        }
+
+        public ICommand OpenInFolderCommand { get; set; }
+        public ICommand DeleteImageCommand { get; set; }
+
         public event PropertyChangedEventHandler PropertyChanged;
         protected virtual void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
+        public void RefreshCountdown()
+        {
+            OnPropertyChanged(nameof(EstimatedRemainingTime));
+        }
+
+        public bool IsExpired => ExpirationUtc.HasValue && ExpirationUtc.Value <= DateTimeOffset.UtcNow;
     }
 
     public class DateGroup : INotifyPropertyChanged
@@ -171,6 +214,12 @@ namespace ImAged.MVVM.ViewModel
         // NEW: master list & search text for filtering
         private readonly List<DateGroup> _allDateGroups = new List<DateGroup>();
 
+        // Real-time expiration tracking
+        private readonly Dictionary<string, ImageViewWindow> _openWindows = new Dictionary<string, ImageViewWindow>();
+        private readonly object _windowsLock = new object();
+        private readonly DispatcherTimer _expirationTimer;
+        private readonly TimeSpan _expirationCheckInterval = TimeSpan.FromSeconds(1); // Check every second
+
         private string _searchText;
         public string SearchText
         {
@@ -202,6 +251,8 @@ namespace ImAged.MVVM.ViewModel
         public ICommand LoadTtlImageCommand { get; }
         public ICommand OpenTtlFileCommand { get; }
 
+        private readonly DispatcherTimer _countdownTimer = new DispatcherTimer();
+
         public HomeViewModel(SecureProcessManager secureProcessManager)
         {
             _secureProcessManager = secureProcessManager;
@@ -216,13 +267,34 @@ namespace ImAged.MVVM.ViewModel
 
             OpenTtlFileCommand = new RelayCommand(async (param) => await OpenTtlFileAsync(param));
 
-            // Setup memory cleanup timer
+            // Setup memory cleanup timer (disabled at runtime)
             _memoryCleanupTimer = new DispatcherTimer
             {
-                Interval = TimeSpan.FromSeconds(10) // Check every 10 seconds
+                Interval = TimeSpan.FromSeconds(10)
             };
-            _memoryCleanupTimer.Tick += OnMemoryCleanupTimer;
-            _memoryCleanupTimer.Start();
+            // Disabled: do not hook Tick or Start to avoid lag spikes
+
+            // Simple minute-based updates (much less laggy)
+            _countdownTimer.Interval = TimeSpan.FromMinutes(1);
+            _countdownTimer.Tick += (_, __) =>
+            {
+                foreach (var g in DateGroups)
+                    foreach (var f in g.Files)
+                        f?.RefreshCountdown();
+            };
+            _countdownTimer.Start();
+
+            // Real-time expiration timer
+            _expirationTimer = new DispatcherTimer
+            {
+                Interval = _expirationCheckInterval
+            };
+            _expirationTimer.Tick += OnExpirationTimerTick;
+            _expirationTimer.Start();
+
+            // Subscribe to window lifecycle events
+            ImageViewWindow.WindowOpened += OnImageViewWindowOpened;
+            ImageViewWindow.WindowClosed += OnImageViewWindowClosed;
 
             // Auto-scan on startup
             _ = InitializeGalleryAsync();
@@ -231,18 +303,188 @@ namespace ImAged.MVVM.ViewModel
 
         private void OnMemoryCleanupTimer(object sender, EventArgs e)
         {
+            // Disabled: avoid runtime cleanup to prevent lag spikes; cleanup happens on Dispose()
+            if (_isDisposed) return;
+        }
+
+        private void OnExpirationTimerTick(object sender, EventArgs e)
+        {
             if (_isDisposed) return;
 
-            // More aggressive cleanup for security
-            ForceSecureMemoryCleanup();
-
-            var process = System.Diagnostics.Process.GetCurrentProcess();
-            var memoryMB = process.WorkingSet64 / (1024 * 1024);
-
-            if (memoryMB > 500) // Lower threshold for security
+            try
             {
-                System.Diagnostics.Debug.WriteLine($"High memory usage detected: {memoryMB}MB, forcing secure cleanup");
-                ForceSecureMemoryCleanup();
+                var expiredFiles = new List<TtlFileInfo>();
+
+                // Check all files for expiration and refresh countdown display
+                foreach (var dateGroup in DateGroups)
+                {
+                    foreach (var fileInfo in dateGroup.Files.ToList()) // Use ToList to avoid modification during enumeration
+                    {
+                        // Refresh countdown display to show "Expired" status
+                        fileInfo.RefreshCountdown();
+                        
+                        if (fileInfo.IsExpired)
+                        {
+                            expiredFiles.Add(fileInfo);
+                        }
+                    }
+                }
+
+                // Handle expired files
+                foreach (var expiredFile in expiredFiles)
+                {
+                    HandleExpiredFile(expiredFile);
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error in expiration timer: {ex.Message}");
+            }
+        }
+
+        private void HandleExpiredFile(TtlFileInfo expiredFile)
+        {
+            try
+            {
+                // Close any open window for this file
+                CloseImageWindow(expiredFile.FilePath);
+
+                // Set thumbnail to black and clear memory
+                ClearFileMemory(expiredFile);
+
+                // Note: We don't remove from UI anymore - just make thumbnail black
+                // RemoveFileFromUI(expiredFile);
+
+                System.Diagnostics.Debug.WriteLine($"Handled expired file: {expiredFile.FileName}");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error handling expired file {expiredFile.FileName}: {ex.Message}");
+            }
+        }
+
+        private void CloseImageWindow(string filePath)
+        {
+            lock (_windowsLock)
+            {
+                if (_openWindows.TryGetValue(filePath, out var window))
+                {
+                    try
+                    {
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            if (window != null && window.IsVisible)
+                            {
+                                window.Close();
+                            }
+                        });
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"Error closing window for {filePath}: {ex.Message}");
+                    }
+                    finally
+                    {
+                        _openWindows.Remove(filePath);
+                    }
+                }
+            }
+        }
+
+        private void ClearFileMemory(TtlFileInfo fileInfo)
+        {
+            // Clear thumbnail from cache
+            lock (_cacheLock)
+            {
+                if (_thumbnailCache.TryGetValue(fileInfo.FilePath, out var secureRef))
+                {
+                    secureRef?.Dispose();
+                    _thumbnailCache.Remove(fileInfo.FilePath);
+                }
+            }
+
+            // Set thumbnail to black instead of clearing it
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                fileInfo.Thumbnail = CreateBlackThumbnail();
+            });
+        }
+
+        private BitmapSource CreateBlackThumbnail()
+        {
+            // Create a 256x256 black bitmap
+            const int size = 256;
+            var pixels = new byte[size * size * 4]; // 4 bytes per pixel (BGRA)
+            
+            // Fill with black pixels (all zeros)
+            for (int i = 0; i < pixels.Length; i += 4)
+            {
+                pixels[i] = 0;     // Blue
+                pixels[i + 1] = 0; // Green
+                pixels[i + 2] = 0; // Red
+                pixels[i + 3] = 255; // Alpha (fully opaque)
+            }
+
+            var bitmap = new WriteableBitmap(size, size, 96, 96, PixelFormats.Bgra32, null);
+            bitmap.WritePixels(new Int32Rect(0, 0, size, size), pixels, size * 4, 0);
+            bitmap.Freeze(); // Make it thread-safe
+
+            return bitmap;
+        }
+
+        private void RemoveFileFromUI(TtlFileInfo fileInfo)
+        {
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                // Remove from current view
+                foreach (var dateGroup in DateGroups.ToList())
+                {
+                    if (dateGroup.Files.Contains(fileInfo))
+                    {
+                        dateGroup.Files.Remove(fileInfo);
+                        dateGroup.ImageCount--;
+
+                        if (dateGroup.Files.Count == 0)
+                        {
+                            DateGroups.Remove(dateGroup);
+                        }
+                        break;
+                    }
+                }
+
+                // Remove from master list
+                foreach (var dateGroup in _allDateGroups.ToList())
+                {
+                    if (dateGroup.Files.Contains(fileInfo))
+                    {
+                        dateGroup.Files.Remove(fileInfo);
+                        dateGroup.ImageCount--;
+
+                        if (dateGroup.Files.Count == 0)
+                        {
+                            _allDateGroups.Remove(dateGroup);
+                        }
+                        break;
+                    }
+                }
+            });
+        }
+
+
+
+        private void OnImageViewWindowOpened(object sender, ImageViewWindowEventArgs e)
+        {
+            lock (_windowsLock)
+            {
+                _openWindows[e.FilePath] = e.Window;
+            }
+        }
+
+        private void OnImageViewWindowClosed(object sender, ImageViewWindowEventArgs e)
+        {
+            lock (_windowsLock)
+            {
+                _openWindows.Remove(e.FilePath);
             }
         }
 
@@ -337,6 +579,11 @@ namespace ImAged.MVVM.ViewModel
                             FileName = Path.GetFileNameWithoutExtension(filePath),
                             LastModified = File.GetLastWriteTime(filePath)
                         };
+
+                        fileInfo.ExpirationUtc = TryReadExpiryUtc(fileInfo.FilePath);
+
+                        fileInfo.OpenInFolderCommand = new RelayCommand(_ => OpenInFolder(fileInfo));
+                        fileInfo.DeleteImageCommand = new RelayCommand(async _ => await DeleteImageAsync(fileInfo));
 
                         dateGroup.Files.Add(fileInfo);
 
@@ -465,6 +712,77 @@ namespace ImAged.MVVM.ViewModel
             }
         }
 
+        private void OpenInFolder(TtlFileInfo fileInfo)
+        {
+            if (fileInfo == null) return;
+            try
+            {
+                if (File.Exists(fileInfo.FilePath))
+                {
+                    System.Diagnostics.Process.Start("explorer.exe", $"/select,\"{fileInfo.FilePath}\"");
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error opening folder for {fileInfo.FileName}: {ex.Message}");
+            }
+        }
+
+        private async Task DeleteImageAsync(TtlFileInfo fileInfo)
+        {
+            if (fileInfo == null) return;
+
+            try
+            {
+                var result = MessageBox.Show(
+                    $"Delete '{fileInfo.FileName}'? This cannot be undone.",
+                    "Confirm Delete",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Warning);
+
+                if (result != MessageBoxResult.Yes) return;
+
+                if (File.Exists(fileInfo.FilePath))
+                {
+                    File.Delete(fileInfo.FilePath);
+                }
+
+                await Application.Current.Dispatcher.InvokeAsync(() =>
+                {
+                    var groupContaining = DateGroups.FirstOrDefault(g => g.Files.Contains(fileInfo));
+                    if (groupContaining != null)
+                    {
+                        groupContaining.Files.Remove(fileInfo);
+                        groupContaining.ImageCount--;
+                        if (groupContaining.Files.Count == 0)
+                        {
+                            DateGroups.Remove(groupContaining);
+                        }
+                    }
+
+                    var masterGroup = _allDateGroups.FirstOrDefault(g => g.Date == fileInfo.LastModified.Date);
+                    if (masterGroup != null)
+                    {
+                        var toRemove = masterGroup.Files.FirstOrDefault(f => f.FilePath == fileInfo.FilePath);
+                        if (toRemove != null)
+                        {
+                            masterGroup.Files.Remove(toRemove);
+                            masterGroup.ImageCount = masterGroup.Files.Count;
+                        }
+                        if (masterGroup.Files.Count == 0)
+                        {
+                            _allDateGroups.Remove(masterGroup);
+                        }
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error deleting {fileInfo.FileName}: {ex.Message}");
+                MessageBox.Show($"Failed to delete file: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
         private void SetupFileWatching()
         {
             foreach (var directory in _searchDirectories)
@@ -517,8 +835,26 @@ namespace ImAged.MVVM.ViewModel
                     LastModified = File.GetLastWriteTime(e.FullPath)
                 };
 
+                fileInfo.ExpirationUtc = TryReadExpiryUtc(fileInfo.FilePath);
+
+                fileInfo.OpenInFolderCommand = new RelayCommand(_ => OpenInFolder(fileInfo));
+                fileInfo.DeleteImageCommand = new RelayCommand(async _ => await DeleteImageAsync(fileInfo));
+
                 dateGroup.Files.Insert(0, fileInfo);
-                _ = Task.Run(async () => await LoadThumbnailAsync(fileInfo));
+                
+                // Check if file is already expired
+                if (fileInfo.IsExpired)
+                {
+                    // Set thumbnail to black immediately for already expired files
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        fileInfo.Thumbnail = CreateBlackThumbnail();
+                    });
+                }
+                else
+                {
+                    _ = Task.Run(async () => await LoadThumbnailAsync(fileInfo));
+                }
             });
         }
 
@@ -560,6 +896,7 @@ namespace ImAged.MVVM.ViewModel
                             oldFile.FilePath = e.FullPath;
                             oldFile.FileName = Path.GetFileNameWithoutExtension(e.FullPath);
                             oldFile.LastModified = File.GetLastWriteTime(e.FullPath);
+                            oldFile.ExpirationUtc = TryReadExpiryUtc(oldFile.FilePath);
                         }
                         else
                         {
@@ -585,6 +922,7 @@ namespace ImAged.MVVM.ViewModel
                             oldFile.FilePath = e.FullPath;
                             oldFile.FileName = Path.GetFileNameWithoutExtension(e.FullPath);
                             oldFile.LastModified = File.GetLastWriteTime(e.FullPath);
+                            oldFile.ExpirationUtc = TryReadExpiryUtc(oldFile.FilePath);
                             targetGroup.Files.Add(oldFile);
                         }
 
@@ -643,6 +981,29 @@ namespace ImAged.MVVM.ViewModel
             _isDisposed = true;
 
             _memoryCleanupTimer?.Stop();
+            _countdownTimer?.Stop();
+            _expirationTimer?.Stop();
+
+            // Unsubscribe from window events
+            ImageViewWindow.WindowOpened -= OnImageViewWindowOpened;
+            ImageViewWindow.WindowClosed -= OnImageViewWindowClosed;
+
+            // Close all open windows
+            lock (_windowsLock)
+            {
+                foreach (var window in _openWindows.Values)
+                {
+                    try
+                    {
+                        if (window != null && window.IsVisible)
+                        {
+                            Application.Current.Dispatcher.Invoke(() => window.Close());
+                        }
+                    }
+                    catch { /* Ignore errors during cleanup */ }
+                }
+                _openWindows.Clear();
+            }
 
             ForceSecureMemoryCleanup();
 
@@ -653,6 +1014,32 @@ namespace ImAged.MVVM.ViewModel
             _fileWatchers.Clear();
 
             _thumbnailSemaphore?.Dispose();
+        }
+
+        private DateTimeOffset? TryReadExpiryUtc(string ttlPath)
+        {
+            try
+            {
+                using (var fs = new FileStream(ttlPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                {
+                    var buf = new byte[6 + 16 + 12 + 8];
+                    int read = 0;
+                    while (read < buf.Length)
+                    {
+                        int r = fs.Read(buf, read, buf.Length - read);
+                        if (r <= 0) break;
+                        read += r;
+                    }
+                    if (read < buf.Length) return null;
+                    if (!(buf[0]=='I'&&buf[1]=='M'&&buf[2]=='A'&&buf[3]=='G'&&buf[4]=='E'&&buf[5]=='D')) return null;
+                    int expOffset = 6 + 16 + 12;
+                    ulong be = ((ulong)buf[expOffset+0] << 56)|((ulong)buf[expOffset+1] << 48)|((ulong)buf[expOffset+2] << 40)|((ulong)buf[expOffset+3] << 32)
+                              |((ulong)buf[expOffset+4] << 24)|((ulong)buf[expOffset+5] << 16)|((ulong)buf[expOffset+6] << 8)|buf[expOffset+7];
+                    if (be > (ulong)DateTimeOffset.MaxValue.ToUnixTimeSeconds()) return null;
+                    return DateTimeOffset.FromUnixTimeSeconds((long)be);
+                }
+            }
+            catch { return null; }
         }
 
         private class SecureImageReference : IDisposable
