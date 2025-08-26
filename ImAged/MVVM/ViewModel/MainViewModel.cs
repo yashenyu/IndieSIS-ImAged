@@ -83,9 +83,11 @@ namespace ImAged.MVVM.ViewModel
                 CurrentView = HomeVm;
             });
 
-            ViewViewCommand = new RelayCommand(o =>
+            // Call the initialization method for ViewVm
+            ViewViewCommand = new RelayCommand(async o =>
             {
                 CurrentView = ViewVm;
+                await ViewVm.InitializeFoldersAsync(); // <-- This line is the key
             });
 
             FileViewCommand = new RelayCommand(o =>

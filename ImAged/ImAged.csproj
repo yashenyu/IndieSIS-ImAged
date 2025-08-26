@@ -120,12 +120,23 @@
     <Compile Include="Core\SecureProcessManager.cs" />
     <Compile Include="Core\TextBoxHelper.cs" />
     <Compile Include="MVVM\Model\FileItem.cs" />
+<<<<<<< Updated upstream
+=======
+    <Compile Include="Core\BooleanToVisibilityConverter.cs" />
+    <Compile Include="Core\BulkObservableCollection.cs" />
+    <Compile Include="Core\DynamicTextBlock.cs" />
+    <Compile Include="Core\SecureProcessManager.cs" />
+    <Compile Include="Core\TextBoxHelper.cs" />
+>>>>>>> Stashed changes
     <Compile Include="MVVM\ViewModel\ConvertViewModel.cs" />
     <Compile Include="MVVM\ViewModel\FileViewModel.cs" />
+    <Compile Include="MVVM\ViewModel\FolderModel.cs" />
+    <Compile Include="MVVM\ViewModel\RelayCommand.cs" />
     <Compile Include="MVVM\ViewModel\SettingsViewModel.cs" />
     <Compile Include="MVVM\View\ConvertView.xaml.cs">
       <DependentUpon>ConvertView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="MVVM\View\EqualsConverter.cs" />
     <Compile Include="MVVM\View\FileView.xaml.cs">
       <DependentUpon>FileView.xaml</DependentUpon>
     </Compile>

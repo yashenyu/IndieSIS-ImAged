@@ -8,70 +8,88 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="2.4*" />
-            <!-- File List -->
-            <ColumnDefinition Width="*" />
-            <!-- File Details -->
+            <ColumnDefinition Width="525"/> <!-- LEFT -->
+            <ColumnDefinition Width="15"/> <!-- SEPARATOR -->
+            <ColumnDefinition/> <!-- RIGHT -->
         </Grid.ColumnDefinitions>
 
-        <!-- Left Grid Rows -->
-        <Grid Grid.Column="0">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <!-- Search row -->
-                <RowDefinition Height="*"/>
-                <!-- DataGrid row -->
-            </Grid.RowDefinitions>
+        <TextBox Grid.Column="0"
+                 Width="250" 
+                 Height="50" HorizontalAlignment="Left" 
+                 VerticalAlignment="Top" 
+                 Margin="5,0,0,0"
+                 Style="{StaticResource ModernTextbox}"/>
 
-            <!-- Search Box -->
-            <TextBox Grid.Row="0"
-                 Width="301"
-                 Margin="15,10,0,5"
-                 VerticalContentAlignment="Center"
-                 Style="{StaticResource ModernTextbox}"
-                 Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left"/>
-
-            <!-- File List -->
-            <Border Grid.Row="1" CornerRadius="8" BorderBrush="#FF212121" BorderThickness=".5" Padding="2" ClipToBounds="True" Background="#FF212121">
-                <DataGrid Grid.Row="1"
-                          ItemsSource="{Binding FilesView}"
-                          AutoGenerateColumns="False"
-                          IsReadOnly="True"
-                          SelectionMode="Single"
-                          SelectedItem="{Binding SelectedFile, Mode=TwoWay}"
-                          Style="{StaticResource GridTheme}"
-                          Margin="0,2,0,1"
-                          Background="Transparent"
-                          GridLinesVisibility="None"
-                          RowHeaderWidth="0">
-                   
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="File Name" Binding="{Binding FileName}" Width="*" FontWeight="Normal" />
-                        <DataGridTextColumn Header="Type" Binding="{Binding FileType}" Width="100" />
-                        <DataGridTextColumn Header="Size (KB)" Binding="{Binding FileSize, StringFormat={}{0:N2}}" Width="100" />
-                        <DataGridTextColumn Header="Created" Binding="{Binding Created}" Width="150" />
-                    </DataGrid.Columns>
-                    
-                </DataGrid>
+        <Button Background="{x:Null}" Grid.Column="0" Width="60" Height="45" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,0,195,0" BorderBrush="{x:Null}">
+            <Border CornerRadius="10" Padding="8" Background="#252525" HorizontalAlignment="Center" VerticalAlignment="Top" Height="30">
+                <TextBlock Text="Filter(3)" HorizontalAlignment="Center" VerticalAlignment="Center" FontFamily="Yu Gothic UI Semibold" Foreground="#FFC3C3C3"/>
             </Border>
-        </Grid>
+        </Button>
 
-        <!-- Details Panel -->
-        <StackPanel Grid.Column="1" Margin="10">
-            <!-- ETO YUNG IMAGE -->
-            <Image Source="{Binding SelectedFile.ImagePath}"
-               Width="200" Height="140"
-               Stretch="Uniform"
-               Margin="0,0,0,5"/>
-            <Separator/>
+        <!--LEFT SIDE CONTENT-->
+        <DataGrid AutoGenerateColumns="False"
+          HeadersVisibility="Column"
+          CanUserAddRows="False"
+          CanUserDeleteRows="False"
+          IsReadOnly="True"
+          Margin="10,60,10,13" Background="#FF131313" BorderBrush="#FF0C0C0C" Foreground="Black">
 
-            <TextBlock Text="{Binding SelectedFile.FileName}" FontWeight="Bold" FontSize="16" Foreground="White" Margin="0,0,0,10" TextWrapping="Wrap"/>
-            
-            <TextBlock Text="{Binding SelectedFile.FileType, StringFormat='Type: {0}'}" Foreground="#FF909090" Margin="0,0,0,5"/>
-            <TextBlock Text="{Binding SelectedFile.FileSize, StringFormat='Size: {0:N2} KB'}" Foreground="#FF909090" Margin="0,0,0,5"/>
-            <TextBlock Text="{Binding SelectedFile.FilePath, StringFormat='Location: {0}'}" Foreground="#FF909090" Margin="0,0,0,5" TextWrapping="Wrap"/>
-            <TextBlock Text="{Binding SelectedFile.Created, StringFormat='Created: {0:MM/dd/yyyy HH:mm}'}" Foreground="#FF909090" Margin="0,0,0,5"/>
-            <TextBlock Text="{Binding SelectedFile.State, StringFormat='State: {0}'}" Foreground="#FF909090" Margin="0,0,0,5"/>
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="File Name" Binding="{Binding FileName}" Width="*" Foreground="Black"/>
+                <DataGridTextColumn Header="Type" Binding="{Binding FileType}" Width="100"/>
+                <DataGridTextColumn Header="Size" Binding="{Binding FileSize}" Width="100"/>
+                <DataGridTextColumn Header="Modified" Binding="{Binding ModifiedDate}" Width="150"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+
+
+        <!--RIGHT SIDE CONTENT-->
+        <StackPanel Grid.Column="2" Background="#FF232323">
+            <!-- Image Preview -->
+            <Image Source="preview.jpg"
+                       Width="200"
+                       Height="120"
+                       Stretch="UniformToFill"
+                       Margin="0,0,0,20" />
+
+            <!-- FILE NAME -->
+            <TextBlock Text="File Name.ttl"
+                           Foreground="White"
+                           FontWeight="Bold"
+                           FontSize="16"
+                           Margin="10,0,0,20"/>
+
+            <Separator Grid.Column="2" Background="#FF2B2A2A" Width="240" HorizontalAlignment="Left" Margin="10,2,0,2" ></Separator>
+
+            <!-- FILE PARAMETERS -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Height="220" Margin="10,10,0,0">
+                    <TextBlock Text="File Details" Foreground="White" FontWeight="Bold" FontSize="14" Margin="0,0,0,10"/>
+                    <TextBlock Text="Type: " Foreground="Gray"/>
+                    <TextBlock Text="File Size: " Foreground="Gray"/>
+                    <TextBlock Text="Location: " Foreground="Gray"/>
+                    <TextBlock Text="Author: " Foreground="Gray"/>
+                    <TextBlock Text="Modified: " Foreground="Gray"/>
+                    <TextBlock Text="State: " Foreground="Gray"/>
+                </StackPanel>
+
+
+                <StackPanel Grid.Column="1" Width="90" Height="112" Margin="0,40,-6,78" HorizontalAlignment="Right">
+                    <TextBlock Text="jpg" Foreground="Gray"/>
+                    <TextBlock Text="n kb" Foreground="Gray"/>
+                    <TextBlock Text="Work/User1" Foreground="Gray"/>
+                    <TextBlock Text="User" Foreground="Gray"/>
+                    <TextBlock Text="2025/18/16" Foreground="Gray"/>
+                    <TextBlock Text="Active" Foreground="Gray"/>
+                </StackPanel>
+            </Grid>
         </StackPanel>
+
     </Grid>
 </UserControl>
