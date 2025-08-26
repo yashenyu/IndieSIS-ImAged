@@ -113,7 +113,7 @@
                                             </Grid.ColumnDefinitions>
                                             <Ellipse Grid.Column="0" Width="8" Height="8" Fill="LimeGreen" VerticalAlignment="Center"/>
                                             <TextBlock Grid.Column="1" Text="Active" FontSize="11" Foreground="#AEAEAE" Margin="8,0,0,0"/>
-                                            <TextBlock Grid.Column="2" Text="0" FontSize="11" Foreground="#AEAEAE" HorizontalAlignment="Right" MinWidth="30"/>
+                                            <TextBlock Grid.Column="2" Text="{Binding ActiveCount}" FontSize="11" Foreground="#AEAEAE" HorizontalAlignment="Right" MinWidth="30"/>
                                         </Grid>
                                         <Grid Margin="10,4">
                                             <Grid.ColumnDefinitions>
@@ -123,7 +123,7 @@
                                             </Grid.ColumnDefinitions>
                                             <Ellipse Grid.Column="0" Width="8" Height="8" Fill="Gold" VerticalAlignment="Center"/>
                                             <TextBlock Grid.Column="1" Text="Near expiry" FontSize="11" Foreground="#AEAEAE" Margin="8,0,0,0"/>
-                                            <TextBlock Grid.Column="2" Text="0" FontSize="11" Foreground="#AEAEAE" HorizontalAlignment="Right" MinWidth="30"/>
+                                            <TextBlock Grid.Column="2" Text="{Binding NearExpiryCount}" FontSize="11" Foreground="#AEAEAE" HorizontalAlignment="Right" MinWidth="30"/>
                                         </Grid>
                                         <Grid Margin="10,4">
                                             <Grid.ColumnDefinitions>
@@ -133,7 +133,7 @@
                                             </Grid.ColumnDefinitions>
                                             <Ellipse Grid.Column="0" Width="8" Height="8" Fill="Red" VerticalAlignment="Center"/>
                                             <TextBlock Grid.Column="1" Text="Expired" FontSize="11" Foreground="#AEAEAE" Margin="8,0,0,0"/>
-                                            <TextBlock Grid.Column="2" Text="0" FontSize="11" Foreground="#AEAEAE" HorizontalAlignment="Right" MinWidth="30"/>
+                                            <TextBlock Grid.Column="2" Text="{Binding ExpiredCount}" FontSize="11" Foreground="#AEAEAE" HorizontalAlignment="Right" MinWidth="30"/>
                                         </Grid>
                                     </StackPanel>
                                 </Expander>
@@ -163,7 +163,7 @@
                     <StackPanel Grid.Row="2" Margin="0,0,0,10">
                         <Separator Margin="12,8" Height="0.3" Foreground="#383838"/>
                         <RadioButton Content="Meet the Developers"
-                                     Height="29"
+                                     Height="35"
                                      FontSize="11"
                                      Foreground="#AEAEAE"
                                      Style="{StaticResource MenuButtonTheme}"

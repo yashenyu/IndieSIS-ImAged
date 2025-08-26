@@ -210,10 +210,10 @@ namespace ImAged.MVVM.ViewModel
             _searchDirectories = new List<string>
             {
                 Environment.GetFolderPath(Environment.SpecialFolder.MyPictures),
-                Environment.GetFolderPath(Environment.SpecialFolder.Desktop)
+                Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads")
             };
 
-            LoadTtlImageCommand = new RelayCommand(async (param) => await LoadTtlImageAsync());
             OpenTtlFileCommand = new RelayCommand(async (param) => await OpenTtlFileAsync(param));
 
             // Setup memory cleanup timer
@@ -269,7 +269,6 @@ namespace ImAged.MVVM.ViewModel
                 _activeImages.Clear();
             }
 
-            // Force immediate cleanup
             GC.Collect();
             GC.WaitForPendingFinalizers();
             GC.Collect();
@@ -281,7 +280,6 @@ namespace ImAged.MVVM.ViewModel
         {
             try
             {
-                // Small delay to ensure UI is fully loaded
                 await Task.Delay(100);
                 await ScanForTtlFilesAsync();
             }
@@ -297,7 +295,7 @@ namespace ImAged.MVVM.ViewModel
             {
                 var allTtlFiles = new List<string>();
 
-                // Scan all configured directories
+     
                 foreach (var directory in _searchDirectories)
                 {
                     if (Directory.Exists(directory))
@@ -307,25 +305,21 @@ namespace ImAged.MVVM.ViewModel
                     }
                 }
 
-                // Remove duplicates and sort by last modified
                 var uniqueFiles = allTtlFiles
                     .Distinct()
                     .OrderByDescending(f => File.GetLastWriteTime(f))
                     .ToList();
 
-                // Group files by date
                 var groupedFiles = uniqueFiles
                     .GroupBy(f => File.GetLastWriteTime(f).Date)
                     .OrderByDescending(g => g.Key)
                     .ToList();
 
-                // Clear and recreate date groups on main thread
                 await Application.Current.Dispatcher.InvokeAsync(() =>
                 {
                     DateGroups.Clear();
                 });
 
-                // Create date groups and add files
                 foreach (var group in groupedFiles)
                 {
                     var dateGroup = new DateGroup
@@ -335,7 +329,6 @@ namespace ImAged.MVVM.ViewModel
                         Files = new ObservableCollection<TtlFileInfo>()
                     };
 
-                    // Add files to the date group
                     foreach (var filePath in group)
                     {
                         var fileInfo = new TtlFileInfo
@@ -347,22 +340,18 @@ namespace ImAged.MVVM.ViewModel
 
                         dateGroup.Files.Add(fileInfo);
 
-                        // Load thumbnail asynchronously
                         _ = Task.Run(async () => await LoadThumbnailAsync(fileInfo));
                     }
 
-                    // Add date group to main collection on main thread
                     await Application.Current.Dispatcher.InvokeAsync(() =>
                     {
                         DateGroups.Add(dateGroup);
                     });
                 }
 
-                // NEW: keep a copy of all groups for search filtering
                 _allDateGroups.Clear();
                 _allDateGroups.AddRange(DateGroups);
 
-                // Apply filter in case user typed before scan finished
                 ApplyFilter();
             }
             catch (Exception ex)
@@ -373,7 +362,6 @@ namespace ImAged.MVVM.ViewModel
 
         private async Task LoadThumbnailAsync(TtlFileInfo fileInfo)
         {
-            // Check cache first
             lock (_cacheLock)
             {
                 if (_thumbnailCache.TryGetValue(fileInfo.FilePath, out var secureRef))
@@ -387,7 +375,6 @@ namespace ImAged.MVVM.ViewModel
                     }
                     else
                     {
-                        // Remove disposed reference
                         _thumbnailCache.Remove(fileInfo.FilePath);
                     }
                 }
@@ -406,19 +393,16 @@ namespace ImAged.MVVM.ViewModel
                 {
                     if (_isDisposed) return;
 
-                    // Load thumbnail with shorter timeout for security
                     var thumbnail = await _secureProcessManager.OpenTtlThumbnailAsync(fileInfo.FilePath, 256);
 
                     if (thumbnail != null)
                     {
-                        // Create secure reference with short timeout
-                        var secureRef = new SecureImageReference(thumbnail, null, 15); // 15 second timeout
+                        var secureRef = new SecureImageReference(thumbnail, null, 15);
 
                         lock (_cacheLock)
                         {
                             if (_thumbnailCache.Count >= _maxCacheSize)
                             {
-                                // Dispose oldest reference securely
                                 var oldestKey = _thumbnailCache.Keys.First();
                                 _thumbnailCache[oldestKey]?.Dispose();
                                 _thumbnailCache.Remove(oldestKey);
@@ -469,7 +453,7 @@ namespace ImAged.MVVM.ViewModel
                     {
                         await Application.Current.Dispatcher.InvokeAsync(() =>
                         {
-                            var win = new ImageViewWindow(bitmapSource, fileInfo.FilePath);   // pass path
+                            var win = new ImageViewWindow(bitmapSource, fileInfo.FilePath);
                             win.Show();
                         });
                     }
@@ -478,21 +462,6 @@ namespace ImAged.MVVM.ViewModel
                 {
                     System.Diagnostics.Debug.WriteLine($"Error opening {fileInfo.FileName}: {ex.Message}");
                 }
-            }
-        }
-
-        private async Task LoadTtlImageAsync()
-        {
-            try
-            {
-                string ttlPath = @"C:\Users\Mark\Desktop\Test\jeon-somi-anime-7680x4320-23149.ttl";
-
-                var bitmapSource = await _secureProcessManager.OpenTtlFileAsync(ttlPath);
-                DisplayedImage = bitmapSource;
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Error loading image: {ex.Message}");
             }
         }
 
@@ -527,7 +496,6 @@ namespace ImAged.MVVM.ViewModel
 
                 if (dateGroup == null)
                 {
-                    // Create new date group
                     dateGroup = new DateGroup
                     {
                         Date = fileDate,
@@ -535,7 +503,6 @@ namespace ImAged.MVVM.ViewModel
                         Files = new ObservableCollection<TtlFileInfo>()
                     };
 
-                    // Insert at the beginning since it's the newest
                     DateGroups.Insert(0, dateGroup);
                 }
                 else
@@ -550,7 +517,7 @@ namespace ImAged.MVVM.ViewModel
                     LastModified = File.GetLastWriteTime(e.FullPath)
                 };
 
-                dateGroup.Files.Insert(0, fileInfo); // Add to beginning of group
+                dateGroup.Files.Insert(0, fileInfo);
                 _ = Task.Run(async () => await LoadThumbnailAsync(fileInfo));
             });
         }
@@ -567,7 +534,6 @@ namespace ImAged.MVVM.ViewModel
                         dateGroup.Files.Remove(fileToRemove);
                         dateGroup.ImageCount--;
 
-                        // Remove empty date groups
                         if (dateGroup.Files.Count == 0)
                         {
                             DateGroups.Remove(dateGroup);
@@ -591,14 +557,12 @@ namespace ImAged.MVVM.ViewModel
 
                         if (newDate == dateGroup.Date)
                         {
-                            // Same date, just update the file
                             oldFile.FilePath = e.FullPath;
                             oldFile.FileName = Path.GetFileNameWithoutExtension(e.FullPath);
                             oldFile.LastModified = File.GetLastWriteTime(e.FullPath);
                         }
                         else
                         {
-                            // Different date, move to appropriate group
                             dateGroup.Files.Remove(oldFile);
                             dateGroup.ImageCount--;
 
@@ -624,7 +588,6 @@ namespace ImAged.MVVM.ViewModel
                             targetGroup.Files.Add(oldFile);
                         }
 
-                        // Remove empty date groups
                         if (dateGroup.Files.Count == 0)
                         {
                             DateGroups.Remove(dateGroup);
@@ -681,7 +644,6 @@ namespace ImAged.MVVM.ViewModel
 
             _memoryCleanupTimer?.Stop();
 
-            // Force secure cleanup
             ForceSecureMemoryCleanup();
 
             foreach (var watcher in _fileWatchers)
@@ -696,7 +658,7 @@ namespace ImAged.MVVM.ViewModel
         private class SecureImageReference : IDisposable
         {
             private BitmapSource _image;
-            private byte[] _encryptedData; // Keep encrypted version
+            private byte[] _encryptedData;
             private readonly Timer _cleanupTimer;
             private bool _disposed = false;
 
@@ -705,7 +667,6 @@ namespace ImAged.MVVM.ViewModel
                 _image = image;
                 _encryptedData = encryptedData;
 
-                // Setup immediate cleanup timer
                 _cleanupTimer = new Timer(_ => Dispose(), null, TimeSpan.FromSeconds(timeoutSeconds), Timeout.InfiniteTimeSpan);
             }
 
@@ -720,12 +681,10 @@ namespace ImAged.MVVM.ViewModel
                 if (_disposed) return;
                 _disposed = true;
 
-                // Securely clear the image from memory
                 if (_image != null)
                 {
                     try
                     {
-                        // Overwrite memory with zeros before disposal
                         if (_image is WriteableBitmap wb)
                         {
                             wb.Lock();
@@ -739,7 +698,6 @@ namespace ImAged.MVVM.ViewModel
                     _image = null;
                 }
 
-                // Securely clear encrypted data
                 if (_encryptedData != null)
                 {
                     for (int i = 0; i < _encryptedData.Length; i++)
@@ -751,7 +709,6 @@ namespace ImAged.MVVM.ViewModel
 
                 _cleanupTimer?.Dispose();
 
-                // Force immediate cleanup
                 GC.Collect();
             }
         }
