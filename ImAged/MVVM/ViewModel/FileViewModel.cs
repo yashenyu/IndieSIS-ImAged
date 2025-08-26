@@ -1,4 +1,11 @@
+<<<<<<< Updated upstream
 ﻿using System;
+=======
+﻿using ImAged.MVVM.Model;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+>>>>>>> Stashed changes
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
@@ -63,9 +70,91 @@ namespace ImAged.MVVM.ViewModel
 
         private void OpenFolder()
         {
+<<<<<<< Updated upstream
             // This is where you would put the logic to navigate to the selected folder,
             // or perform some other action.
             Debug.WriteLine($"Folder '{Name}' was clicked!");
+=======
+            foreach (var folderPath in GetCandidateFolders())
+            {
+                if (!Directory.Exists(folderPath))
+                    continue;
+
+                try
+                {
+                    foreach (var path in Directory.EnumerateFiles(folderPath, "*.ttl", SearchOption.AllDirectories))
+                    {
+                        FileInfo info;
+                        try
+                        {
+                            info = new FileInfo(path);
+                        }
+                        catch
+                        {
+                            continue;
+                        }
+
+                        Files.Add(new FileItem
+                        {
+                            FileName = info.Name,
+                            FileType = info.Extension,
+                            FileSize = info.Length / 1024d, // in KB
+                            FilePath = info.FullName,
+                            Created = info.CreationTime,
+                            State = "Converted",
+                            ImagePath = "256x256.ico"
+                        });
+                    }
+                }
+                catch (UnauthorizedAccessException)
+                {
+                    // Skip folders we cannot access
+                }
+                catch (IOException)
+                {
+                    // Skip problematic folders
+                }
+            }
+        }
+
+        private IEnumerable<string> GetCandidateFolders()
+        {
+            var folders = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            string desktop = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
+            string documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            string pictures = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
+            string userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            string downloads = string.IsNullOrEmpty(userProfile) ? null : Path.Combine(userProfile, "Downloads");
+
+            if (!string.IsNullOrWhiteSpace(desktop)) folders.Add(desktop);
+            if (!string.IsNullOrWhiteSpace(documents)) folders.Add(documents);
+            if (!string.IsNullOrWhiteSpace(pictures)) folders.Add(pictures);
+            if (!string.IsNullOrWhiteSpace(downloads)) folders.Add(downloads);
+
+            // Also consider the application's base directory
+            try
+            {
+                string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+                if (!string.IsNullOrWhiteSpace(baseDir)) folders.Add(baseDir);
+            }
+            catch { }
+
+            return folders;
+        }
+
+        private bool FilterFiles(object obj)
+        {
+            if (obj is FileItem file)
+            {
+                if (string.IsNullOrWhiteSpace(SearchText))
+                    return true;
+
+                return file.FileName.IndexOf(SearchText, System.StringComparison.OrdinalIgnoreCase) >= 0 ||
+                       file.FileType.IndexOf(SearchText, System.StringComparison.OrdinalIgnoreCase) >= 0;
+            }
+            return false;
+>>>>>>> Stashed changes
         }
 
         #region INotifyPropertyChanged Implementation
