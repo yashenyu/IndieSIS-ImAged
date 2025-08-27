@@ -66,7 +66,7 @@ namespace ImAged.MVVM.ViewModel
             {
                 if (Directory.Exists(folderPath))
                 {
-                    foreach (var path in Directory.GetFiles(folderPath, "*.ttl"))
+                    foreach (var path in SafeEnumerateTtlFiles(folderPath))
                     {
                         var info = new FileInfo(path);
                         Files.Add(new FileItem
@@ -80,6 +80,45 @@ namespace ImAged.MVVM.ViewModel
                             ImagePath = "256x256.ico" // generic icon
                         });
                     }
+                }
+            }
+        }
+
+        private IEnumerable<string> SafeEnumerateTtlFiles(string root)
+        {
+            var pending = new Stack<string>();
+            pending.Push(root);
+            while (pending.Count > 0)
+            {
+                var current = pending.Pop();
+                IEnumerable<string> subdirs;
+                try
+                {
+                    subdirs = Directory.EnumerateDirectories(current);
+                }
+                catch
+                {
+                    subdirs = Array.Empty<string>();
+                }
+
+                foreach (var dir in subdirs)
+                {
+                    pending.Push(dir);
+                }
+
+                IEnumerable<string> files;
+                try
+                {
+                    files = Directory.EnumerateFiles(current, "*.ttl", SearchOption.TopDirectoryOnly);
+                }
+                catch
+                {
+                    files = Array.Empty<string>();
+                }
+
+                foreach (var file in files)
+                {
+                    yield return file;
                 }
             }
         }

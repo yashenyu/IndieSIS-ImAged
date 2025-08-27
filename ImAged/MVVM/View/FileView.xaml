@@ -32,7 +32,7 @@
                  Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left"/>
 
             <!-- File List -->
-            <Border Grid.Row="1" CornerRadius="8" BorderBrush="#FF212121" BorderThickness=".5" Padding="2" ClipToBounds="True" Background="#FF212121">
+            <Border Grid.Row="1" CornerRadius="8" BorderBrush="#FF212121" BorderThickness="1" Padding="2" ClipToBounds="True" Background="Transparent">
                 <DataGrid Grid.Row="1"
                           ItemsSource="{Binding FilesView}"
                           AutoGenerateColumns="False"
@@ -40,16 +40,16 @@
                           SelectionMode="Single"
                           SelectedItem="{Binding SelectedFile, Mode=TwoWay}"
                           Style="{StaticResource GridTheme}"
-                          Margin="0,2,0,1"
+                          Margin="-2,-2,-2.335,1"
                           Background="Transparent"
                           GridLinesVisibility="None"
                           RowHeaderWidth="0">
 
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="File Name" Binding="{Binding FileName}" Width="*" FontWeight="Normal" />
-                        <DataGridTextColumn Header="Type" Binding="{Binding FileType}" Width="100" />
-                        <DataGridTextColumn Header="Size (KB)" Binding="{Binding FileSize, StringFormat={}{0:N2}}" Width="100" />
-                        <DataGridTextColumn Header="Created" Binding="{Binding Created}" Width="150" />
+                        <DataGridTextColumn Header="File Name" Binding="{Binding FileName}" Width="*" FontWeight="Normal" ElementStyle="{StaticResource LeftCellText}" />
+                        <DataGridTextColumn Header="Type" Binding="{Binding FileType}" Width="100" ElementStyle="{StaticResource CenterCellText}" />
+                        <DataGridTextColumn Header="Size (KB)" Binding="{Binding FileSize, StringFormat={}{0:N2}}" Width="100" ElementStyle="{StaticResource CenterCellText}" />
+                        <DataGridTextColumn Header="Created" Binding="{Binding Created}" Width="150" ElementStyle="{StaticResource CenterCellText}" />
                     </DataGrid.Columns>
 
                 </DataGrid>

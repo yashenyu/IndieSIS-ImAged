@@ -2,12 +2,11 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <!-- DataGrid Style -->
     <Style x:Key="GridTheme" TargetType="DataGrid">
-        <Setter Property="Background" Value="#FF1F1F1F"/>
-        <Setter Property="Foreground" Value="#FF9E9E9E"/>
-        <Setter Property="BorderBrush" Value="#FF212121"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="Transparent"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
         <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="RowBackground" Value="#FFFFFF"/>
-        <Setter Property="AlternatingRowBackground" Value="#F7F7F7"/>
+        <Setter Property="RowBackground" Value="Transparent"/>
         <Setter Property="GridLinesVisibility" Value="None"/>
         <Setter Property="FontFamily" Value="Segoe UI"/>
         <Setter Property="FontSize" Value="14"/>
@@ -18,7 +17,7 @@
     </Style>
     
     <Style TargetType="DataGridRowHeader">
-        <Setter Property="Background" Value="#FF121212"/>
+        <Setter Property="Background" Value="Transparent"/>
         <Setter Property="BorderBrush" Value="Transparent"/>
     </Style>
 
@@ -35,24 +34,47 @@
 
     <!-- DataGrid Row Style -->
     <Style TargetType="DataGridCell">
-        <Setter Property="Background" Value="#FF1F1F1F"/>
+        <!-- Base style -->
+        <Setter Property="Background" Value="Transparent"/>
         <Setter Property="Foreground" Value="#FFADADAD"/>
         <Setter Property="BorderBrush" Value="Transparent"/>
         <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+
+        <!-- Apply to inner TextBlock -->
         <Setter Property="TextBlock.TextTrimming" Value="CharacterEllipsis"/>
         <Setter Property="TextBlock.TextWrapping" Value="NoWrap"/>
+        <Setter Property="TextBlock.TextAlignment" Value="Center"/>
+
         <Style.Triggers>
             <!-- Hover effect -->
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="#FF131313"/>
-                <Setter Property="Foreground" Value="#FFADADAD"/>
+                <Setter Property="Background" Value="#FF383838"/>
+                <Setter Property="Foreground" Value="#FFD4D4D4"/>
             </Trigger>
 
             <!-- Selected effect -->
             <Trigger Property="IsSelected" Value="True">
-                <Setter Property="Background" Value="#FF464646"/>
-                <Setter Property="Foreground" Value="Black"/>
+                <Setter Property="Background" Value="#FF171717"/>
+                <Setter Property="Foreground" Value="#FFD4D4D4"/>
             </Trigger>
         </Style.Triggers>
     </Style>
+
+    <!-- Reusable TextBlock styles for DataGridTextColumn.ElementStyle -->
+    <Style x:Key="LeftCellText" TargetType="TextBlock">
+        <Setter Property="TextAlignment" Value="Left"/>
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+        <Setter Property="TextWrapping" Value="NoWrap"/>
+    </Style>
+
+    <Style x:Key="CenterCellText" TargetType="TextBlock">
+        <Setter Property="TextAlignment" Value="Center"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+        <Setter Property="TextWrapping" Value="NoWrap"/>
+    </Style>
+
 </ResourceDictionary>

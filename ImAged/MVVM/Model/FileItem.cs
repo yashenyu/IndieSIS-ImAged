@@ -16,6 +16,8 @@ namespace ImAged.MVVM.Model
         public string State { get; set; } //  (e.g., "Active", "Expired")
 
         public string ImagePath { get; set; }
+
+        public bool IsFolder { get; set; }
     }
 
 }
