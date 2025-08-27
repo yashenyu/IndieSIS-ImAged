@@ -58,11 +58,16 @@
 
         <!-- Details Panel -->
         <StackPanel Grid.Column="1" Margin="10">
-            <!-- ETO YUNG IMAGE -->
-            <Image Source="{Binding SelectedFile.ImagePath}"
-               Width="200" Height="140"
-               Stretch="Uniform"
-               Margin="0,0,0,5"/>
+            <!-- Image-only preview styled similar to HomeView tiles -->
+            <Border Height="200" HorizontalAlignment="Stretch" CornerRadius="8" Margin="0,0,0,5" SnapsToDevicePixels="True" ClipToBounds="True">
+                <Border.Background>
+                    <ImageBrush ImageSource="{Binding SelectedFile.Thumbnail}"
+                                Stretch="UniformToFill"
+                                AlignmentX="Center"
+                                AlignmentY="Center"
+                                RenderOptions.BitmapScalingMode="HighQuality"/>
+                </Border.Background>
+            </Border>
             <Separator/>
 
             <TextBlock Text="{Binding SelectedFile.FileName}" FontWeight="Bold" FontSize="16" Foreground="White" Margin="0,0,0,10" TextWrapping="Wrap"/>

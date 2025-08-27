@@ -5,6 +5,10 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Windows.Data;
+using System.Threading.Tasks;
+using System.Windows.Media.Imaging;
+using System.Windows;
+using ImAged.Services;
 
 namespace ImAged.MVVM.ViewModel
 {
@@ -24,6 +28,7 @@ namespace ImAged.MVVM.ViewModel
                 {
                     _selectedFile = value;
                     OnPropertyChanged(nameof(SelectedFile));
+                    _ = LoadSelectedThumbnailAsync();
                 }
             }
         }
@@ -42,6 +47,85 @@ namespace ImAged.MVVM.ViewModel
                     OnPropertyChanged(nameof(SearchText));
                     FilesView.Refresh(); // apply filter when search text changes
                 }
+            }
+        }
+
+        private SecureProcessManager _secureProcessManager;
+        private bool _secureInitialized;
+
+        private async Task EnsureSecureAsync()
+        {
+            if (_secureProcessManager == null)
+            {
+                _secureProcessManager = new SecureProcessManager();
+            }
+            if (!_secureInitialized)
+            {
+                try
+                {
+                    await _secureProcessManager.InitializeAsync();
+                    _secureInitialized = true;
+                }
+                catch
+                {
+                    _secureInitialized = false;
+                }
+            }
+        }
+
+        private async Task LoadSelectedThumbnailAsync()
+        {
+            var file = _selectedFile;
+            if (file == null) return;
+            try
+            {
+                // If expired, show default logo immediately
+                if (string.Equals(file.State, "Expired", StringComparison.OrdinalIgnoreCase))
+                {
+                    await Application.Current.Dispatcher.InvokeAsync(() => file.Thumbnail = GetDefaultLogo());
+                    return;
+                }
+
+                await EnsureSecureAsync();
+                if (!_secureInitialized)
+                {
+                    await Application.Current.Dispatcher.InvokeAsync(() => file.Thumbnail = GetDefaultLogo());
+                    return;
+                }
+
+                var bmp = await _secureProcessManager.OpenTtlThumbnailAsync(file.FilePath, 256);
+                await Application.Current.Dispatcher.InvokeAsync(() => file.Thumbnail = bmp ?? GetDefaultLogo());
+            }
+            catch
+            {
+                // On any error, set default logo
+                try
+                {
+                    await Application.Current.Dispatcher.InvokeAsync(() => file.Thumbnail = GetDefaultLogo());
+                }
+                catch { }
+            }
+        }
+
+        private BitmapSource _defaultLogo;
+        private BitmapSource GetDefaultLogo()
+        {
+            if (_defaultLogo != null) return _defaultLogo;
+            try
+            {
+                var uri = new Uri("pack://application:,,,/ImAged;component/Images/base logo.png", UriKind.Absolute);
+                var img = new BitmapImage();
+                img.BeginInit();
+                img.CacheOption = BitmapCacheOption.OnLoad;
+                img.UriSource = uri;
+                img.EndInit();
+                img.Freeze();
+                _defaultLogo = img;
+                return _defaultLogo;
+            }
+            catch
+            {
+                return null;
             }
         }
         public FileViewModel()
@@ -69,6 +153,7 @@ namespace ImAged.MVVM.ViewModel
                     foreach (var path in SafeEnumerateTtlFiles(folderPath))
                     {
                         var info = new FileInfo(path);
+                        var imagePath = TryFindAssociatedImagePath(path) ?? "256x256.ico";
                         Files.Add(new FileItem
                         {
                             FileName = info.Name,
@@ -77,11 +162,111 @@ namespace ImAged.MVVM.ViewModel
                             FilePath = info.FullName,
                             Created = info.CreationTime,
                             State = GetFileState(path),
-                            ImagePath = "256x256.ico" // generic icon
+                            ImagePath = imagePath
                         });
                     }
                 }
             }
+        }
+
+        private string TryFindAssociatedImagePath(string ttlPath)
+        {
+            try
+            {
+                var directory = Path.GetDirectoryName(ttlPath);
+                var baseName = Path.GetFileNameWithoutExtension(ttlPath);
+                if (string.IsNullOrEmpty(directory) || string.IsNullOrEmpty(baseName))
+                    return null;
+
+                string[] candidateExtensions = new[] { ".jpg", ".jpeg", ".png", ".bmp", ".gif", ".webp", ".tif", ".tiff" };
+                foreach (var ext in candidateExtensions)
+                {
+                    var candidate = Path.Combine(directory, baseName + ext);
+                    if (File.Exists(candidate))
+                        return candidate;
+                }
+
+                // Also probe for common suffix patterns (e.g., "-image", "_image")
+                string[] suffixes = new[] { "-image", "_image", "-img", "_img" };
+                foreach (var suffix in suffixes)
+                {
+                    foreach (var ext in candidateExtensions)
+                    {
+                        var candidate = Path.Combine(directory, baseName + suffix + ext);
+                        if (File.Exists(candidate))
+                            return candidate;
+                    }
+                }
+
+                // Look into common subfolders one-level deep (e.g., images/, img/, thumbs/)
+                string[] commonChildFolders = new[] { "images", "image", "img", "imgs", "thumb", "thumbs", "thumbnails" };
+                foreach (var child in commonChildFolders)
+                {
+                    var childDir = Path.Combine(directory, child);
+                    if (Directory.Exists(childDir))
+                    {
+                        foreach (var ext in candidateExtensions)
+                        {
+                            var candidate = Path.Combine(childDir, baseName + ext);
+                            if (File.Exists(candidate))
+                                return candidate;
+
+                            foreach (var suffix in suffixes)
+                            {
+                                var candidateWithSuffix = Path.Combine(childDir, baseName + suffix + ext);
+                                if (File.Exists(candidateWithSuffix))
+                                    return candidateWithSuffix;
+                            }
+                        }
+                    }
+                }
+
+                // Probe parent directory (one level up)
+                var parentDir = Directory.GetParent(directory)?.FullName;
+                if (!string.IsNullOrEmpty(parentDir) && Directory.Exists(parentDir))
+                {
+                    foreach (var ext in candidateExtensions)
+                    {
+                        var candidate = Path.Combine(parentDir, baseName + ext);
+                        if (File.Exists(candidate))
+                            return candidate;
+
+                        foreach (var suffix in suffixes)
+                        {
+                            var candidateWithSuffix = Path.Combine(parentDir, baseName + suffix + ext);
+                            if (File.Exists(candidateWithSuffix))
+                                return candidateWithSuffix;
+                        }
+                    }
+
+                    // Common image folders at parent level
+                    foreach (var child in commonChildFolders)
+                    {
+                        var childDir = Path.Combine(parentDir, child);
+                        if (Directory.Exists(childDir))
+                        {
+                            foreach (var ext in candidateExtensions)
+                            {
+                                var candidate = Path.Combine(childDir, baseName + ext);
+                                if (File.Exists(candidate))
+                                    return candidate;
+
+                                foreach (var suffix in suffixes)
+                                {
+                                    var candidateWithSuffix = Path.Combine(childDir, baseName + suffix + ext);
+                                    if (File.Exists(candidateWithSuffix))
+                                        return candidateWithSuffix;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                // ignore and fall back
+            }
+            return null;
         }
 
         private IEnumerable<string> SafeEnumerateTtlFiles(string root)
