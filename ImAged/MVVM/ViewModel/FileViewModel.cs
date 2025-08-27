@@ -76,7 +76,7 @@ namespace ImAged.MVVM.ViewModel
                             FileSize = info.Length / 1024d, // in KB
                             FilePath = info.FullName,
                             Created = info.CreationTime,
-                            State = "Converted",
+                            State = GetFileState(path),
                             ImagePath = "256x256.ico" // generic icon
                         });
                     }
@@ -94,6 +94,51 @@ namespace ImAged.MVVM.ViewModel
                        file.FileType.IndexOf(SearchText, StringComparison.OrdinalIgnoreCase) >= 0;
             }
             return false;
+        }
+
+        private string GetFileState(string ttlPath)
+        {
+            var expiry = TryReadExpiryUtc(ttlPath);
+            if (expiry == null) return "Unknown";
+
+            var nowUtc = DateTimeOffset.UtcNow;
+            var nearCutoff = nowUtc + TimeSpan.FromHours(24);
+
+            if (expiry < nowUtc) return "Expired";
+            else if (expiry <= nearCutoff) return "Near expiry";
+            else return "Active";
+        }
+
+        // TTL layout: MAGIC(6)+salt(16)+nonce_hdr(12)+header(8 big-endian expiry)
+        private DateTimeOffset? TryReadExpiryUtc(string ttlPath)
+        {
+            try
+            {
+                using (var fs = new FileStream(ttlPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                {
+                    var buf = new byte[6 + 16 + 12 + 8];
+                    int read = 0;
+                    while (read < buf.Length)
+                    {
+                        int toRead = buf.Length - read;
+                        int r = fs.Read(buf, read, toRead);
+                        if (r <= 0) break;
+                        read += r;
+                    }
+                    if (read < buf.Length) return null;
+                    if (!(buf[0] == (byte)'I' && buf[1] == (byte)'M' && buf[2] == (byte)'A' && buf[3] == (byte)'G' && buf[4] == (byte)'E' && buf[5] == (byte)'D'))
+                        return null;
+                    int expOffset = 6 + 16 + 12;
+                    ulong be = ((ulong)buf[expOffset + 0] << 56) | ((ulong)buf[expOffset + 1] << 48) | ((ulong)buf[expOffset + 2] << 40) | ((ulong)buf[expOffset + 3] << 32)
+                             | ((ulong)buf[expOffset + 4] << 24) | ((ulong)buf[expOffset + 5] << 16) | ((ulong)buf[expOffset + 6] << 8) | buf[expOffset + 7];
+                    if (be > (ulong)DateTimeOffset.MaxValue.ToUnixTimeSeconds()) return null;
+                    return DateTimeOffset.FromUnixTimeSeconds((long)be);
+                }
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
