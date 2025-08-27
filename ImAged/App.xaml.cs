@@ -15,6 +15,8 @@ namespace ImAged
     /// </summary>
     public partial class App : Application
     {
+        private const bool CaptureProtectionEnabled = false;
+
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
@@ -26,13 +28,12 @@ namespace ImAged
                     AttachSecurity(window);
                 }
 
-                // Apply to any window created after startup (use Loaded routed event)
                 EventManager.RegisterClassHandler(
                     typeof(Window),
                     FrameworkElement.LoadedEvent,
                     new RoutedEventHandler((sender, args) =>
                     {
-                        if (sender is Window w)
+                        if (CaptureProtectionEnabled && sender is Window w)
                         {
                             WindowSecurity.ApplyExcludeFromCapture(w);
                         }
@@ -44,7 +45,10 @@ namespace ImAged
         {
             void Apply(object sender, EventArgs args)
             {
-                WindowSecurity.ApplyExcludeFromCapture(window);
+                if (CaptureProtectionEnabled)
+                {
+                    WindowSecurity.ApplyExcludeFromCapture(window);
+                }
             }
 
             if (new WindowInteropHelper(window).Handle != IntPtr.Zero)
@@ -53,7 +57,6 @@ namespace ImAged
             }
             else
             {
-                // Fallback to Loaded when SourceInitialized is not available as a routed event
                 window.Loaded += (s, e) => Apply(s, EventArgs.Empty);
             }
         }
