@@ -49,6 +49,7 @@
                             <!-- Normal hover becomes red -->
                             <Trigger Property="IsHighlighted" Value="True">
                                 <Setter TargetName="border" Property="Background" Value="#FF4444"/>
+                                <Setter TargetName="border" Property="Background" Value="#FF4444"/>
                             </Trigger>
                             <!-- Disabled gray -->
                             <Trigger Property="IsEnabled" Value="False">
@@ -184,23 +185,25 @@
                                                     </Border.ContextMenu>
 
                                                     <Border.Background>
-                                                        <ImageBrush ImageSource="{Binding Thumbnail}" 
-                                                               Stretch="UniformToFill" 
-                                                               RenderOptions.BitmapScalingMode="HighQuality"/>
+                                                        <ImageBrush ImageSource="{Binding Thumbnail}"
+                                                                Stretch="UniformToFill"
+                                                                AlignmentX="Center"
+                                                                AlignmentY="Center"
+                                                                RenderOptions.BitmapScalingMode="HighQuality"/>
                                                     </Border.Background>
 
                                                     <Grid>
                                                         <!-- Blurred thumbnail background -->
                                                         <Image Source="{Binding Thumbnail}"
                                                                Stretch="UniformToFill"
+                                                               HorizontalAlignment="Center"
+                                                               VerticalAlignment="Center"
                                                                RenderOptions.BitmapScalingMode="HighQuality"
                                                                IsHitTestVisible="False">
                                                             <Image.CacheMode>
                                                                 <BitmapCache RenderAtScale="1"/>
                                                             </Image.CacheMode>
-                                                            <Image.Effect>
-                                                                <BlurEffect Radius="14"/>
-                                                            </Image.Effect>
+                                                            
                                                         </Image>
 
                                                         <!-- Loading overlay -->
