@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 using System.Windows;
 using ImAged.Services;
+using System.Linq;
+using System.Windows.Threading;
 
 namespace ImAged.MVVM.ViewModel
 {
@@ -134,6 +136,12 @@ namespace ImAged.MVVM.ViewModel
             FilesView = CollectionViewSource.GetDefaultView(Files);
             FilesView.Filter = FilterFiles;
             LoadFiles();
+
+            // Setup real-time: watch filesystem and expiration updates
+            SetupFileWatching();
+            _expirationTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+            _expirationTimer.Tick += OnExpirationTimerTick;
+            _expirationTimer.Start();
         }
 
         private void LoadFiles()
@@ -267,6 +275,102 @@ namespace ImAged.MVVM.ViewModel
                 // ignore and fall back
             }
             return null;
+        }
+
+        private readonly List<FileSystemWatcher> _watchers = new List<FileSystemWatcher>();
+        private DispatcherTimer _expirationTimer;
+
+        private void SetupFileWatching()
+        {
+            var roots = Files.Select(f => Path.GetDirectoryName(f.FilePath)).Distinct().ToList();
+            foreach (var root in roots)
+            {
+                if (string.IsNullOrEmpty(root) || !Directory.Exists(root)) continue;
+                var watcher = new FileSystemWatcher(root)
+                {
+                    Filter = "*.ttl",
+                    IncludeSubdirectories = true,
+                    EnableRaisingEvents = true
+                };
+                watcher.Created += OnTtlChanged;
+                watcher.Deleted += OnTtlChanged;
+                watcher.Renamed += OnTtlRenamed;
+                _watchers.Add(watcher);
+            }
+        }
+
+        private void OnTtlChanged(object sender, FileSystemEventArgs e)
+        {
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                if (e.ChangeType == WatcherChangeTypes.Created)
+                {
+                    try
+                    {
+                        var info = new FileInfo(e.FullPath);
+                        var imagePath = TryFindAssociatedImagePath(e.FullPath) ?? "256x256.ico";
+                        Files.Add(new FileItem
+                        {
+                            FileName = info.Name,
+                            FileType = info.Extension,
+                            FileSize = info.Length / 1024d,
+                            FilePath = info.FullName,
+                            Created = info.CreationTime,
+                            State = GetFileState(e.FullPath),
+                            ImagePath = imagePath
+                        });
+                    }
+                    catch { }
+                }
+                else if (e.ChangeType == WatcherChangeTypes.Deleted)
+                {
+                    var existing = Files.FirstOrDefault(f => string.Equals(f.FilePath, e.FullPath, StringComparison.OrdinalIgnoreCase));
+                    if (existing != null) Files.Remove(existing);
+                }
+            });
+        }
+
+        private void OnTtlRenamed(object sender, RenamedEventArgs e)
+        {
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                var existing = Files.FirstOrDefault(f => string.Equals(f.FilePath, e.OldFullPath, StringComparison.OrdinalIgnoreCase));
+                if (existing != null)
+                {
+                    existing.FilePath = e.FullPath;
+                    existing.FileName = Path.GetFileName(e.FullPath);
+                    existing.Created = File.GetCreationTime(e.FullPath);
+                    existing.State = GetFileState(e.FullPath);
+                }
+            });
+        }
+
+        private void OnExpirationTimerTick(object sender, EventArgs e)
+        {
+            try
+            {
+                foreach (var f in Files)
+                {
+                    var newState = GetFileState(f.FilePath);
+                    if (!string.Equals(f.State, newState, StringComparison.Ordinal))
+                    {
+                        f.State = newState;
+                        if (ReferenceEquals(f, _selectedFile))
+                        {
+                            if (string.Equals(newState, "Expired", StringComparison.OrdinalIgnoreCase))
+                            {
+                                // Swap to logo if expired
+                                f.Thumbnail = GetDefaultLogo();
+                            }
+                            else
+                            {
+                                _ = LoadSelectedThumbnailAsync();
+                            }
+                        }
+                    }
+                }
+            }
+            catch { }
         }
 
         private IEnumerable<string> SafeEnumerateTtlFiles(string root)

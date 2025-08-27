@@ -68,7 +68,18 @@
                                 RenderOptions.BitmapScalingMode="HighQuality"/>
                 </Border.Background>
             </Border>
-            <Separator/>
+            <Separator>
+                <Separator.Style>
+                    <Style TargetType="Separator">
+                        <Setter Property="Visibility" Value="Visible"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding SelectedFile}" Value="{x:Null}">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Separator.Style>
+            </Separator>
 
             <TextBlock Text="{Binding SelectedFile.FileName}" FontWeight="Bold" FontSize="16" Foreground="White" Margin="0,0,0,10" TextWrapping="Wrap"/>
 

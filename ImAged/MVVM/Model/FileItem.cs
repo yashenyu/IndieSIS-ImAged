@@ -11,7 +11,19 @@ namespace ImAged.MVVM.Model
         public double FileSize { get; set; } // KB
         public string FilePath { get; set; }
         public DateTime Created { get; set; }
-        public string State { get; set; } //  (e.g., "Active", "Expired")
+        private string _state; //  (e.g., "Active", "Expired")
+        public string State
+        {
+            get => _state;
+            set
+            {
+                if (!string.Equals(_state, value, StringComparison.Ordinal))
+                {
+                    _state = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(State)));
+                }
+            }
+        }
 
         public string ImagePath { get; set; }
 
