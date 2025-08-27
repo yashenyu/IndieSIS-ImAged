@@ -119,6 +119,7 @@
     <Compile Include="Core\DynamicTextBlock.cs" />
     <Compile Include="Core\SecureProcessManager.cs" />
     <Compile Include="Core\TextBoxHelper.cs" />
+    <Compile Include="Core\WindowSecurity.cs" />
     <Compile Include="MVVM\Model\FileItem.cs" />
     <Compile Include="MVVM\ViewModel\ConvertViewModel.cs" />
     <Compile Include="MVVM\ViewModel\FileViewModel.cs" />
