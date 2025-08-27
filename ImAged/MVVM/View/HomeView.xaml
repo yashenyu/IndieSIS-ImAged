@@ -190,6 +190,20 @@
                                                     </Border.Background>
 
                                                     <Grid>
+                                                        <!-- Blurred thumbnail background -->
+                                                        <Image Source="{Binding Thumbnail}"
+                                                               Stretch="UniformToFill"
+                                                               RenderOptions.BitmapScalingMode="HighQuality"
+                                                               IsHitTestVisible="False">
+                                                            <Image.CacheMode>
+                                                                <BitmapCache RenderAtScale="1"/>
+                                                            </Image.CacheMode>
+                                                            <Image.Effect>
+                                                                <BlurEffect Radius="14"/>
+                                                            </Image.Effect>
+                                                        </Image>
+
+                                                        <!-- Loading overlay -->
                                                         <Border Style="{StaticResource LoadingOverlayStyle}">
                                                             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                                                                 <ProgressBar Style="{StaticResource LoadingProgressBarStyle}"/>
@@ -198,6 +212,7 @@
                                                             </StackPanel>
                                                         </Border>
 
+                                                        <!-- File info overlay (visible on hover) -->
                                                         <Border Style="{StaticResource FileInfoOverlayStyle}">
                                                             <Grid>
                                                                 <Grid.RowDefinitions>

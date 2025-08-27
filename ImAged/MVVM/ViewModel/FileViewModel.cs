@@ -5,6 +5,10 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Windows.Data;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows;
 
 namespace ImAged.MVVM.ViewModel
 {
@@ -12,6 +16,8 @@ namespace ImAged.MVVM.ViewModel
     {
         private FileItem _selectedFile;
         private string _searchText;
+        private readonly List<string> _searchDirectories = new List<string>();
+        private readonly List<FileSystemWatcher> _fileWatchers = new List<FileSystemWatcher>();
 
         public FileItem SelectedFile
         {
@@ -49,7 +55,17 @@ namespace ImAged.MVVM.ViewModel
             FilesView = CollectionViewSource.GetDefaultView(Files);
             FilesView.Filter = FilterFiles;
 
+            InitializeSearchDirectories();
             LoadFiles();
+            SetupFileWatching();
+        }
+
+        private void InitializeSearchDirectories()
+        {
+            _searchDirectories.Clear();
+            _searchDirectories.Add(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures));
+            _searchDirectories.Add(Environment.GetFolderPath(Environment.SpecialFolder.Desktop));
+            _searchDirectories.Add(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads"));
         }
 
         private void LoadFiles()
