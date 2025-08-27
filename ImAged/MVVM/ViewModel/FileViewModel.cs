@@ -12,6 +12,8 @@ namespace ImAged.MVVM.ViewModel
     {
         private FileItem _selectedFile;
         private string _searchText;
+        private readonly List<string> _searchDirectories = new List<string>();
+        private readonly List<FileSystemWatcher> _fileWatchers = new List<FileSystemWatcher>();
 
         public FileItem SelectedFile
         {
@@ -42,13 +44,11 @@ namespace ImAged.MVVM.ViewModel
                 }
             }
         }
-
         public FileViewModel()
         {
             Files = new ObservableCollection<FileItem>();
             FilesView = CollectionViewSource.GetDefaultView(Files);
             FilesView.Filter = FilterFiles;
-
             LoadFiles();
         }
 
@@ -57,9 +57,9 @@ namespace ImAged.MVVM.ViewModel
             // Folders to search
             var targetFolders = new List<string>
             {
+                Environment.GetFolderPath(Environment.SpecialFolder.MyPictures),
                 Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
-                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads"),
-                Environment.GetFolderPath(Environment.SpecialFolder.MyPictures)
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads")
             };
 
             foreach (var folderPath in targetFolders)
