@@ -106,8 +106,8 @@
                                              Command="{Binding FileViewCommand}"
                                              GroupName="MenuGroup">
                                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                        <Image Source="/Images/File Icon.png" Width="16" Height="16" Margin="0,0,8,0"/>
-                                        <TextBlock Text="File Info"/>
+                                        <Image Source="/Images/Folder Icon.png" Width="16" Height="16" Margin="0,0,8,0"/>
+                                        <TextBlock Text="Files"/>
                                     </StackPanel>
                                 </RadioButton>
 
