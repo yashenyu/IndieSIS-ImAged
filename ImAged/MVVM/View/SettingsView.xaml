@@ -6,16 +6,15 @@
              xmlns:local="clr-namespace:ImAged.MVVM.View"
              mc:Ignorable="d" 
              d:DesignHeight="450" 
-             d:DesignWidth="800">
+             d:DesignWidth="800"
+             Background="Transparent">
 
-    <!-- Main container scales with window -->
-    <Grid Background="#121212">
+    <Grid Background="Transparent">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- Title stays visible, scales down if needed -->
         <Viewbox Grid.Row="0" Stretch="Uniform" MaxHeight="100" Margin="0,20,0,10">
             <TextBlock Text="INDIESIS"
                        FontSize="60"
@@ -25,12 +24,10 @@
                        VerticalAlignment="Center"/>
         </Viewbox>
 
-        <!-- Cards auto-resize to always fit screen -->
         <Viewbox Grid.Row="1" Stretch="Uniform">
             <ItemsControl ItemsSource="{Binding Developers}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <!-- Flexible layout: adjusts automatically -->
                         <UniformGrid Rows="2" Columns="2"/>
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
@@ -43,7 +40,6 @@
                                 Margin="10"
                                 SnapsToDevicePixels="True">
                             <StackPanel HorizontalAlignment="Center">
-                                <!-- Avatar container now scales with Viewbox -->
                                 <Grid Width="200" Height="200">
                                     <Ellipse Fill="#171717"/>
                                     <Ellipse Stroke="#6C5CE7" StrokeThickness="2"/>
