@@ -75,30 +75,41 @@
                         <StackPanel>
                             <!-- TOP MENU -->
                             <StackPanel Margin="0,0,0,16" Height="307">
-                                <RadioButton Content="Gallery"
-                                             Height="35"
+                                <RadioButton Height="35"
                                              FontSize="11"
                                              Foreground="#AEAEAE"
                                              Style="{StaticResource MenuButtonTheme}"
-                                             IsChecked="True"
-                                             Command="{Binding HomeViewCommand}"
-                                             GroupName="MenuGroup"/>
+                                             Command="{Binding ConvertViewCommand}"
+                                             GroupName="MenuGroup">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <Image Source="/Images/Home Icon.png" Width="16" Height="16" Margin="0,0,8,0"/>
+                                        <TextBlock Text="Gallery"/>
+                                    </StackPanel>
+                                </RadioButton>
 
-                                <RadioButton Content="Tools"
-                                             Height="35"
+                                <RadioButton Height="35"
                                              FontSize="11"
                                              Foreground="#AEAEAE"
                                              Style="{StaticResource MenuButtonTheme}"
-                                             Command = "{Binding ConvertViewCommand}"
-                                             GroupName="MenuGroup"/>
+                                             Command="{Binding ConvertViewCommand}"
+                                             GroupName="MenuGroup">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <Image Source="/Images/Tools Icon.png" Width="16" Height="16" Margin="0,0,8,0"/>
+                                        <TextBlock Text="Tools"/>
+                                    </StackPanel>
+                                </RadioButton>
 
-                                <RadioButton Content="File Info"
-                                             Height="35"
+                                <RadioButton Height="35"
                                              FontSize="11"
                                              Foreground="#AEAEAE"
                                              Style="{StaticResource MenuButtonTheme}"
-                                             GroupName="MenuGroup"
-                                             Command="{Binding FileViewCommand}"/>
+                                             Command="{Binding ConvertViewCommand}"
+                                             GroupName="MenuGroup">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <Image Source="/Images/File Icon.png" Width="16" Height="16" Margin="0,0,8,0"/>
+                                        <TextBlock Text="File Info"/>
+                                    </StackPanel>
+                                </RadioButton>
 
 
                                 <!-- FILES DROPDOWN -->
