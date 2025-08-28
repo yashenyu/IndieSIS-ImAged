@@ -277,6 +277,12 @@
     <Resource Include="256x256.ico" />
     <Resource Include="Images\base logo.png" />
     <Resource Include="Images\dre.jpg" />
+    <Resource Include="Images\All_Files Icon.png" />
+    <Resource Include="Images\File Icon.png" />
+    <Resource Include="Images\Folder Icon.png" />
+    <Resource Include="Images\Home Icon.png" />
+    <Resource Include="Images\Search Icon.png" />
+    <Resource Include="Images\Tools Icon.png" />
     <Resource Include="Images\Mark.png" />
     <Resource Include="Images\Ric.jpg" />
     <Content Include="pysrc\aes_gcm.py" />
