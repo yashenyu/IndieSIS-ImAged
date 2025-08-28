@@ -79,7 +79,7 @@
                                              FontSize="11"
                                              Foreground="#AEAEAE"
                                              Style="{StaticResource MenuButtonTheme}"
-                                             Command="{Binding ConvertViewCommand}"
+                                             Command="{Binding HomeViewCommand}"
                                              GroupName="MenuGroup">
                                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                         <Image Source="/Images/Home Icon.png" Width="16" Height="16" Margin="0,0,8,0"/>
@@ -103,7 +103,7 @@
                                              FontSize="11"
                                              Foreground="#AEAEAE"
                                              Style="{StaticResource MenuButtonTheme}"
-                                             Command="{Binding ConvertViewCommand}"
+                                             Command="{Binding FileViewCommand}"
                                              GroupName="MenuGroup">
                                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                         <Image Source="/Images/File Icon.png" Width="16" Height="16" Margin="0,0,8,0"/>
