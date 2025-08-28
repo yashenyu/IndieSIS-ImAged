@@ -85,16 +85,24 @@
                           VerticalAlignment="Stretch">
 
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="File Name"
-                        Binding="{Binding FileName}"
-                        Width="*"
-                        FontWeight="Normal">
-                            <DataGridTextColumn.ElementStyle>
-                                <Style TargetType="TextBlock" BasedOn="{StaticResource LeftCellText}">
-                                    <Setter Property="Margin" Value="5,0,0,0"/>
-                                </Style>
-                            </DataGridTextColumn.ElementStyle>
-                        </DataGridTextColumn>
+                        <DataGridTemplateColumn Header="File Name" Width="*">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="5,0,0,0">
+                                        <Image Source="/Images/File Icon.png" 
+                                               Width="16" 
+                                               Height="16" 
+                                               VerticalAlignment="Center" 
+                                               Margin="0,0,8,0" 
+                                               Opacity="0.8"/>
+                                        <TextBlock Text="{Binding FileName}" 
+                                                   VerticalAlignment="Center"
+                                                   Style="{StaticResource LeftCellText}"
+                                                   Margin="0,0,0,0"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
 
                         <DataGridTextColumn Header="Type"
                         Binding="{Binding FileType}"
