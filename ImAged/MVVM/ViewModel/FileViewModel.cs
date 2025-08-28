@@ -1,4 +1,5 @@
-﻿using ImAged.MVVM.Model;
+﻿using ImAged;
+using ImAged.MVVM.Model;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -20,6 +21,12 @@ namespace ImAged.MVVM.ViewModel
         private string _searchText;
         private readonly List<string> _searchDirectories = new List<string>();
         private readonly List<FileSystemWatcher> _fileWatchers = new List<FileSystemWatcher>();
+
+        // Shared cache and watchers to persist across navigations
+        private static readonly object _cacheLock = new object();
+        private static ObservableCollection<FileItem> _sharedFiles;
+        private static bool _sharedInitialized;
+        private static readonly List<FileSystemWatcher> _sharedWatchers = new List<FileSystemWatcher>();
 
         public FileItem SelectedFile
         {
@@ -52,27 +59,13 @@ namespace ImAged.MVVM.ViewModel
             }
         }
 
-        private SecureProcessManager _secureProcessManager;
-        private bool _secureInitialized;
+        private SecureProcessManager _secureProcessManager = App.SecureProcessManagerInstance;
+        private bool _secureInitialized = true; // Already initialized by App
 
         private async Task EnsureSecureAsync()
         {
-            if (_secureProcessManager == null)
-            {
-                _secureProcessManager = new SecureProcessManager();
-            }
-            if (!_secureInitialized)
-            {
-                try
-                {
-                    await _secureProcessManager.InitializeAsync();
-                    _secureInitialized = true;
-                }
-                catch
-                {
-                    _secureInitialized = false;
-                }
-            }
+            // No-op: already initialized by App
+            await Task.CompletedTask;
         }
 
         private async Task LoadSelectedThumbnailAsync()
@@ -132,21 +125,28 @@ namespace ImAged.MVVM.ViewModel
         }
         public FileViewModel()
         {
-            Files = new ObservableCollection<FileItem>();
+            if (_sharedFiles == null)
+                _sharedFiles = new ObservableCollection<FileItem>();
+
+            Files = _sharedFiles; // bind to shared cache
             FilesView = CollectionViewSource.GetDefaultView(Files);
             FilesView.Filter = FilterFiles;
-            LoadFiles();
 
-            // Setup real-time: watch filesystem and expiration updates
-            SetupFileWatching();
+            if (!_sharedInitialized)
+            {
+                _sharedInitialized = true;
+                _ = LoadFilesAsync();
+                SetupSharedWatchers();
+            }
+
+            // Per-VM timer only (cheap)
             _expirationTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
             _expirationTimer.Tick += OnExpirationTimerTick;
             _expirationTimer.Start();
         }
 
-        private void LoadFiles()
+        private async Task LoadFilesAsync()
         {
-            // Folders to search
             var targetFolders = new List<string>
             {
                 Environment.GetFolderPath(Environment.SpecialFolder.MyPictures),
@@ -154,26 +154,55 @@ namespace ImAged.MVVM.ViewModel
                 Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads")
             };
 
-            foreach (var folderPath in targetFolders)
+            const int batchSize = 100;
+            var batch = new List<FileItem>(batchSize);
+
+            await Task.Run(() =>
             {
-                if (Directory.Exists(folderPath))
+                foreach (var folderPath in targetFolders)
                 {
+                    if (!Directory.Exists(folderPath)) continue;
+
                     foreach (var path in SafeEnumerateTtlFiles(folderPath))
                     {
-                        var info = new FileInfo(path);
-                        var imagePath = TryFindAssociatedImagePath(path) ?? "256x256.ico";
-                        Files.Add(new FileItem
+                        try
                         {
-                            FileName = info.Name,
-                            FileType = info.Extension,
-                            FileSize = info.Length / 1024d, // in KB
-                            FilePath = info.FullName,
-                            Created = info.CreationTime,
-                            State = GetFileState(path),
-                            ImagePath = imagePath
-                        });
+                            var info = new FileInfo(path);
+                            var imagePath = TryFindAssociatedImagePath(path) ?? "256x256.ico";
+                            batch.Add(new FileItem
+                            {
+                                FileName = info.Name,
+                                FileType = info.Extension,
+                                FileSize = info.Length / 1024d,
+                                FilePath = info.FullName,
+                                Created = info.CreationTime,
+                                State = GetFileState(path),
+                                ImagePath = imagePath
+                            });
+
+                            if (batch.Count >= batchSize)
+                            {
+                                var toAdd = batch.ToArray();
+                                batch.Clear();
+                                Application.Current.Dispatcher.Invoke(() =>
+                                {
+                                    foreach (var item in toAdd) _sharedFiles.Add(item);
+                                });
+                            }
+                        }
+                        catch { }
                     }
                 }
+            });
+
+            if (batch.Count > 0)
+            {
+                var remaining = batch.ToArray();
+                batch.Clear();
+                await Application.Current.Dispatcher.InvokeAsync(() =>
+                {
+                    foreach (var item in remaining) _sharedFiles.Add(item);
+                });
             }
         }
 
@@ -299,6 +328,38 @@ namespace ImAged.MVVM.ViewModel
             }
         }
 
+        private void SetupSharedWatchers()
+        {
+            // Avoid duplicate watchers
+            if (_sharedWatchers.Count > 0) return;
+
+            var targetFolders = new List<string>
+            {
+                Environment.GetFolderPath(Environment.SpecialFolder.MyPictures),
+                Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads")
+            };
+
+            foreach (var root in targetFolders)
+            {
+                try
+                {
+                    if (string.IsNullOrEmpty(root) || !Directory.Exists(root)) continue;
+                    var watcher = new FileSystemWatcher(root)
+                    {
+                        Filter = "*.ttl",
+                        IncludeSubdirectories = true,
+                        EnableRaisingEvents = true
+                    };
+                    watcher.Created += OnTtlChanged;
+                    watcher.Deleted += OnTtlChanged;
+                    watcher.Renamed += OnTtlRenamed;
+                    _sharedWatchers.Add(watcher);
+                }
+                catch { }
+            }
+        }
+
         private void OnTtlChanged(object sender, FileSystemEventArgs e)
         {
             Application.Current.Dispatcher.Invoke(() =>
@@ -309,7 +370,7 @@ namespace ImAged.MVVM.ViewModel
                     {
                         var info = new FileInfo(e.FullPath);
                         var imagePath = TryFindAssociatedImagePath(e.FullPath) ?? "256x256.ico";
-                        Files.Add(new FileItem
+                        _sharedFiles.Add(new FileItem
                         {
                             FileName = info.Name,
                             FileType = info.Extension,
@@ -324,8 +385,8 @@ namespace ImAged.MVVM.ViewModel
                 }
                 else if (e.ChangeType == WatcherChangeTypes.Deleted)
                 {
-                    var existing = Files.FirstOrDefault(f => string.Equals(f.FilePath, e.FullPath, StringComparison.OrdinalIgnoreCase));
-                    if (existing != null) Files.Remove(existing);
+                    var existing = _sharedFiles.FirstOrDefault(f => string.Equals(f.FilePath, e.FullPath, StringComparison.OrdinalIgnoreCase));
+                    if (existing != null) _sharedFiles.Remove(existing);
                 }
             });
         }
@@ -334,7 +395,7 @@ namespace ImAged.MVVM.ViewModel
         {
             Application.Current.Dispatcher.Invoke(() =>
             {
-                var existing = Files.FirstOrDefault(f => string.Equals(f.FilePath, e.OldFullPath, StringComparison.OrdinalIgnoreCase));
+                var existing = _sharedFiles.FirstOrDefault(f => string.Equals(f.FilePath, e.OldFullPath, StringComparison.OrdinalIgnoreCase));
                 if (existing != null)
                 {
                     existing.FilePath = e.FullPath;

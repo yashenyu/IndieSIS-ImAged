@@ -82,7 +82,12 @@
                           Padding="0"
                           Margin="5"
                           HorizontalAlignment="Stretch"
-                          VerticalAlignment="Stretch">
+                          VerticalAlignment="Stretch"
+                          VirtualizingStackPanel.IsVirtualizing="True"
+                          VirtualizingStackPanel.VirtualizationMode="Recycling"
+                          ScrollViewer.CanContentScroll="True"
+                          EnableRowVirtualization="True"
+                          EnableColumnVirtualization="True">
 
                     <DataGrid.Columns>
                         <DataGridTemplateColumn Header="File Name" Width="*">

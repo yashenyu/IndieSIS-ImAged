@@ -305,27 +305,43 @@ namespace ImAged.MVVM.View
                     FullImage.Source = null;
                 }
 
-                // Dispose of the BitmapSource if it's a WriteableBitmap
-                if (_currentImage is WriteableBitmap writeableBitmap)
+                // Properly dispose of the BitmapSource
+                if (_currentImage != null)
                 {
-                    try
+                    // If it's a WriteableBitmap, clear the pixels
+                    if (_currentImage is WriteableBitmap writeableBitmap)
                     {
-                        writeableBitmap.Lock();
-                        // Clear the pixels to free memory
-                        var pixels = new byte[writeableBitmap.PixelWidth * writeableBitmap.PixelHeight * 4];
-                        writeableBitmap.WritePixels(new Int32Rect(0, 0, writeableBitmap.PixelWidth, writeableBitmap.PixelHeight), 
-                                                  pixels, writeableBitmap.PixelWidth * 4, 0);
-                        writeableBitmap.Unlock();
+                        try
+                        {
+                            writeableBitmap.Lock();
+                            // Clear the pixels to free memory
+                            var pixels = new byte[writeableBitmap.PixelWidth * writeableBitmap.PixelHeight * 4];
+                            writeableBitmap.WritePixels(new Int32Rect(0, 0, writeableBitmap.PixelWidth, writeableBitmap.PixelHeight), 
+                                                      pixels, writeableBitmap.PixelWidth * 4, 0);
+                            writeableBitmap.Unlock();
+                        }
+                        catch { /* Ignore errors during cleanup */ }
                     }
-                    catch { /* Ignore errors during cleanup */ }
-                }
+                    
+                    // If it's a BitmapImage, clear the stream source
+                    if (_currentImage is BitmapImage bitmapImage)
+                    {
+                        try
+                        {
+                            bitmapImage.StreamSource?.Dispose();
+                            bitmapImage.StreamSource = null;
+                        }
+                        catch { /* Ignore errors during cleanup */ }
+                    }
 
-                // Clear the reference
-                _currentImage = null;
+                    // Clear the reference
+                    _currentImage = null;
+                }
 
                 // Force garbage collection for this object
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
+                GC.Collect();
             }
             catch { /* Ignore errors during cleanup */ }
         }

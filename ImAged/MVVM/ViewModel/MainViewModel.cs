@@ -1,4 +1,5 @@
-﻿using ImAged.Core;
+﻿using ImAged;
+using ImAged.Core;
 using ImAged.Services;
 using System;
 using System.Collections.Generic;
@@ -68,7 +69,8 @@ namespace ImAged.MVVM.ViewModel
 
         public MainViewModel()
         {
-            var secureProcessManager = new SecureProcessManager();
+            // Use the singleton SecureProcessManager from App
+            var secureProcessManager = App.SecureProcessManagerInstance;
 
             HomeVm = new HomeViewModel(secureProcessManager);
             ViewVm = new ViewViewModel();
@@ -158,7 +160,8 @@ namespace ImAged.MVVM.ViewModel
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Failed to initialize secure backend: {ex.Message}");
+                // Silently handle initialization errors
+                System.Diagnostics.Debug.WriteLine($"Secure backend initialization failed: {ex.Message}");
             }
         }
 

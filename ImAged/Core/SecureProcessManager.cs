@@ -41,49 +41,67 @@ namespace ImAged.Services
 
         public byte[] SessionKey => _sessionKey;
 
+        public bool IsHealthy => _isInitialized && _pythonProcess != null && !_pythonProcess.HasExited;
+
         public async Task InitializeAsync()
         {
             if (_isInitialized) return;
 
-            var projectDir = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..\\..\\.."));
-            var pythonScriptPath = Path.Combine(projectDir, "ImAged", "pysrc", "secure_backend.py");
-
-            var startInfo = new ProcessStartInfo
+            try
             {
-                FileName = "python",
-                Arguments = $"\"{pythonScriptPath}\"",
-                UseShellExecute = false,
-                RedirectStandardInput = true,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                CreateNoWindow = true,
-                WindowStyle = ProcessWindowStyle.Hidden,
-                WorkingDirectory = projectDir
-            };
+                var projectDir = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..\\..\\.."));
+                var pythonScriptPath = Path.Combine(projectDir, "ImAged", "pysrc", "secure_backend.py");
 
-            _pythonProcess = Process.Start(startInfo);
-            _inputStream = _pythonProcess.StandardInput;
-            _outputStream = _pythonProcess.StandardOutput;
-
-            _pythonProcess.ErrorDataReceived += (sender, e) =>
-            {
-                if (!string.IsNullOrEmpty(e.Data))
+                var startInfo = new ProcessStartInfo
                 {
-                    System.Diagnostics.Debug.WriteLine($"Python Error: {e.Data}");
+                    FileName = "python",
+                    Arguments = $"\"{pythonScriptPath}\"",
+                    UseShellExecute = false,
+                    RedirectStandardInput = true,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true,
+                    WindowStyle = ProcessWindowStyle.Hidden,
+                    WorkingDirectory = projectDir
+                };
+
+                _pythonProcess = Process.Start(startInfo);
+                _inputStream = _pythonProcess.StandardInput;
+                _outputStream = _pythonProcess.StandardOutput;
+
+                _pythonProcess.ErrorDataReceived += (sender, e) =>
+                {
+                    if (!string.IsNullOrEmpty(e.Data))
+                    {
+                        System.Diagnostics.Debug.WriteLine($"Python Error: {e.Data}");
+                    }
+                };
+                _pythonProcess.BeginErrorReadLine();
+
+                if (_pythonProcess.HasExited)
+                {
+                    throw new Exception("Python process failed to start");
                 }
-            };
-            _pythonProcess.BeginErrorReadLine();
 
-            if (_pythonProcess.HasExited)
-            {
-                throw new Exception("Python process failed to start");
+                var channelEstablished = await EstablishSecureChannelAsync();
+                if (channelEstablished)
+                {
+                    _isInitialized = true;
+                    System.Diagnostics.Debug.WriteLine("SecureProcessManager initialized successfully");
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("Failed to establish secure channel, will retry on next operation");
+                }
             }
-
-            await EstablishSecureChannelAsync();
-            _isInitialized = true;
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Failed to initialize SecureProcessManager: {ex.Message}");
+                // Don't set _isInitialized = true on failure, so we can retry
+            }
         }
 
-        private async Task EstablishSecureChannelAsync()
+        private async Task<bool> EstablishSecureChannelAsync()
         {
             _sessionKey = GenerateSecureRandomKey(32);
             System.Diagnostics.Debug.WriteLine($"Generated session key: {_sessionKey.Length} bytes");
@@ -91,7 +109,9 @@ namespace ImAged.Services
             var publicPemBase64 = await ReadBase64LineAsync(_outputStream, 10000);
             if (string.IsNullOrEmpty(publicPemBase64))
             {
-                throw new SecurityException("No RSA public key received from Python backend");
+                // Gracefully handle timeout instead of throwing exception
+                System.Diagnostics.Debug.WriteLine("Timeout waiting for RSA public key from Python backend");
+                return false;
             }
             var publicPemBytes = Convert.FromBase64String(publicPemBase64);
             var publicPem = Encoding.ASCII.GetString(publicPemBytes);
@@ -103,17 +123,29 @@ namespace ImAged.Services
             var confirmationLine = await ReadBase64LineAsync(_outputStream, 10000);
             if (string.IsNullOrEmpty(confirmationLine))
             {
-                throw new SecurityException("No confirmation received from Python backend");
+                // Gracefully handle timeout instead of throwing exception
+                System.Diagnostics.Debug.WriteLine("Timeout waiting for confirmation from Python backend");
+                return false;
             }
             var confirmationData = Convert.FromBase64String(confirmationLine);
             var decrypted = DecryptData(confirmationData);
+
+            if (decrypted == null)
+            {
+                System.Diagnostics.Debug.WriteLine("Failed to decrypt confirmation from Python backend");
+                return false;
+            }
+
             var message = Encoding.UTF8.GetString(decrypted);
             if (message != "CHANNEL_ESTABLISHED")
             {
-                throw new SecurityException("Invalid channel confirmation");
+                // Gracefully handle invalid confirmation instead of throwing exception
+                System.Diagnostics.Debug.WriteLine("Invalid channel confirmation received");
+                return false;
             }
 
             System.Diagnostics.Debug.WriteLine("Secure channel established successfully");
+            return true;
         }
 
         private byte[] GenerateSecureRandomKey(int length)
@@ -170,8 +202,33 @@ namespace ImAged.Services
 
         public async Task<SecureResponse> SendCommandAsync(SecureCommand command)
         {
+            // Check if we're being disposed
+            if (_disposed)
+            {
+                return new SecureResponse { Success = false, Error = "SecureProcessManager is being disposed", Result = null };
+            }
+
+            // Try to initialize if not already initialized
             if (!_isInitialized)
-                throw new InvalidOperationException("SecureProcessManager not initialized");
+            {
+                await InitializeAsync();
+                if (!_isInitialized)
+                {
+                    return new SecureResponse { Success = false, Error = "Failed to initialize secure backend", Result = null };
+                }
+            }
+
+            // Check if Python process is still alive
+            if (_pythonProcess?.HasExited == true)
+            {
+                System.Diagnostics.Debug.WriteLine("Python process has exited, attempting to reinitialize");
+                _isInitialized = false;
+                await InitializeAsync();
+                if (!_isInitialized)
+                {
+                    return new SecureResponse { Success = false, Error = "Failed to reinitialize secure backend", Result = null };
+                }
+            }
 
             await _ioLock.WaitAsync();
             try
@@ -190,13 +247,22 @@ namespace ImAged.Services
 
                 if (string.IsNullOrEmpty(response))
                 {
-                    throw new Exception("No response received from Python backend");
+                    // Gracefully handle timeout instead of throwing exception
+                    System.Diagnostics.Debug.WriteLine("Timeout waiting for response from Python backend");
+                    return new SecureResponse { Success = false, Error = "Timeout waiting for response", Result = null };
                 }
 
                 System.Diagnostics.Debug.WriteLine($"Received response: {response.Length} chars");
 
                 var responseData = Convert.FromBase64String(response);
                 var decryptedResponse = DecryptData(responseData);
+
+                if (decryptedResponse == null)
+                {
+                    System.Diagnostics.Debug.WriteLine("Failed to decrypt response from Python backend");
+                    return new SecureResponse { Success = false, Error = "Failed to decrypt response", Result = null };
+                }
+
                 var responseJson = Encoding.UTF8.GetString(decryptedResponse);
 
                 System.Diagnostics.Debug.WriteLine($"Response JSON: Success");
@@ -261,26 +327,36 @@ namespace ImAged.Services
 
         private byte[] DecryptData(byte[] encryptedData)
         {
-            if (encryptedData == null || encryptedData.Length < 12 + 16)
+            try
             {
-                throw new SecurityException("Encrypted data too short.");
+                if (encryptedData == null || encryptedData.Length < 12 + 16)
+                {
+                    System.Diagnostics.Debug.WriteLine("Encrypted data too short for GCM decryption");
+                    return null;
+                }
+                var nonce = new byte[12];
+                Array.Copy(encryptedData, 0, nonce, 0, 12);
+                var cipherTextAndTag = new byte[encryptedData.Length - 12];
+                Array.Copy(encryptedData, 12, cipherTextAndTag, 0, cipherTextAndTag.Length);
+
+                var cipher = new GcmBlockCipher(new AesEngine());
+                var parameters = new AeadParameters(new KeyParameter(_sessionKey), 128, nonce, null);
+                cipher.Init(false, parameters);
+
+                var output = new byte[cipher.GetOutputSize(cipherTextAndTag.Length)];
+                int len = cipher.ProcessBytes(cipherTextAndTag, 0, cipherTextAndTag.Length, output, 0);
+                len += cipher.DoFinal(output, len);
+
+                var plaintext = new byte[len];
+                Array.Copy(output, 0, plaintext, 0, len);
+                return plaintext;
             }
-            var nonce = new byte[12];
-            Array.Copy(encryptedData, 0, nonce, 0, 12);
-            var cipherTextAndTag = new byte[encryptedData.Length - 12];
-            Array.Copy(encryptedData, 12, cipherTextAndTag, 0, cipherTextAndTag.Length);
-
-            var cipher = new GcmBlockCipher(new AesEngine());
-            var parameters = new AeadParameters(new KeyParameter(_sessionKey), 128, nonce, null);
-            cipher.Init(false, parameters);
-
-            var output = new byte[cipher.GetOutputSize(cipherTextAndTag.Length)];
-            int len = cipher.ProcessBytes(cipherTextAndTag, 0, cipherTextAndTag.Length, output, 0);
-            len += cipher.DoFinal(output, len);
-
-            var plaintext = new byte[len];
-            Array.Copy(output, 0, plaintext, 0, len);
-            return plaintext;
+            catch (Exception ex)
+            {
+                // Gracefully handle GCM decryption errors instead of throwing exceptions
+                System.Diagnostics.Debug.WriteLine($"GCM decryption failed: {ex.Message}");
+                return null;
+            }
         }
 
         private static bool IsValidBase64(string s)
@@ -312,14 +388,16 @@ namespace ImAged.Services
                 var remaining = deadline - DateTime.UtcNow;
                 if (remaining <= TimeSpan.Zero)
                 {
-                    throw new TimeoutException("Timeout waiting for valid Base64 line.");
+                    // Return null instead of throwing exception for graceful handling
+                    return null;
                 }
 
                 var readTask = reader.ReadLineAsync();
                 var completed = await Task.WhenAny(readTask, Task.Delay(remaining));
                 if (completed != readTask)
                 {
-                    throw new TimeoutException("Timeout waiting for valid Base64 line.");
+                    // Return null instead of throwing exception for graceful handling
+                    return null;
                 }
 
                 var line = await readTask;
@@ -336,30 +414,40 @@ namespace ImAged.Services
 
         public void Dispose()
         {
-            if (!_disposed)
+            if (_disposed) return;
+            _disposed = true;
+
+            try
             {
-                try
+                if (_pythonProcess != null)
                 {
-                    if (_pythonProcess != null && !_pythonProcess.HasExited)
+                    if (!_pythonProcess.HasExited)
                     {
-                        _pythonProcess.Kill();
+                        try
+                        {
+                            _pythonProcess.Kill();
+                        }
+                        catch (InvalidOperationException)
+                        {
+                            // Process already exited, ignore.
+                        }
+                        catch (Exception ex)
+                        {
+                            // Log but ignore any other errors.
+                            System.Diagnostics.Debug.WriteLine($"Error killing Python process: {ex.Message}");
+                        }
                     }
-                }
-                catch (InvalidOperationException)
-                {
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine($"Error killing Python process: {ex.Message}");
-                }
-                finally
-                {
-                    _pythonProcess?.Dispose();
-                    _inputStream?.Dispose();
-                    _outputStream?.Dispose();
-                    _disposed = true;
+                    _pythonProcess.Dispose();
                 }
             }
+            catch (Exception ex)
+            {
+                // Log but ignore errors during disposing.
+                System.Diagnostics.Debug.WriteLine($"Error during SecureProcessManager.Dispose: {ex.Message}");
+            }
+
+            try { _inputStream?.Dispose(); } catch { }
+            try { _outputStream?.Dispose(); } catch { }
         }
 
         public async Task<string> ConvertImageToTtlAsync(string imagePath, DateTimeOffset expiryUtc)
@@ -419,7 +507,7 @@ namespace ImAged.Services
                 // Use more memory-efficient conversion for thumbnails
                 if (thumbnailMode)
                 {
-                    return ConvertBytesToBitmapSourceOptimized(imageBytes);
+                    return ConvertBytesToBitmapSourceOptimized(imageBytes, maxSize);
                 }
 
                 return ConvertBytesToBitmapSourceGdi(imageBytes);
@@ -450,7 +538,7 @@ namespace ImAged.Services
                 var imageBytes = Convert.FromBase64String(response.Result.ToString());
 
                 // Use memory-efficient conversion for thumbnails
-                return ConvertBytesToBitmapSourceOptimized(imageBytes);
+                return ConvertBytesToBitmapSourceOptimized(imageBytes, maxSize);
             }
             else
             {
@@ -491,50 +579,81 @@ namespace ImAged.Services
             throw new Exception("No image payload received from Python backend");
         }
 
-        private BitmapSource ConvertBytesToBitmapSourceOptimized(byte[] imageBytes)
+        private BitmapSource ConvertBytesToBitmapSourceOptimized(byte[] imageBytes, int maxSize = 256)
         {
             try
             {
                 using (var memoryStream = new MemoryStream(imageBytes))
-                using (var bitmap = new System.Drawing.Bitmap(memoryStream))
+                using (var originalBitmap = new System.Drawing.Bitmap(memoryStream))
                 {
-                    var writeableBitmap = new WriteableBitmap(
-                        bitmap.Width,
-                        bitmap.Height,
-                        96, 96,
-                        PixelFormats.Bgr24,
-                        null);
-
-                    writeableBitmap.Lock();
-
-                    var bitmapData = bitmap.LockBits(
-                        new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height),
-                        System.Drawing.Imaging.ImageLockMode.ReadOnly,
-                        System.Drawing.Imaging.PixelFormat.Format24bppRgb);
-
-                    try
+                    // Calculate dimensions preserving aspect ratio
+                    int width, height;
+                    if (originalBitmap.Width > originalBitmap.Height)
                     {
-                        writeableBitmap.WritePixels(
-                            new Int32Rect(0, 0, bitmap.Width, bitmap.Height),
-                            bitmapData.Scan0,
-                            bitmap.Width * bitmap.Height * 3,
-                            bitmapData.Stride);
+                        width = maxSize;
+                        height = (int)(originalBitmap.Height * (maxSize / (double)originalBitmap.Width));
                     }
-                    finally
+                    else
                     {
-                        bitmap.UnlockBits(bitmapData);
-                        writeableBitmap.Unlock();
+                        height = maxSize;
+                        width = (int)(originalBitmap.Width * (maxSize / (double)originalBitmap.Height));
                     }
 
-                    writeableBitmap.Freeze();
+                    // Ensure minimum size for quality
+                    if (width < 64) width = 64;
+                    if (height < 64) height = 64;
 
-                    // Securely clear the input bytes
-                    for (int i = 0; i < imageBytes.Length; i++)
+                    using (var thumbBitmap = new System.Drawing.Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format32bppArgb))
+                    using (var g = System.Drawing.Graphics.FromImage(thumbBitmap))
                     {
-                        imageBytes[i] = 0;
-                    }
+                        // Set high-quality rendering options
+                        g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
+                        g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                        g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+                        g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
+                        g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
 
-                    return writeableBitmap;
+                        // Clear with transparent background instead of black
+                        g.Clear(System.Drawing.Color.Transparent);
+
+                        // Draw the image with high quality
+                        g.DrawImage(originalBitmap, 0, 0, width, height);
+
+                        var writeableBitmap = new WriteableBitmap(
+                            width,
+                            height,
+                            96, 96,
+                            PixelFormats.Bgra32,
+                            null);
+
+                        writeableBitmap.Lock();
+
+                        var bitmapData = thumbBitmap.LockBits(
+                            new System.Drawing.Rectangle(0, 0, width, height),
+                            System.Drawing.Imaging.ImageLockMode.ReadOnly,
+                            System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+                        try
+                        {
+                            writeableBitmap.WritePixels(
+                                new Int32Rect(0, 0, width, height),
+                                bitmapData.Scan0,
+                                width * height * 4,
+                                bitmapData.Stride);
+                        }
+                        finally
+                        {
+                            thumbBitmap.UnlockBits(bitmapData);
+                            writeableBitmap.Unlock();
+                        }
+
+                        writeableBitmap.Freeze();
+
+                        // Securely clear the input bytes
+                        Array.Clear(imageBytes, 0, imageBytes.Length);
+
+                        return writeableBitmap;
+                    }
                 }
             }
             catch (Exception ex)
@@ -577,13 +696,13 @@ namespace ImAged.Services
                         IntPtr.Zero,
                         Int32Rect.Empty,
                         BitmapSizeOptions.FromEmptyOptions());
-                    
+
                     // Freeze the BitmapSource to make it cross-thread accessible and improve performance
                     source.Freeze();
-                    
+
                     // Clear the original bytes to help with memory cleanup
                     Array.Clear(imageBytes, 0, imageBytes.Length);
-                    
+
                     return source;
                 }
                 finally
@@ -601,10 +720,23 @@ namespace ImAged.Services
         {
             try
             {
-                // Force garbage collection to clean up any remaining BitmapSource objects
+                // Force multiple garbage collection passes to clean up any remaining BitmapSource objects
+                for (int i = 0; i < 3; i++)
+                {
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
+                }
                 GC.Collect();
-                GC.WaitForPendingFinalizers();
-                GC.Collect();
+
+                // Also try to clean up any remaining GDI handles
+                try
+                {
+                    // Force cleanup of any remaining WriteableBitmap objects
+                    GC.AddMemoryPressure(1024 * 1024); // Add pressure to force cleanup
+                    GC.Collect();
+                    GC.RemoveMemoryPressure(1024 * 1024);
+                }
+                catch { /* Ignore errors during cleanup */ }
             }
             catch (Exception ex)
             {

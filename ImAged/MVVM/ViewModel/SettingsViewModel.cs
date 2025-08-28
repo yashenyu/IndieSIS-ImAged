@@ -40,7 +40,7 @@ namespace ImAged.MVVM.ViewModel
                 Name = "Siron, Carlo S.",
                 Role = "UI/UX Designer Front-end Developer",
                 School = "Holy Angel University",
-                ImagePath = "/Images/"
+                ImagePath = "/Images/base logo.png"
             });
         }
     }

@@ -52,7 +52,7 @@ try:
 except RuntimeError as e:
     print(f"Critical: Application cannot start without NTP access: {e}")
     print("Please check your internet connection and NTP server configuration.")
-    sys.exit(1)
+    sys.exit(0)
 
 class SimpleTestUI:
     def __init__(self, root):

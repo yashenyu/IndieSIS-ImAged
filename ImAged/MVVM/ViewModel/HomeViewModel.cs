@@ -14,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using ImAged.MVVM.View;
+using ImAged;
 
 
 namespace ImAged.MVVM.ViewModel
@@ -124,6 +125,17 @@ namespace ImAged.MVVM.ViewModel
         }
 
         public bool IsExpired => ExpirationUtc.HasValue && ExpirationUtc.Value <= DateTimeOffset.UtcNow;
+
+        private bool _expiredHandled;
+        public bool ExpiredHandled
+        {
+            get => _expiredHandled;
+            set
+            {
+                _expiredHandled = value;
+                OnPropertyChanged(nameof(ExpiredHandled));
+            }
+        }
     }
 
     public class DateGroup : INotifyPropertyChanged
@@ -203,12 +215,12 @@ namespace ImAged.MVVM.ViewModel
         private readonly List<FileSystemWatcher> _fileWatchers = new List<FileSystemWatcher>();
 
         // Memory management
-        private readonly SemaphoreSlim _thumbnailSemaphore = new SemaphoreSlim(10, 10); // Reduce to 2 concurrent
+        private readonly SemaphoreSlim _thumbnailSemaphore = new SemaphoreSlim(3, 3); // Reduced from 10 to 3 concurrent
         private readonly Dictionary<string, SecureImageReference> _thumbnailCache = new Dictionary<string, SecureImageReference>();
         private readonly List<SecureImageReference> _activeImages = new List<SecureImageReference>();
         private readonly object _imagesLock = new object();
         private readonly DispatcherTimer _memoryCleanupTimer;
-        private readonly int _maxCacheSize = 100;
+        private readonly int _maxCacheSize = 20; // Lowered from 50 to 20 for better memory usage
         private readonly object _cacheLock = new object();
 
         // NEW: master list & search text for filtering
@@ -252,6 +264,8 @@ namespace ImAged.MVVM.ViewModel
         public ICommand OpenTtlFileCommand { get; }
 
         private readonly DispatcherTimer _countdownTimer = new DispatcherTimer();
+
+        public HomeViewModel() : this(App.SecureProcessManagerInstance) { }
 
         public HomeViewModel(SecureProcessManager secureProcessManager)
         {
@@ -313,32 +327,30 @@ namespace ImAged.MVVM.ViewModel
         {
             if (_isDisposed) return;
 
-            // Check memory usage and force cleanup if needed
             CheckMemoryUsageAndCleanup();
 
             try
             {
                 var expiredFiles = new List<TtlFileInfo>();
 
-                // Check all files for expiration and refresh countdown display
                 foreach (var dateGroup in DateGroups)
                 {
-                    foreach (var fileInfo in dateGroup.Files.ToList()) // Use ToList to avoid modification during enumeration
+                    foreach (var fileInfo in dateGroup.Files.ToList())
                     {
-                        // Refresh countdown display to show "Expired" status
                         fileInfo.RefreshCountdown();
-                        
-                        if (fileInfo.IsExpired)
+
+                        // Only handle if not already handled
+                        if (fileInfo.IsExpired && !fileInfo.ExpiredHandled)
                         {
                             expiredFiles.Add(fileInfo);
                         }
                     }
                 }
 
-                // Handle expired files
                 foreach (var expiredFile in expiredFiles)
                 {
                     HandleExpiredFile(expiredFile);
+                    expiredFile.ExpiredHandled = true; // Mark as handled
                 }
             }
             catch (Exception ex)
@@ -529,8 +541,20 @@ namespace ImAged.MVVM.ViewModel
                 }
             }
             
-            // Force garbage collection to free up memory
+            // Force aggressive garbage collection to free up memory
             GC.Collect();
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
+            
+            // Also trigger secure memory cleanup
+            try
+            {
+                _secureProcessManager?.ForceMemoryCleanup();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error during secure cleanup after window close: {ex.Message}");
+            }
         }
 
         private void ForceSecureMemoryCleanup()
@@ -632,7 +656,8 @@ namespace ImAged.MVVM.ViewModel
                         {
                             FilePath = filePath,
                             FileName = Path.GetFileNameWithoutExtension(filePath),
-                            LastModified = File.GetLastWriteTime(filePath)
+                            LastModified = File.GetLastWriteTime(filePath),
+                            ExpiredHandled = false // Ensure reset
                         };
 
                         fileInfo.ExpirationUtc = TryReadExpiryUtc(fileInfo.FilePath);
@@ -642,7 +667,19 @@ namespace ImAged.MVVM.ViewModel
 
                         dateGroup.Files.Add(fileInfo);
 
-                        _ = Task.Run(async () => await LoadThumbnailAsync(fileInfo));
+                        // Only load thumbnail if file is not expired (expired files get black thumbnail immediately)
+                        if (!fileInfo.IsExpired)
+                        {
+                            _ = Task.Run(async () => await LoadThumbnailAsync(fileInfo));
+                        }
+                        else
+                        {
+                            // Set black thumbnail immediately for expired files
+                            Application.Current.Dispatcher.Invoke(() =>
+                            {
+                                fileInfo.Thumbnail = CreateBlackThumbnail();
+                            });
+                        }
                     }
 
                     await Application.Current.Dispatcher.InvokeAsync(() =>
@@ -746,6 +783,11 @@ namespace ImAged.MVVM.ViewModel
             if (parameter is TtlFileInfo fileInfo)
             {
                 System.Diagnostics.Debug.WriteLine("OpenTtlFileAsync called for: " + fileInfo.FilePath);
+                
+                // Set loading cursor
+                var originalCursor = Mouse.OverrideCursor;
+                Mouse.OverrideCursor = Cursors.Wait;
+                
                 try
                 {
                     var bitmapSource = await _secureProcessManager.OpenTtlFileAsync(
@@ -770,6 +812,16 @@ namespace ImAged.MVVM.ViewModel
                 catch (Exception ex)
                 {
                     System.Diagnostics.Debug.WriteLine($"Error opening {fileInfo.FileName}: {ex.Message}");
+                    
+                    await Application.Current.Dispatcher.InvokeAsync(() =>
+                    {
+                        MessageBox.Show($"Error opening image: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    });
+                }
+                finally
+                {
+                    // Restore original cursor
+                    Mouse.OverrideCursor = originalCursor;
                 }
             }
         }
@@ -894,7 +946,8 @@ namespace ImAged.MVVM.ViewModel
                 {
                     FilePath = e.FullPath,
                     FileName = Path.GetFileNameWithoutExtension(e.FullPath),
-                    LastModified = File.GetLastWriteTime(e.FullPath)
+                    LastModified = File.GetLastWriteTime(e.FullPath),
+                    ExpiredHandled = false // Ensure reset
                 };
 
                 fileInfo.ExpirationUtc = TryReadExpiryUtc(fileInfo.FilePath);

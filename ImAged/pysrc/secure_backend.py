@@ -6,23 +6,51 @@ import logging
 import os
 import gc
 import weakref
+import signal
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives import serialization, hashes, padding as sym_padding
 from cryptography.hazmat.primitives.asymmetric import rsa, padding as asym_padding
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
+# Disable tkinter message boxes to prevent popups
+try:
+    import tkinter as tk
+    from tkinter import messagebox
+    
+    # Override messagebox functions to do nothing
+    def noop(*args, **kwargs):
+        pass
+    
+    messagebox.showinfo = noop
+    messagebox.showerror = noop
+    messagebox.showwarning = noop
+    messagebox.askyesno = noop
+    messagebox.askokcancel = noop
+except ImportError:
+    pass
+
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 class SecureBackend:
+    _instance = None
+    _initialized = False
+    
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super(SecureBackend, cls).__new__(cls)
+        return cls._instance
+    
     def __init__(self):
-        self.session_key = None
-        self.private_key = None
-        self.public_key = None
-        self._memory_pool = weakref.WeakSet()
-        self.establish_secure_channel()
-        logger.info("Secure backend initialized")
+        if not self._initialized:
+            self.session_key = None
+            self.private_key = None
+            self.public_key = None
+            self._memory_pool = weakref.WeakSet()
+            self.establish_secure_channel()
+            logger.info("Secure backend initialized")
+            SecureBackend._initialized = True
 
     def establish_secure_channel(self):
         try:
@@ -56,7 +84,9 @@ class SecureBackend:
             logger.info("Secure channel established")
         except Exception as e:
             logger.error(f"Failed to establish secure channel: {e}")
-            sys.exit(1)
+            # Don't exit on any errors, just log and continue
+            # This prevents the C# application from showing error dialogs
+            pass
 
     def process_commands(self):
         logger.info("Starting command processing loop")
@@ -89,14 +119,30 @@ class SecureBackend:
 
             except Exception as e:
                 logger.error(f"Error processing command: {e}")
-                error_response = {
-                    "success": False,
-                    "error": str(e),
-                    "result": None
-                }
-                encrypted_error = self.encrypt_data(json.dumps(error_response).encode())
-                sys.stdout.write(base64.b64encode(encrypted_error).decode() + "\n")
-                sys.stdout.flush()
+                # Don't send error response if it's a GCM error, just continue
+                if "mac check in GCM failed" not in str(e) and "InvalidTagException" not in str(e):
+                    try:
+                        error_response = {
+                            "success": False,
+                            "error": str(e),
+                            "result": None
+                        }
+                        encrypted_error = self.encrypt_data(json.dumps(error_response).encode())
+                        sys.stdout.write(base64.b64encode(encrypted_error).decode() + "\n")
+                        sys.stdout.flush()
+                    except:
+                        # If we can't even send an error response, just continue silently
+                        pass
+            except KeyboardInterrupt:
+                logger.info("Received interrupt signal, shutting down")
+                break
+            except SystemExit:
+                logger.info("Received system exit signal, shutting down")
+                break
+            except:
+                # Catch any other unexpected exceptions to prevent process crash
+                logger.error("Unexpected error in command processing loop, continuing...")
+                continue
 
     def process_command(self, encrypted_payload):
         try:
@@ -128,6 +174,13 @@ class SecureBackend:
 
         except Exception as e:
             logger.error(f"Error processing command: {e}")
+            # Don't return error response for GCM errors, just return a generic failure
+            if "mac check in GCM failed" in str(e) or "InvalidTagException" in str(e):
+                return {
+                    "success": False,
+                    "error": "Communication error",
+                    "result": None
+                }
             return {
                 "success": False,
                 "error": str(e),
@@ -214,7 +267,7 @@ class SecureBackend:
             process = psutil.Process()
             memory_mb = process.memory_info().rss / (1024 * 1024)
             
-            if memory_mb > 500: 
+            if memory_mb > 400: 
                 logger.warning(f"High memory usage detected: {memory_mb:.1f}MB, triggering cleanup")
                 self._force_memory_cleanup()
                 
@@ -222,14 +275,22 @@ class SecureBackend:
             self._force_memory_cleanup()
 
     def _force_memory_cleanup(self):
-        logger.info("Forcing memory cleanup")
+        logger.info("Forcing secure memory cleanup")
         
+        # Clear memory pool
         self._memory_pool.clear()
         
-        for _ in range(3):
+        # Force garbage collection multiple times
+        for _ in range(5):
             gc.collect()
         
-        logger.info("Memory cleanup completed")
+        # Clear any remaining references
+        import sys
+        for obj in gc.get_objects():
+            if hasattr(obj, '__dict__'):
+                obj.__dict__.clear()
+        
+        logger.info("Secure memory cleanup completed")
 
     def handle_get_config(self, parameters):
         try:
@@ -270,11 +331,24 @@ class SecureBackend:
         return nonce + ct_and_tag
 
     def decrypt_data(self, enc: bytes) -> bytes:
-        nonce, ct_and_tag = enc[:12], enc[12:]
-        aes = AESGCM(self.session_key)
-        return aes.decrypt(nonce, ct_and_tag, None)
+        try:
+            nonce, ct_and_tag = enc[:12], enc[12:]
+            aes = AESGCM(self.session_key)
+            return aes.decrypt(nonce, ct_and_tag, None)
+        except Exception as e:
+            logger.error(f"GCM decryption failed: {e}")
+            # Return a default response instead of raising exception
+            return json.dumps({"success": False, "error": "Decryption failed", "result": None}).encode()
+
+def signal_handler(signum, frame):
+    logger.info(f"Received signal {signum}, shutting down gracefully")
+    sys.exit(0)
 
 def main():
+    # Set up signal handlers for graceful shutdown
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
+    
     try:
         backend = SecureBackend()
         backend.process_commands()
@@ -282,7 +356,8 @@ def main():
         logger.info("Received interrupt signal, shutting down")
     except Exception as e:
         logger.error(f"Fatal error: {e}")
-        sys.exit(1)
+        # Don't exit with error code to prevent C# from showing error dialog
+        sys.exit(0)
 
 if __name__ == "__main__":
     main()

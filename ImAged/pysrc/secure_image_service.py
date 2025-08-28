@@ -142,16 +142,38 @@ class SecureImageService:
         try:
             # Load image from bytes
             with Image.open(io.BytesIO(image_bytes)) as img:
-                # Convert to RGB if necessary
+                # Preserve transparency if present
                 if img.mode in ('RGBA', 'LA', 'P'):
+                    # Keep RGBA for better quality and transparency support
+                    if img.mode != 'RGBA':
+                        img = img.convert('RGBA')
+                else:
                     img = img.convert('RGB')
                 
-                # Create thumbnail with memory optimization
-                img.thumbnail((max_size, max_size), Image.Resampling.LANCZOS)
+                # Calculate dimensions preserving aspect ratio
+                width, height = img.size
+                if width > height:
+                    new_width = max_size
+                    new_height = int(height * (max_size / width))
+                else:
+                    new_height = max_size
+                    new_width = int(width * (max_size / height))
                 
-                # Convert to optimized format
+                # Ensure minimum size for quality
+                if new_width < 64: new_width = 64
+                if new_height < 64: new_height = 64
+                
+                # Resize with high quality
+                img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
+                
+                # Convert to optimized format with higher quality
                 output = io.BytesIO()
-                img.save(output, format='JPEG', quality=85, optimize=True)
+                if img.mode == 'RGBA':
+                    # Use PNG for transparency support and better quality
+                    img.save(output, format='PNG', optimize=True)
+                else:
+                    # Use JPEG with higher quality for RGB images
+                    img.save(output, format='JPEG', quality=95, optimize=True)
                 output.seek(0)
                 
                 return output.getvalue()

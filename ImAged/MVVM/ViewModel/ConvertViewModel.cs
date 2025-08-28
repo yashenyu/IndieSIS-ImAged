@@ -68,10 +68,10 @@ namespace ImAged.MVVM.ViewModel
             return new string(input.Where(char.IsDigit).Take(2).ToArray());
         }
 
-        public string Day    { get => _day;    set { _day    = DigitsOnly(value); OnPropertyChanged(nameof(Day));    } }
-        public string Month  { get => _month;  set { _month  = DigitsOnly(value); OnPropertyChanged(nameof(Month));  } }
-        public string Year   { get => _year;   set { _year   = DigitsOnly(value); OnPropertyChanged(nameof(Year));   } }
-        public string Hour   { get => _hour;   set { _hour   = DigitsOnly(value); OnPropertyChanged(nameof(Hour));   } }
+        public string Day { get => _day; set { _day = DigitsOnly(value); OnPropertyChanged(nameof(Day)); } }
+        public string Month { get => _month; set { _month = DigitsOnly(value); OnPropertyChanged(nameof(Month)); } }
+        public string Year { get => _year; set { _year = DigitsOnly(value); OnPropertyChanged(nameof(Year)); } }
+        public string Hour { get => _hour; set { _hour = DigitsOnly(value); OnPropertyChanged(nameof(Hour)); } }
         public string Minute { get => _minute; set { _minute = DigitsOnly(value); OnPropertyChanged(nameof(Minute)); } }
 
         public bool IsPM
@@ -163,7 +163,7 @@ namespace ImAged.MVVM.ViewModel
             NextStepCommand = new RelayCommand(_ => NextStep(), _ => CurrentStep < MAX_STEPS && HasConvertedFile);
             PreviousStepCommand = new RelayCommand(_ => PreviousStep(), _ => CurrentStep > 1);
 
-            _ = _secureManager.InitializeAsync();
+            _ = _secureManager = App.SecureProcessManagerInstance;
             UpdateStepParts(); // Initialize first step
         }
 
@@ -183,10 +183,10 @@ namespace ImAged.MVVM.ViewModel
         private void UpdateStepParts()
         {
             CurrentStepParts.Clear();
-            
+
             if (!HasConvertedFile)
                 return;
-            
+
             switch (CurrentStep)
             {
                 case 1:
@@ -194,14 +194,14 @@ namespace ImAged.MVVM.ViewModel
                     CurrentStepParts.Add(new FilePart { Name = "Magic", Data = "494d41474544" });
                     CurrentStepParts.Add(new FilePart { Name = "Salt", Data = GetSaltHex() });
                     break;
-                    
+
                 case 2:
                     // Magic, Salt, and Header
                     CurrentStepParts.Add(new FilePart { Name = "Magic", Data = "494d41474544" });
                     CurrentStepParts.Add(new FilePart { Name = "Salt", Data = GetSaltHex() });
                     CurrentStepParts.Add(new FilePart { Name = "Header", Data = GetHeaderHex() });
                     break;
-                    
+
                 case 3:
                     // Magic, Salt, Header Nonce, Header, Header Tag
                     CurrentStepParts.Add(new FilePart { Name = "Magic", Data = "494d41474544" });
@@ -210,7 +210,7 @@ namespace ImAged.MVVM.ViewModel
                     CurrentStepParts.Add(new FilePart { Name = "Header", Data = GetEncryptedHeaderHex() });
                     CurrentStepParts.Add(new FilePart { Name = "Header Tag", Data = GetHeaderTagHex() });
                     break;
-                    
+
                 case 4:
                     // Magic, Salt, Header Nonce, Header, Header Tag, Body Nonce, Body
                     CurrentStepParts.Add(new FilePart { Name = "Magic", Data = "494d41474544" });
@@ -221,7 +221,7 @@ namespace ImAged.MVVM.ViewModel
                     CurrentStepParts.Add(new FilePart { Name = "Body Nonce", Data = GetBodyNonceHex() });
                     CurrentStepParts.Add(new FilePart { Name = "Body", Data = GetOriginalBodyHex() });
                     break;
-                    
+
                 case 5:
                     // Magic, Salt, Header Nonce, Header, Header Tag, Body Nonce, Body Tag, Encrypted Body
                     CurrentStepParts.Add(new FilePart { Name = "Magic", Data = "494d41474544" });
@@ -239,7 +239,7 @@ namespace ImAged.MVVM.ViewModel
         private void UpdateOriginalFileParts()
         {
             OriginalFileParts.Clear();
-            
+
             if (_originalFileBytes == null || _originalFileBytes.Length == 0)
                 return;
 
@@ -357,10 +357,10 @@ namespace ImAged.MVVM.ViewModel
         {
             var timestamp = DateTime.Now.ToString("HH:mm:ss");
             var logEntry = $"[{timestamp}] {message}";
-            
+
             // Add to the beginning to show newest first
             ConversionLogs.Insert(0, logEntry);
-            
+
             // Keep only the last 20 logs
             if (ConversionLogs.Count > 20)
             {
@@ -375,7 +375,7 @@ namespace ImAged.MVVM.ViewModel
             {
                 SelectedFile = dlg.FileName;
                 AddLog($"File selected: {System.IO.Path.GetFileName(SelectedFile)}");
-                
+
                 // Reset simulation state when new file is selected
                 HasConvertedFile = false;
                 _originalFileBytes = null;
@@ -390,6 +390,10 @@ namespace ImAged.MVVM.ViewModel
         {
             System.Diagnostics.Debug.WriteLine($"Trying to convert");
             AddLog("Starting conversion process...");
+
+            // Set loading cursor
+            var originalCursor = System.Windows.Input.Mouse.OverrideCursor;
+            System.Windows.Input.Mouse.OverrideCursor = System.Windows.Input.Cursors.Wait;
 
             try
             {
@@ -480,6 +484,11 @@ namespace ImAged.MVVM.ViewModel
                 var errorMsg = $"ERROR: Conversion failed - {ex.Message}";
                 AddLog(errorMsg);
                 StatusMessage = errorMsg;
+            }
+            finally
+            {
+                // Restore original cursor
+                System.Windows.Input.Mouse.OverrideCursor = originalCursor;
             }
             System.Diagnostics.Debug.WriteLine($"Convert ran");
         }

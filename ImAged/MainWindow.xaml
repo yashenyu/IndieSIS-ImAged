@@ -80,7 +80,8 @@
                                              Foreground="#AEAEAE"
                                              Style="{StaticResource MenuButtonTheme}"
                                              Command="{Binding HomeViewCommand}"
-                                             GroupName="MenuGroup">
+                                             GroupName="MenuGroup"
+                                             IsChecked="True">
                                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                         <Image Source="/Images/Home Icon.png" Width="16" Height="16" Margin="0,0,8,0"/>
                                         <TextBlock Text="Gallery"/>

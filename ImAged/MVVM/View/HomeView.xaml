@@ -146,20 +146,29 @@
 
         <ScrollViewer  Grid.Row="2"
                    VerticalScrollBarVisibility="Auto" 
-                   HorizontalScrollBarVisibility="Disabled" Margin="0,10,0,0" Grid.RowSpan="2">
+                   HorizontalScrollBarVisibility="Disabled" Margin="0,10,0,0" Grid.RowSpan="2"
+                   VirtualizingStackPanel.IsVirtualizing="True"
+                   VirtualizingStackPanel.VirtualizationMode="Recycling"
+                   ScrollViewer.CanContentScroll="True">
 
             <StackPanel>
-                <ItemsControl ItemsSource="{Binding DateGroups}">
+                <ItemsControl ItemsSource="{Binding DateGroups}"
+                             VirtualizingStackPanel.IsVirtualizing="True"
+                             VirtualizingStackPanel.VirtualizationMode="Recycling"
+                             VirtualizingStackPanel.ScrollUnit="Pixel">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Style="{StaticResource DateHeaderContainerStyle}">
                                 <TextBlock Text="{Binding DisplayDate}" 
                                        Style="{StaticResource DateHeaderTextStyle}"/>
 
-                                <ItemsControl ItemsSource="{Binding Files}">
+                                <ItemsControl ItemsSource="{Binding Files}"
+                                             VirtualizingStackPanel.IsVirtualizing="True"
+                                             VirtualizingStackPanel.VirtualizationMode="Recycling"
+                                             VirtualizingStackPanel.ScrollUnit="Pixel">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
-                                            <WrapPanel Orientation="Horizontal"/>
+                                            <VirtualizingStackPanel Orientation="Horizontal"/>
                                         </ItemsPanelTemplate>
                                     </ItemsControl.ItemsPanel>
 
@@ -201,7 +210,7 @@
                                                                RenderOptions.BitmapScalingMode="HighQuality"
                                                                IsHitTestVisible="False">
                                                             <Image.CacheMode>
-                                                                <BitmapCache RenderAtScale="1"/>
+                                                                <BitmapCache RenderAtScale="1.0"/>
                                                             </Image.CacheMode>
                                                             
                                                         </Image>

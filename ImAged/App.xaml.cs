@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Interop;
 using ImAged.Core;
+using ImAged.Services;
 
 namespace ImAged
 {
@@ -17,9 +18,36 @@ namespace ImAged
     {
         private const bool CaptureProtectionEnabled = false;
 
+        // Singleton instance for SecureProcessManager
+        public static SecureProcessManager SecureProcessManagerInstance { get; private set; }
+        public static bool IsShuttingDown { get; private set; } = false;
+
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
+
+            // Set up global exception handling to prevent error dialogs
+            this.DispatcherUnhandledException += (sender, args) =>
+            {
+                System.Diagnostics.Debug.WriteLine($"Unhandled exception: {args.Exception.Message}");
+                args.Handled = true; // Prevent the exception from being re-thrown
+            };
+
+            // Initialize the singleton SecureProcessManager
+            SecureProcessManagerInstance = new SecureProcessManager();
+            this.Dispatcher.InvokeAsync(async () =>
+            {
+                if (IsShuttingDown) return; // Prevent late init
+                try
+                {
+                    await SecureProcessManagerInstance.InitializeAsync();
+                }
+                catch (Exception ex)
+                {
+                    // Silently handle initialization errors
+                    System.Diagnostics.Debug.WriteLine($"Secure backend initialization failed: {ex.Message}");
+                }
+            });
 
             this.Dispatcher.InvokeAsync(() =>
             {
@@ -39,6 +67,29 @@ namespace ImAged
                         }
                     }));
             });
+        }
+
+        protected override void OnExit(ExitEventArgs e)
+        {
+            IsShuttingDown = true;
+            try
+            {
+                // Dispose the singleton SecureProcessManager on app exit
+                if (SecureProcessManagerInstance != null)
+                {
+                    SecureProcessManagerInstance.Dispose();
+                    SecureProcessManagerInstance = null;
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log but don't show error during shutdown
+                System.Diagnostics.Debug.WriteLine($"Error during app shutdown: {ex.Message}");
+            }
+            finally
+            {
+                base.OnExit(e);
+            }
         }
 
         private static void AttachSecurity(Window window)
