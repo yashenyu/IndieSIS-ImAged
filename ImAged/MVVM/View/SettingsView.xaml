@@ -8,144 +8,76 @@
              d:DesignHeight="450" 
              d:DesignWidth="800">
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto" 
-                  HorizontalScrollBarVisibility="Disabled">
-        <Grid Margin="30,90,50,50">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
+    <!-- Main container scales with window -->
+    <Grid Background="#121212">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
+        <!-- Title stays visible, scales down if needed -->
+        <Viewbox Grid.Row="0" Stretch="Uniform" MaxHeight="100" Margin="0,20,0,10">
+            <TextBlock Text="INDIESIS"
+                       FontSize="60"
+                       Foreground="White"
+                       FontFamily="Bahnschrift Light"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"/>
+        </Viewbox>
 
-            <TextBlock Text="INDIESIS" 
-               HorizontalAlignment="Left" 
-               VerticalAlignment="Top" 
-               FontSize="36" 
-               Foreground="White" 
-               FontFamily="Bahnschrift Light" 
-               Height="41" 
-               Margin="252,-67,0,0" 
-               Grid.ColumnSpan="2"/>
+        <!-- Cards auto-resize to always fit screen -->
+        <Viewbox Grid.Row="1" Stretch="Uniform">
+            <ItemsControl ItemsSource="{Binding Developers}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <!-- Flexible layout: adjusts automatically -->
+                        <UniformGrid Rows="2" Columns="2"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
 
-            <!-- Top Left -->
-            <Border Grid.Row="0" Grid.Column="0" 
-            CornerRadius="20" 
-            Background="#FF121212" 
-            Margin="10">
-                <StackPanel>
-                    <Image Source="/Images/dre.jpg" 
-                   Width="380"
-                   Height="198" 
-                   HorizontalAlignment="Stretch"
-                   Stretch="Uniform" 
-                   Margin="0,20,0,0"/>
-                    <TextBlock Text="Dayrit, Mark Aaron B." 
-                       HorizontalAlignment="Center"
-                       Foreground="White"
-                       FontSize="14"
-                       Margin="0,12,0,0"/>
-                    <TextBlock Text="4th Computer Science Student" 
-                       HorizontalAlignment="Center"
-                       Foreground="White"
-                       FontSize="10"/>
-                    <TextBlock Text="Holy Angel University" 
-                       HorizontalAlignment="Center"
-                       Foreground="White"
-                       FontSize="10"
-                       Margin="0,0,0,26"/>
-                </StackPanel>
-            </Border>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border CornerRadius="12"
+                                Background="#171717"
+                                Padding="16"
+                                Margin="10"
+                                SnapsToDevicePixels="True">
+                            <StackPanel HorizontalAlignment="Center">
+                                <!-- Avatar container now scales with Viewbox -->
+                                <Grid Width="200" Height="200">
+                                    <Ellipse Fill="#171717"/>
+                                    <Ellipse Stroke="#6C5CE7" StrokeThickness="2"/>
+                                    <Image Source="{Binding ImagePath}" 
+                                           Stretch="UniformToFill"
+                                           RenderOptions.BitmapScalingMode="HighQuality"
+                                           SnapsToDevicePixels="True">
+                                        <Image.Clip>
+                                            <EllipseGeometry Center="100,100" RadiusX="100" RadiusY="100"/>
+                                        </Image.Clip>
+                                    </Image>
+                                </Grid>
 
-            <!-- Top Right -->
-            <Border Grid.Row="0" Grid.Column="1" 
-            CornerRadius="20" 
-            Background="#FF121212" 
-            Margin="10">
-                <StackPanel>
-                    <Image Source="/Images/dre.jpg" 
-                   Width="380" 
-                   Height="198" 
-                   HorizontalAlignment="Stretch" 
-                   Stretch="Uniform" 
-                   Margin="0,20,0,0"/>
-                    <TextBlock Text="Pangan, Ric Chrisitian B." 
-                       HorizontalAlignment="Center"
-                       Foreground="White"
-                       FontSize="14"
-                       Margin="0,12,0,0"/>
-                    <TextBlock Text="4th Computer Science Student" 
-                       HorizontalAlignment="Center"
-                       Foreground="White"
-                       FontSize="10"/>
-                    <TextBlock Text="Holy Angel University" 
-                       HorizontalAlignment="Center"
-                       Foreground="White"
-                       FontSize="10"
-                       Margin="0,0,0,26"/>
-                </StackPanel>
-            </Border>
-
-            <!-- Bottom Left -->
-            <Border Grid.Row="1" Grid.Column="0" 
-            CornerRadius="20" 
-            Background="#FF121212" 
-            Margin="10">
-                <StackPanel>
-                    <Image Source="/Images/dre.jpg" 
-                   Width="380" 
-                   Height="198" 
-                   HorizontalAlignment="Stretch" 
-                   Stretch="Uniform" 
-                   Margin="0,20,0,0"/>
-                    <TextBlock Text="Quizon, Andre Thomas M." 
-                       HorizontalAlignment="Center"
-                       Foreground="White"
-                       FontSize="14"
-                       Margin="0,12,0,0"/>
-                    <TextBlock Text="4th Computer Science Student" 
-                       HorizontalAlignment="Center"
-                       Foreground="White"
-                       FontSize="10"/>
-                    <TextBlock Text="Holy Angel University" 
-                       HorizontalAlignment="Center"
-                       Foreground="White"
-                       FontSize="10"
-                       Margin="0,0,0,26"/>
-                </StackPanel>
-            </Border>
-
-            <!-- Bottom Right -->
-            <Border Grid.Row="1" Grid.Column="1" 
-            CornerRadius="20" 
-            Background="#FF121212" 
-            Margin="10">
-                <StackPanel>
-                    <Image Source="/Images/dre.jpg" 
-                   Width="380"
-                   Height="198" 
-                   HorizontalAlignment="Stretch"
-                   Stretch="Uniform" 
-                   Margin="0,20,0,0"/>
-                    <TextBlock Text="Siron, Carlo S." 
-                       HorizontalAlignment="Center" 
-                       Foreground="White"
-                       FontSize="14" 
-                       Margin="0,12,0,0"/>
-                    <TextBlock Text="4th Computer Science Student" 
-                       HorizontalAlignment="Center"
-                       Foreground="White"
-                       FontSize="10"/>
-                    <TextBlock Text="Holy Angel University" 
-                       HorizontalAlignment="Center"
-                       Foreground="White"
-                       FontSize="10" 
-                       Margin="0,0,0,26"/>
-                </StackPanel>
-            </Border>
-        </Grid>
-    </ScrollViewer>
+                                <TextBlock Text="{Binding Name}" 
+                                           Foreground="White" 
+                                           FontSize="22" 
+                                           FontWeight="SemiBold" 
+                                           Margin="0,16,0,0" 
+                                           HorizontalAlignment="Center"/>
+                                <TextBlock Text="{Binding Role}" 
+                                           Foreground="#B3FFFFFF" 
+                                           FontSize="14" 
+                                           Margin="0,6,0,0" 
+                                           HorizontalAlignment="Center"/>
+                                <TextBlock Text="{Binding School}" 
+                                           Foreground="#B3FFFFFF" 
+                                           FontSize="14" 
+                                           Margin="0,6,0,0" 
+                                           HorizontalAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Viewbox>
+    </Grid>
 </UserControl>

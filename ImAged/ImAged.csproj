@@ -121,6 +121,7 @@
     <Compile Include="Core\TextBoxHelper.cs" />
     <Compile Include="Core\WindowSecurity.cs" />
     <Compile Include="MVVM\Model\FileItem.cs" />
+    <Compile Include="MVVM\Model\Developer.cs" />
     <Compile Include="MVVM\ViewModel\ConvertViewModel.cs" />
     <Compile Include="MVVM\ViewModel\FileViewModel.cs" />
     <Compile Include="MVVM\ViewModel\ImageItemViewModel.cs" />
@@ -276,6 +277,8 @@
     <Resource Include="256x256.ico" />
     <Resource Include="Images\base logo.png" />
     <Resource Include="Images\dre.jpg" />
+    <Resource Include="Images\Mark.png" />
+    <Resource Include="Images\Ric.jpg" />
     <Content Include="pysrc\aes_gcm.py" />
     <Content Include="pysrc\config.py" />
     <Content Include="pysrc\crypto.py" />
