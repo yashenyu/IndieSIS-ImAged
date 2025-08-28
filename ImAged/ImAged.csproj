@@ -282,6 +282,7 @@
     <Resource Include="Images\Home Icon.png" />
     <Resource Include="Images\Search Icon.png" />
     <Resource Include="Images\Tools Icon.png" />
+    <Resource Include="Images\bolpen.png" />
     <Content Include="pysrc\aes_gcm.py" />
     <Content Include="pysrc\config.py" />
     <Content Include="pysrc\crypto.py" />

@@ -94,7 +94,7 @@
                                              Command="{Binding ConvertViewCommand}"
                                              GroupName="MenuGroup">
                                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                        <Image Source="/Images/Tools Icon.png" Width="16" Height="16" Margin="0,0,8,0"/>
+                                        <Image Source="/Images/bolpen.png" Width="16" Height="16" Margin="0,0,8,0"/>
                                         <TextBlock Text="Tools"/>
                                     </StackPanel>
                                 </RadioButton>
