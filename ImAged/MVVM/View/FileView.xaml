@@ -7,32 +7,67 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="2.4*" />
-            <!-- File List -->
-            <ColumnDefinition Width="*" />
-            <!-- File Details -->
-        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="5"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-        <!-- Left Grid Rows -->
-        <Grid Grid.Column="0">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <!-- Search row -->
-                <RowDefinition Height="*"/>
-                <!-- DataGrid row -->
-            </Grid.RowDefinitions>
 
-            <!-- Search Box -->
-            <TextBox Grid.Row="0"
-                 Width="301"
-                 Margin="15,10,0,5"
-                 VerticalContentAlignment="Center"
-                 Style="{StaticResource ModernTextbox}"
-                 Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left"/>
+        <Grid Grid.Row="0">
+            <TextBlock Text="File Info"
+                       Foreground="White"
+                       FontFamily="pack://application:,,,/ImAged;component/Fonts/Poppins/#Poppins Bold"
+                       FontSize="20"
+                       VerticalAlignment="Center"
+                       Margin="0,0,0,0"/>
 
-            <!-- File List -->
-            <Border Grid.Row="1" CornerRadius="8" BorderBrush="#FF212121" BorderThickness="1" Padding="2" ClipToBounds="True" Background="Transparent">
+        </Grid>
+
+        <Separator Grid.Row ="1" Margin="0,0,0,0" Foreground="#383838" RenderTransformOrigin="0.5,0.5">
+            <Separator.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform ScaleY="-1"/>
+                    <SkewTransform/>
+                    <RotateTransform/>
+                    <TranslateTransform/>
+                </TransformGroup>
+            </Separator.RenderTransform>
+        </Separator>
+
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2.4*" />
+                <!-- File List -->
+                <ColumnDefinition Width="1*" />
+                <!-- File Details -->
+            </Grid.ColumnDefinitions>
+
+            <!-- Left Grid Rows -->
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <!-- DataGrid row -->
+                </Grid.RowDefinitions>
+               
+
+                <Grid Grid.Row="0" Margin="5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBox Grid.Column="1"
+                             VerticalContentAlignment="Center"
+                             Style="{StaticResource ModernTextbox}"
+                             Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                             HorizontalAlignment="Stretch"
+                             Margin="0,0,0,0"/>
+
+
+                </Grid>
+
                 <DataGrid Grid.Row="1"
                           ItemsSource="{Binding FilesView}"
                           AutoGenerateColumns="False"
@@ -40,54 +75,97 @@
                           SelectionMode="Single"
                           SelectedItem="{Binding SelectedFile, Mode=TwoWay}"
                           Style="{StaticResource GridTheme}"
-                          Margin="-2,-2,-2.335,1"
                           Background="Transparent"
                           GridLinesVisibility="None"
-                          RowHeaderWidth="0">
+                          BorderBrush="#FF212121"
+                          BorderThickness="1"
+                          Padding="0"
+                          Margin="5"
+                          HorizontalAlignment="Stretch"
+                          VerticalAlignment="Stretch">
 
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="File Name" Binding="{Binding FileName}" Width="*" FontWeight="Normal" ElementStyle="{StaticResource LeftCellText}" />
-                        <DataGridTextColumn Header="Type" Binding="{Binding FileType}" Width="100" ElementStyle="{StaticResource CenterCellText}" />
-                        <DataGridTextColumn Header="Size (KB)" Binding="{Binding FileSize, StringFormat={}{0:N2}}" Width="100" ElementStyle="{StaticResource CenterCellText}" />
-                        <DataGridTextColumn Header="Created" Binding="{Binding Created}" Width="150" ElementStyle="{StaticResource CenterCellText}" />
+                        <DataGridTextColumn Header="File Name"
+                        Binding="{Binding FileName}"
+                        Width="*"
+                        FontWeight="Normal">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock" BasedOn="{StaticResource LeftCellText}">
+                                    <Setter Property="Margin" Value="5,0,0,0"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+
+                        <DataGridTextColumn Header="Type"
+                        Binding="{Binding FileType}"
+                        Width="100">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock" BasedOn="{StaticResource CenterCellText}">
+                                    <Setter Property="Margin" Value="5,0"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+
+                        <DataGridTextColumn Header="Size (KB)"
+                        Binding="{Binding FileSize, StringFormat={}{0:N2}}"
+                        Width="100">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock" BasedOn="{StaticResource CenterCellText}">
+                                    <Setter Property="Margin" Value="5,0"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+
+                        <DataGridTextColumn Header="Created"
+                        Binding="{Binding Created}"
+                        Width="150">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock" BasedOn="{StaticResource CenterCellText}">
+                                    <Setter Property="Margin" Value="5,0"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
                     </DataGrid.Columns>
 
                 </DataGrid>
-            </Border>
+            </Grid>
+
+            <!-- Details Panel -->
+            <StackPanel Grid.Column="1" Margin="5,5,1,1">
+                <!-- Image preview (fits itself, pushes down the other elements) -->
+                <Border HorizontalAlignment="Stretch"
+                        CornerRadius="8"
+                        Margin="0,0,0,5"
+                        SnapsToDevicePixels="True"
+                        ClipToBounds="True"
+                        Background="Black">
+                    <Image Source="{Binding SelectedFile.Thumbnail}"
+                           Stretch="Uniform"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Top"
+                           RenderOptions.BitmapScalingMode="HighQuality"/>      
+                </Border>
+
+                <Separator>
+                    <Separator.Style>
+                        <Style TargetType="Separator">
+                            <Setter Property="Visibility" Value="Visible"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding SelectedFile}" Value="{x:Null}">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Separator.Style>
+                </Separator>
+
+                <TextBlock Text="{Binding SelectedFile.FileName}" FontWeight="Bold" FontSize="16" Foreground="White" Margin="0,0,0,10" TextWrapping="Wrap"/>
+                <TextBlock Text="{Binding SelectedFile.FileType, StringFormat='Type: {0}'}" Foreground="#FF909090" Margin="0,0,0,5"/>
+                <TextBlock Text="{Binding SelectedFile.FileSize, StringFormat='Size: {0:N2} KB'}" Foreground="#FF909090" Margin="0,0,0,5"/>
+                <TextBlock Text="{Binding SelectedFile.FilePath, StringFormat='Location: {0}'}" Foreground="#FF909090" Margin="0,0,0,5" TextWrapping="Wrap"/>
+                <TextBlock Text="{Binding SelectedFile.Created, StringFormat='Created: {0:MM/dd/yyyy HH:mm}'}" Foreground="#FF909090" Margin="0,0,0,5"/>
+                <TextBlock Text="{Binding SelectedFile.State, StringFormat='State: {0}'}" Foreground="#FF909090" Margin="0,0,0,5"/>
+            </StackPanel>
         </Grid>
-
-        <!-- Details Panel -->
-        <StackPanel Grid.Column="1" Margin="10">
-            <!-- Image-only preview styled similar to HomeView tiles -->
-            <Border Height="200" HorizontalAlignment="Stretch" CornerRadius="8" Margin="0,0,0,5" SnapsToDevicePixels="True" ClipToBounds="True">
-                <Border.Background>
-                    <ImageBrush ImageSource="{Binding SelectedFile.Thumbnail}"
-                                Stretch="UniformToFill"
-                                AlignmentX="Center"
-                                AlignmentY="Center"
-                                RenderOptions.BitmapScalingMode="HighQuality"/>
-                </Border.Background>
-            </Border>
-            <Separator>
-                <Separator.Style>
-                    <Style TargetType="Separator">
-                        <Setter Property="Visibility" Value="Visible"/>
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding SelectedFile}" Value="{x:Null}">
-                                <Setter Property="Visibility" Value="Collapsed"/>
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Separator.Style>
-            </Separator>
-
-            <TextBlock Text="{Binding SelectedFile.FileName}" FontWeight="Bold" FontSize="16" Foreground="White" Margin="0,0,0,10" TextWrapping="Wrap"/>
-
-            <TextBlock Text="{Binding SelectedFile.FileType, StringFormat='Type: {0}'}" Foreground="#FF909090" Margin="0,0,0,5"/>
-            <TextBlock Text="{Binding SelectedFile.FileSize, StringFormat='Size: {0:N2} KB'}" Foreground="#FF909090" Margin="0,0,0,5"/>
-            <TextBlock Text="{Binding SelectedFile.FilePath, StringFormat='Location: {0}'}" Foreground="#FF909090" Margin="0,0,0,5" TextWrapping="Wrap"/>
-            <TextBlock Text="{Binding SelectedFile.Created, StringFormat='Created: {0:MM/dd/yyyy HH:mm}'}" Foreground="#FF909090" Margin="0,0,0,5"/>
-            <TextBlock Text="{Binding SelectedFile.State, StringFormat='State: {0}'}" Foreground="#FF909090" Margin="0,0,0,5"/>
-        </StackPanel>
     </Grid>
 </UserControl>

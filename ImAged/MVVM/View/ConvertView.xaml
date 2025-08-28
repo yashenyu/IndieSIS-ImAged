@@ -117,9 +117,10 @@
         <StackPanel Grid.Row="0" Orientation="Horizontal" Height="40" VerticalAlignment="Center">
             <TextBlock Text="Tools"
                        Foreground="White"
-                       FontFamily="pack://application:,,,/ImAged;component/Fonts/Poppins/#Poppins Bold"
-                       FontSize="24"
-                       Margin="0,0,28,0"/>
+                        FontFamily="pack://application:,,,/ImAged;component/Fonts/Poppins/#Poppins Bold"
+                        FontSize="20"
+                        VerticalAlignment="Center"
+                        Margin="0,0,0,0"/>
         </StackPanel>
 
         <Separator Grid.Row="1" Foreground="#383838"/>

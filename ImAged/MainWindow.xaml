@@ -18,7 +18,7 @@
         <viewModel:MainViewModel/>
     </Window.DataContext>
 
-    <Border x:Name="MainBorder" Background="#060606" CornerRadius="10">
+    <Border x:Name="MainBorder" Background="#141414" CornerRadius="10">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="75"/>
@@ -84,18 +84,25 @@
                                              Command="{Binding HomeViewCommand}"
                                              GroupName="MenuGroup"/>
 
-                                <RadioButton Content="All Folders"
+                                <RadioButton Content="Tools"
                                              Height="35"
                                              FontSize="11"
                                              Foreground="#AEAEAE"
                                              Style="{StaticResource MenuButtonTheme}"
-                                             Command="{Binding ViewViewCommand}"
+                                             Command = "{Binding ConvertViewCommand}"
                                              GroupName="MenuGroup"/>
 
-                                <Separator Margin="12,8" Height="0.3" Foreground="#383838"/>
+                                <RadioButton Content="File Info"
+                                             Height="35"
+                                             FontSize="11"
+                                             Foreground="#AEAEAE"
+                                             Style="{StaticResource MenuButtonTheme}"
+                                             GroupName="MenuGroup"
+                                             Command="{Binding FileViewCommand}"/>
+
 
                                 <!-- FILES DROPDOWN -->
-                                <Expander Header="Files"
+                                <Expander Header="Statuses"
                                           Style="{StaticResource LeftHeaderExpander}"
                                           FontFamily="pack://application:,,,/ImAged;component/Fonts/Poppins/#Poppins SemiBold"
                                           Foreground="#AEAEAE"
@@ -138,23 +145,8 @@
                                     </StackPanel>
                                 </Expander>
 
-                                <Separator Margin="12,8" Height="0.3" Foreground="#383838"/>
 
-                                <RadioButton Content="All Files"
-                                             Height="35"
-                                             FontSize="11"
-                                             Foreground="#AEAEAE"
-                                             Style="{StaticResource MenuButtonTheme}"
-                                             GroupName="MenuGroup"
-                                             Command="{Binding FileViewCommand}"/>
 
-                                <RadioButton Content="Tools"
-                                             Height="35"
-                                             FontSize="11"
-                                             Foreground="#AEAEAE"
-                                             Style="{StaticResource MenuButtonTheme}"
-                                             Command = "{Binding ConvertViewCommand}"
-                                             GroupName="MenuGroup"/>
                             </StackPanel>
                         </StackPanel>
                     </ScrollViewer>

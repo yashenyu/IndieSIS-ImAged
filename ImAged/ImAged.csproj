@@ -235,7 +235,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="packages.config" />
     <None Include="pysrc\config\config.json" />
     <None Include="pysrc\config\master.key" />
     <Resource Include="Fonts\Poppins\Poppins-Black.ttf" />

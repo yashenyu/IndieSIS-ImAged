@@ -9,7 +9,7 @@
                         Background="#252525"
                         Width="{TemplateBinding Width}"
                         Height="33"
-                        Margin="0,0,0,5">
+                        Margin="0,0,0,0">
                         <Grid>
                             <Rectangle StrokeThickness="1"/>
                             <TextBox Margin="3,1,1,1"
@@ -28,7 +28,7 @@
                             </TextBox>
 
                             <TextBlock IsHitTestVisible="False"
-                                   Text="Search photos"
+                                   Text="Search"
                                    VerticalAlignment="Center"
                                    HorizontalAlignment="Left"
                                    FontFamily="pack://application:,,,/ImAged;component/Fonts/Poppins/#Poppins Regular"
