@@ -283,6 +283,7 @@
     <Resource Include="Images\Home Icon.png" />
     <Resource Include="Images\Search Icon.png" />
     <Resource Include="Images\Tools Icon.png" />
+    <Resource Include="Images\bolpen.png" />
     <Resource Include="Images\Mark.png" />
     <Resource Include="Images\Ric.jpg" />
     <Content Include="pysrc\aes_gcm.py" />
