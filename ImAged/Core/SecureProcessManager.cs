@@ -49,12 +49,42 @@ namespace ImAged.Services
 
             try
             {
-                var projectDir = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..\\..\\.."));
-                var pythonScriptPath = Path.Combine(projectDir, "ImAged", "pysrc", "secure_backend.py");
+                // In published version, Python files are copied to the output directory
+                var pythonScriptPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "pysrc", "secure_backend.py");
+                
+                // Check if the file exists, if not, try the development path
+                if (!File.Exists(pythonScriptPath))
+                {
+                    var projectDir = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..\\..\\.."));
+                    pythonScriptPath = Path.Combine(projectDir, "ImAged", "pysrc", "secure_backend.py");
+                }
+
+                // Check if Python is available
+                var pythonCommand = "python";
+                try
+                {
+                    var pythonCheck = Process.Start(new ProcessStartInfo
+                    {
+                        FileName = "python",
+                        Arguments = "--version",
+                        UseShellExecute = false,
+                        RedirectStandardOutput = true,
+                        CreateNoWindow = true
+                    });
+                    pythonCheck.WaitForExit(5000);
+                    if (pythonCheck.ExitCode != 0)
+                    {
+                        pythonCommand = "python3";
+                    }
+                }
+                catch
+                {
+                    pythonCommand = "python3";
+                }
 
                 var startInfo = new ProcessStartInfo
                 {
-                    FileName = "python",
+                    FileName = pythonCommand,
                     Arguments = $"\"{pythonScriptPath}\"",
                     UseShellExecute = false,
                     RedirectStandardInput = true,
@@ -62,9 +92,17 @@ namespace ImAged.Services
                     RedirectStandardError = true,
                     CreateNoWindow = true,
                     WindowStyle = ProcessWindowStyle.Hidden,
-                    WorkingDirectory = projectDir
+                    WorkingDirectory = Path.GetDirectoryName(pythonScriptPath)
                 };
 
+                System.Diagnostics.Debug.WriteLine($"Starting Python process with script: {pythonScriptPath}");
+                System.Diagnostics.Debug.WriteLine($"Working directory: {startInfo.WorkingDirectory}");
+                
+                if (!File.Exists(pythonScriptPath))
+                {
+                    throw new FileNotFoundException($"Python script not found: {pythonScriptPath}");
+                }
+                
                 _pythonProcess = Process.Start(startInfo);
                 _inputStream = _pythonProcess.StandardInput;
                 _outputStream = _pythonProcess.StandardOutput;
@@ -80,7 +118,9 @@ namespace ImAged.Services
 
                 if (_pythonProcess.HasExited)
                 {
-                    throw new Exception("Python process failed to start");
+                    var exitCode = _pythonProcess.ExitCode;
+                    var errorOutput = _pythonProcess.StandardError?.ReadToEnd() ?? "No error output available";
+                    throw new Exception($"Python process failed to start. Exit code: {exitCode}, Error: {errorOutput}");
                 }
 
                 var channelEstablished = await EstablishSecureChannelAsync();
@@ -581,84 +621,122 @@ namespace ImAged.Services
 
         private BitmapSource ConvertBytesToBitmapSourceOptimized(byte[] imageBytes, int maxSize = 256)
         {
+            // Validate input data
+            if (imageBytes == null || imageBytes.Length == 0)
+            {
+                System.Diagnostics.Debug.WriteLine("ConvertBytesToBitmapSourceOptimized: Invalid image data (null or empty)");
+                return null;
+            }
+
+            // Check if the data looks like a valid image (minimum size for any image format)
+            if (imageBytes.Length < 100)
+            {
+                System.Diagnostics.Debug.WriteLine($"ConvertBytesToBitmapSourceOptimized: Image data too small ({imageBytes.Length} bytes)");
+                return null;
+            }
+
             try
             {
                 using (var memoryStream = new MemoryStream(imageBytes))
-                using (var originalBitmap = new System.Drawing.Bitmap(memoryStream))
                 {
-                    // Calculate dimensions preserving aspect ratio
-                    int width, height;
-                    if (originalBitmap.Width > originalBitmap.Height)
+                    // Validate the stream can be read
+                    if (!memoryStream.CanRead)
                     {
-                        width = maxSize;
-                        height = (int)(originalBitmap.Height * (maxSize / (double)originalBitmap.Width));
-                    }
-                    else
-                    {
-                        height = maxSize;
-                        width = (int)(originalBitmap.Width * (maxSize / (double)originalBitmap.Height));
+                        System.Diagnostics.Debug.WriteLine("ConvertBytesToBitmapSourceOptimized: Memory stream not readable");
+                        return null;
                     }
 
-                    // Ensure minimum size for quality
-                    if (width < 64) width = 64;
-                    if (height < 64) height = 64;
-
-                    using (var thumbBitmap = new System.Drawing.Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format32bppArgb))
-                    using (var g = System.Drawing.Graphics.FromImage(thumbBitmap))
+                    using (var originalBitmap = new System.Drawing.Bitmap(memoryStream))
                     {
-                        // Set high-quality rendering options
-                        g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
-                        g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-                        g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-                        g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
-                        g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
-
-                        // Clear with transparent background instead of black
-                        g.Clear(System.Drawing.Color.Transparent);
-
-                        // Draw the image with high quality
-                        g.DrawImage(originalBitmap, 0, 0, width, height);
-
-                        var writeableBitmap = new WriteableBitmap(
-                            width,
-                            height,
-                            96, 96,
-                            PixelFormats.Bgra32,
-                            null);
-
-                        writeableBitmap.Lock();
-
-                        var bitmapData = thumbBitmap.LockBits(
-                            new System.Drawing.Rectangle(0, 0, width, height),
-                            System.Drawing.Imaging.ImageLockMode.ReadOnly,
-                            System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-
-                        try
+                        // Validate the bitmap was created successfully
+                        if (originalBitmap.Width <= 0 || originalBitmap.Height <= 0)
                         {
-                            writeableBitmap.WritePixels(
-                                new Int32Rect(0, 0, width, height),
-                                bitmapData.Scan0,
-                                width * height * 4,
-                                bitmapData.Stride);
-                        }
-                        finally
-                        {
-                            thumbBitmap.UnlockBits(bitmapData);
-                            writeableBitmap.Unlock();
+                            System.Diagnostics.Debug.WriteLine($"ConvertBytesToBitmapSourceOptimized: Invalid bitmap dimensions {originalBitmap.Width}x{originalBitmap.Height}");
+                            return null;
                         }
 
-                        writeableBitmap.Freeze();
+                        // Calculate dimensions preserving aspect ratio
+                        int width, height;
+                        if (originalBitmap.Width > originalBitmap.Height)
+                        {
+                            width = maxSize;
+                            height = (int)(originalBitmap.Height * (maxSize / (double)originalBitmap.Width));
+                        }
+                        else
+                        {
+                            height = maxSize;
+                            width = (int)(originalBitmap.Width * (maxSize / (double)originalBitmap.Height));
+                        }
 
-                        // Securely clear the input bytes
-                        Array.Clear(imageBytes, 0, imageBytes.Length);
+                        // Ensure minimum size for quality
+                        if (width < 64) width = 64;
+                        if (height < 64) height = 64;
 
-                        return writeableBitmap;
+                        using (var thumbBitmap = new System.Drawing.Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format32bppArgb))
+                        using (var g = System.Drawing.Graphics.FromImage(thumbBitmap))
+                        {
+                            // Set high-quality rendering options
+                            g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
+                            g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+                            g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
+                            g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
+
+                            // Clear with transparent background instead of black
+                            g.Clear(System.Drawing.Color.Transparent);
+
+                            // Draw the image with high quality
+                            g.DrawImage(originalBitmap, 0, 0, width, height);
+
+                            var writeableBitmap = new WriteableBitmap(
+                                width,
+                                height,
+                                96, 96,
+                                PixelFormats.Bgra32,
+                                null);
+
+                            writeableBitmap.Lock();
+
+                            var bitmapData = thumbBitmap.LockBits(
+                                new System.Drawing.Rectangle(0, 0, width, height),
+                                System.Drawing.Imaging.ImageLockMode.ReadOnly,
+                                System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+                            try
+                            {
+                                writeableBitmap.WritePixels(
+                                    new Int32Rect(0, 0, width, height),
+                                    bitmapData.Scan0,
+                                    width * height * 4,
+                                    bitmapData.Stride);
+                            }
+                            finally
+                            {
+                                thumbBitmap.UnlockBits(bitmapData);
+                                writeableBitmap.Unlock();
+                            }
+
+                            writeableBitmap.Freeze();
+
+                            // Validate the final bitmap
+                            if (writeableBitmap.PixelWidth <= 0 || writeableBitmap.PixelHeight <= 0)
+                            {
+                                System.Diagnostics.Debug.WriteLine("ConvertBytesToBitmapSourceOptimized: Final WriteableBitmap has invalid dimensions");
+                                return null;
+                            }
+
+                            // Securely clear the input bytes
+                            Array.Clear(imageBytes, 0, imageBytes.Length);
+
+                            return writeableBitmap;
+                        }
                     }
                 }
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Error in optimized conversion: {ex.Message}");
+                // Try fallback method
                 return ConvertBytesToBitmapSourceGdi(imageBytes);
             }
         }
@@ -685,31 +763,69 @@ namespace ImAged.Services
 
         private BitmapSource ConvertBytesToBitmapSourceGdi(byte[] imageBytes)
         {
-            using (var memoryStream = new MemoryStream(imageBytes))
-            using (var bitmap = new System.Drawing.Bitmap(memoryStream))
+            // Validate input data
+            if (imageBytes == null || imageBytes.Length == 0)
             {
-                IntPtr hBitmap = bitmap.GetHbitmap();
-                try
+                System.Diagnostics.Debug.WriteLine("ConvertBytesToBitmapSourceGdi: Invalid image data (null or empty)");
+                return null;
+            }
+
+            try
+            {
+                using (var memoryStream = new MemoryStream(imageBytes))
                 {
-                    var source = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(
-                        hBitmap,
-                        IntPtr.Zero,
-                        Int32Rect.Empty,
-                        BitmapSizeOptions.FromEmptyOptions());
+                    // Validate the stream can be read
+                    if (!memoryStream.CanRead)
+                    {
+                        System.Diagnostics.Debug.WriteLine("ConvertBytesToBitmapSourceGdi: Memory stream not readable");
+                        return null;
+                    }
 
-                    // Freeze the BitmapSource to make it cross-thread accessible and improve performance
-                    source.Freeze();
+                    using (var bitmap = new System.Drawing.Bitmap(memoryStream))
+                    {
+                        // Validate the bitmap was created successfully
+                        if (bitmap.Width <= 0 || bitmap.Height <= 0)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"ConvertBytesToBitmapSourceGdi: Invalid bitmap dimensions {bitmap.Width}x{bitmap.Height}");
+                            return null;
+                        }
 
-                    // Clear the original bytes to help with memory cleanup
-                    Array.Clear(imageBytes, 0, imageBytes.Length);
+                        IntPtr hBitmap = bitmap.GetHbitmap();
+                        try
+                        {
+                            var source = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(
+                                hBitmap,
+                                IntPtr.Zero,
+                                Int32Rect.Empty,
+                                BitmapSizeOptions.FromEmptyOptions());
 
-                    return source;
+                            // Validate the created BitmapSource
+                            if (source == null || source.PixelWidth <= 0 || source.PixelHeight <= 0)
+                            {
+                                System.Diagnostics.Debug.WriteLine("ConvertBytesToBitmapSourceGdi: Failed to create valid BitmapSource");
+                                return null;
+                            }
+
+                            // Freeze the BitmapSource to make it cross-thread accessible and improve performance
+                            source.Freeze();
+
+                            // Clear the original bytes to help with memory cleanup
+                            Array.Clear(imageBytes, 0, imageBytes.Length);
+
+                            return source;
+                        }
+                        finally
+                        {
+                            // Always delete the GDI handle to prevent memory leaks
+                            DeleteObject(hBitmap);
+                        }
+                    }
                 }
-                finally
-                {
-                    // Always delete the GDI handle to prevent memory leaks
-                    DeleteObject(hBitmap);
-                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error in GDI conversion: {ex.Message}");
+                return null;
             }
         }
 

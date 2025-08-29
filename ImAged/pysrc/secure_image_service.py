@@ -323,7 +323,13 @@ class SecureImageService:
                 if session['timer'] is not None:
                     session['timer'].cancel()
                 logging.info(f"Force cleanup: Session {session_id} cleared")
-            self._active_sessions.clear()
+            
+            # Handle case where _active_sessions might be a mappingproxy
+            try:
+                self._active_sessions.clear()
+            except AttributeError:
+                # If clear() is not available, recreate the dictionary
+                self._active_sessions = {}
         
         for _ in range(3):
             gc.collect()

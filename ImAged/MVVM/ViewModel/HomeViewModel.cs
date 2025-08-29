@@ -701,12 +701,15 @@ namespace ImAged.MVVM.ViewModel
 
         private async Task LoadThumbnailAsync(TtlFileInfo fileInfo)
         {
+            const int maxRetries = 3;
+            const int retryDelayMs = 500;
+
             lock (_cacheLock)
             {
                 if (_thumbnailCache.TryGetValue(fileInfo.FilePath, out var secureRef))
                 {
                     var cachedThumbnail = secureRef.GetImage();
-                    if (cachedThumbnail != null)
+                    if (cachedThumbnail != null && IsValidBitmapSource(cachedThumbnail))
                     {
                         fileInfo.Thumbnail = cachedThumbnail;
                         fileInfo.IsLoading = false;
@@ -732,9 +735,48 @@ namespace ImAged.MVVM.ViewModel
                 {
                     if (_isDisposed) return;
 
-                    var thumbnail = await _secureProcessManager.OpenTtlThumbnailAsync(fileInfo.FilePath, 256);
+                    BitmapSource thumbnail = null;
+                    Exception lastException = null;
 
-                    if (thumbnail != null)
+                    // Retry logic for thumbnail loading
+                    for (int attempt = 1; attempt <= maxRetries; attempt++)
+                    {
+                        try
+                        {
+                            System.Diagnostics.Debug.WriteLine($"Loading thumbnail for {fileInfo.FileName} (attempt {attempt}/{maxRetries})");
+                            
+                            thumbnail = await _secureProcessManager.OpenTtlThumbnailAsync(fileInfo.FilePath, 256);
+
+                            // Validate the thumbnail
+                            if (thumbnail != null && IsValidBitmapSource(thumbnail))
+                            {
+                                System.Diagnostics.Debug.WriteLine($"Successfully loaded thumbnail for {fileInfo.FileName} on attempt {attempt}");
+                                break;
+                            }
+                            else
+                            {
+                                System.Diagnostics.Debug.WriteLine($"Invalid thumbnail received for {fileInfo.FileName} on attempt {attempt}");
+                                thumbnail = null;
+                                
+                                if (attempt < maxRetries)
+                                {
+                                    await Task.Delay(retryDelayMs);
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            lastException = ex;
+                            System.Diagnostics.Debug.WriteLine($"Error loading thumbnail for {fileInfo.FileName} on attempt {attempt}: {ex.Message}");
+                            
+                            if (attempt < maxRetries)
+                            {
+                                await Task.Delay(retryDelayMs);
+                            }
+                        }
+                    }
+
+                    if (thumbnail != null && IsValidBitmapSource(thumbnail))
                     {
                         var secureRef = new SecureImageReference(thumbnail, null, 15);
 
@@ -758,6 +800,38 @@ namespace ImAged.MVVM.ViewModel
                             }
                         });
                     }
+                    else
+                    {
+                        System.Diagnostics.Debug.WriteLine($"Failed to load valid thumbnail for {fileInfo.FileName} after {maxRetries} attempts");
+                        if (lastException != null)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"Last exception: {lastException.Message}");
+                        }
+
+                        // Create a placeholder thumbnail instead of leaving it black
+                        var placeholder = CreatePlaceholderThumbnail(256);
+                        if (placeholder != null)
+                        {
+                            await Application.Current.Dispatcher.InvokeAsync(() =>
+                            {
+                                if (!_isDisposed)
+                                {
+                                    fileInfo.Thumbnail = placeholder;
+                                    fileInfo.IsLoading = false;
+                                }
+                            });
+                        }
+                        else
+                        {
+                            await Application.Current.Dispatcher.InvokeAsync(() =>
+                            {
+                                if (!_isDisposed)
+                                {
+                                    fileInfo.IsLoading = false;
+                                }
+                            });
+                        }
+                    }
                 }
                 finally
                 {
@@ -775,6 +849,70 @@ namespace ImAged.MVVM.ViewModel
                         fileInfo.IsLoading = false;
                     }
                 });
+            }
+        }
+
+        private bool IsValidBitmapSource(BitmapSource bitmapSource)
+        {
+            try
+            {
+                if (bitmapSource == null)
+                    return false;
+
+                // Check if the bitmap has valid dimensions
+                if (bitmapSource.PixelWidth <= 0 || bitmapSource.PixelHeight <= 0)
+                    return false;
+
+                // Check if the bitmap is frozen (required for cross-thread access)
+                if (!bitmapSource.IsFrozen)
+                    return false;
+
+                // Additional validation: check if the bitmap has actual pixel data
+                // This is a basic check - you could add more sophisticated validation if needed
+                return true;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error validating BitmapSource: {ex.Message}");
+                return false;
+            }
+        }
+
+        private BitmapSource CreatePlaceholderThumbnail(int size = 256)
+        {
+            try
+            {
+                var writeableBitmap = new WriteableBitmap(
+                    size, size, 96, 96, PixelFormats.Bgra32, null);
+
+                writeableBitmap.Lock();
+
+                // Create a simple placeholder with a gray background and text
+                var pixels = new byte[size * size * 4];
+                for (int i = 0; i < pixels.Length; i += 4)
+                {
+                    // Gray background
+                    pixels[i] = 128;     // Blue
+                    pixels[i + 1] = 128; // Green
+                    pixels[i + 2] = 128; // Red
+                    pixels[i + 3] = 255; // Alpha
+                }
+
+                writeableBitmap.WritePixels(
+                    new Int32Rect(0, 0, size, size),
+                    pixels,
+                    size * 4,
+                    0);
+
+                writeableBitmap.Unlock();
+                writeableBitmap.Freeze();
+
+                return writeableBitmap;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error creating placeholder thumbnail: {ex.Message}");
+                return null;
             }
         }
 

@@ -284,12 +284,8 @@ class SecureBackend:
         for _ in range(5):
             gc.collect()
         
-        # Clear any remaining references
-        import sys
-        for obj in gc.get_objects():
-            if hasattr(obj, '__dict__'):
-                obj.__dict__.clear()
-        
+        # Don't clear __dict__ of all objects as it can cause issues
+        # with mappingproxy objects and other internal Python structures
         logger.info("Secure memory cleanup completed")
 
     def handle_get_config(self, parameters):
