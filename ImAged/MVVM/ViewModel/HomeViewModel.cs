@@ -925,6 +925,23 @@ namespace ImAged.MVVM.ViewModel
                 // Set loading cursor
                 var originalCursor = Mouse.OverrideCursor;
                 Mouse.OverrideCursor = Cursors.Wait;
+                // Auto-reset cursor after 5 seconds to avoid stuck wait cursor
+                var cursorResetCts = new CancellationTokenSource();
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        await Task.Delay(TimeSpan.FromSeconds(5), cursorResetCts.Token);
+                        await Application.Current.Dispatcher.InvokeAsync(() =>
+                        {
+                            if (Mouse.OverrideCursor == Cursors.Wait)
+                            {
+                                Mouse.OverrideCursor = originalCursor;
+                            }
+                        });
+                    }
+                    catch (TaskCanceledException) { }
+                });
                 
                 try
                 {
@@ -959,6 +976,7 @@ namespace ImAged.MVVM.ViewModel
                 finally
                 {
                     // Restore original cursor
+                    try { cursorResetCts.Cancel(); } catch { }
                     Mouse.OverrideCursor = originalCursor;
                 }
             }

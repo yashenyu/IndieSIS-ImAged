@@ -220,9 +220,15 @@ class SecureImageService:
             key_hdr = derive_subkey(salt, b"ImAged HDR")
             aes_hdr = AES_GCM(key_hdr)
             try:
+                # Current format: AAD = header, data = tag only (empty ciphertext)
                 aes_hdr.decrypt(nonce_hdr, cand_taghdr, cand_header)
             except Exception:
-                raise ValueError("Invalid TTL format")
+                # Backward compatibility: legacy format may have used header as ciphertext and no AAD
+                try:
+                    aes_hdr.decrypt(nonce_hdr, cand_header + cand_taghdr, b"")
+                    logging.info("Header auth verified using legacy format fallback")
+                except Exception:
+                    raise ValueError("Invalid TTL format")
             self._log_timing("Verify header auth", step_start)
             
             # Validate file expiry timestamp

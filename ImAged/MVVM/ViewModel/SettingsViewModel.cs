@@ -37,10 +37,10 @@ namespace ImAged.MVVM.ViewModel
 
             Developers.Add(new Developer
             {
-                Name = "Siron, Carlo S.",
+                Name = "Siron, Carlo T.",
                 Role = "UI/UX Designer Front-end Developer",
                 School = "Holy Angel University",
-                ImagePath = "/Images/base logo.png"
+                ImagePath = "/Images/Carlo.jpg"
             });
         }
     }

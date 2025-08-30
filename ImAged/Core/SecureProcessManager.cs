@@ -35,6 +35,7 @@ namespace ImAged.Services
         private bool _isInitialized = false;
         private bool _disposed = false;
         private readonly System.Threading.SemaphoreSlim _ioLock = new System.Threading.SemaphoreSlim(1, 1);
+        private readonly System.Threading.SemaphoreSlim _initLock = new System.Threading.SemaphoreSlim(1, 1);
 
         [DllImport("gdi32.dll")]
         private static extern bool DeleteObject(IntPtr hObject);
@@ -47,63 +48,66 @@ namespace ImAged.Services
         {
             if (_isInitialized) return;
 
+            await _initLock.WaitAsync();
             try
             {
-                // In published version, Python files are copied to the output directory
-                var pythonScriptPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "pysrc", "secure_backend.py");
-                
-                // Check if the file exists, if not, try the development path
-                if (!File.Exists(pythonScriptPath))
+                if (_isInitialized) return;
+                // Prefer bundled backend EXE if present
+                var exePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "pysrc", "secure_backend.exe");
+                if (File.Exists(exePath))
                 {
-                    var projectDir = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..\\..\\.."));
-                    pythonScriptPath = Path.Combine(projectDir, "ImAged", "pysrc", "secure_backend.py");
-                }
-
-                // Check if Python is available
-                var pythonCommand = "python";
-                try
-                {
-                    var pythonCheck = Process.Start(new ProcessStartInfo
+                    var startInfo = new ProcessStartInfo
                     {
-                        FileName = "python",
-                        Arguments = "--version",
+                        FileName = exePath,
                         UseShellExecute = false,
+                        RedirectStandardInput = true,
                         RedirectStandardOutput = true,
-                        CreateNoWindow = true
-                    });
-                    pythonCheck.WaitForExit(5000);
-                    if (pythonCheck.ExitCode != 0)
+                        RedirectStandardError = true,
+                        CreateNoWindow = true,
+                        WindowStyle = ProcessWindowStyle.Hidden,
+                        WorkingDirectory = Path.GetDirectoryName(exePath)
+                    };
+                    _pythonProcess = Process.Start(startInfo);
+                }
+                else
+                {
+                    // Dev fallback: run Python script
+                    var pythonScriptPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "pysrc", "secure_backend.py");
+                    if (!File.Exists(pythonScriptPath))
                     {
-                        pythonCommand = "python3";
+                        var projectDir = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..\\..\\.."));
+                        pythonScriptPath = Path.Combine(projectDir, "ImAged", "pysrc", "secure_backend.py");
                     }
-                }
-                catch
-                {
-                    pythonCommand = "python3";
-                }
+                    var pythonCommand = "python";
+                    try
+                    {
+                        var check = Process.Start(new ProcessStartInfo
+                        {
+                            FileName = "python",
+                            Arguments = "--version",
+                            UseShellExecute = false,
+                            RedirectStandardOutput = true,
+                            CreateNoWindow = true
+                        });
+                        check.WaitForExit(5000);
+                        if (check.ExitCode != 0) pythonCommand = "python3";
+                    }
+                    catch { pythonCommand = "python3"; }
 
-                var startInfo = new ProcessStartInfo
-                {
-                    FileName = pythonCommand,
-                    Arguments = $"\"{pythonScriptPath}\"",
-                    UseShellExecute = false,
-                    RedirectStandardInput = true,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    CreateNoWindow = true,
-                    WindowStyle = ProcessWindowStyle.Hidden,
-                    WorkingDirectory = Path.GetDirectoryName(pythonScriptPath)
-                };
-
-                System.Diagnostics.Debug.WriteLine($"Starting Python process with script: {pythonScriptPath}");
-                System.Diagnostics.Debug.WriteLine($"Working directory: {startInfo.WorkingDirectory}");
-                
-                if (!File.Exists(pythonScriptPath))
-                {
-                    throw new FileNotFoundException($"Python script not found: {pythonScriptPath}");
+                    var startInfo = new ProcessStartInfo
+                    {
+                        FileName = pythonCommand,
+                        Arguments = $"\"{pythonScriptPath}\"",
+                        UseShellExecute = false,
+                        RedirectStandardInput = true,
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        CreateNoWindow = true,
+                        WindowStyle = ProcessWindowStyle.Hidden,
+                        WorkingDirectory = Path.GetDirectoryName(pythonScriptPath)
+                    };
+                    _pythonProcess = Process.Start(startInfo);
                 }
-                
-                _pythonProcess = Process.Start(startInfo);
                 _inputStream = _pythonProcess.StandardInput;
                 _outputStream = _pythonProcess.StandardOutput;
 
@@ -139,6 +143,10 @@ namespace ImAged.Services
                 System.Diagnostics.Debug.WriteLine($"Failed to initialize SecureProcessManager: {ex.Message}");
                 // Don't set _isInitialized = true on failure, so we can retry
             }
+            finally
+            {
+                _initLock.Release();
+            }
         }
 
         private async Task<bool> EstablishSecureChannelAsync()
@@ -146,7 +154,7 @@ namespace ImAged.Services
             _sessionKey = GenerateSecureRandomKey(32);
             System.Diagnostics.Debug.WriteLine($"Generated session key: {_sessionKey.Length} bytes");
 
-            var publicPemBase64 = await ReadBase64LineAsync(_outputStream, 10000);
+            var publicPemBase64 = await ReadBase64LineAsync(_outputStream, 20000);
             if (string.IsNullOrEmpty(publicPemBase64))
             {
                 // Gracefully handle timeout instead of throwing exception
@@ -160,7 +168,7 @@ namespace ImAged.Services
             var encryptedSessionKey = RsaOaepSha256Encrypt(rsaPublicKey, _sessionKey);
             await _inputStream.WriteLineAsync(Convert.ToBase64String(encryptedSessionKey));
 
-            var confirmationLine = await ReadBase64LineAsync(_outputStream, 10000);
+            var confirmationLine = await ReadBase64LineAsync(_outputStream, 20000);
             if (string.IsNullOrEmpty(confirmationLine))
             {
                 // Gracefully handle timeout instead of throwing exception
@@ -351,7 +359,7 @@ namespace ImAged.Services
             var nonce = new byte[12];
             random.NextBytes(nonce);
 
-            var cipher = new GcmBlockCipher(new AesFastEngine());
+            var cipher = new GcmBlockCipher(new AesEngine());
             var parameters = new AeadParameters(new KeyParameter(_sessionKey), 128, nonce, null);
             cipher.Init(true, parameters);
 

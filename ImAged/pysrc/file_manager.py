@@ -28,6 +28,16 @@ class TTLFileManager:
         
         logging.info(message)
         print(f"  {message}")
+
+    def _unique_path(self, path: str) -> str:
+        """Return a non-conflicting file path by appending " (n)" if needed."""
+        p = Path(path)
+        candidate = p
+        n = 1
+        while candidate.exists():
+            candidate = p.with_name(f"{p.stem} ({n}){p.suffix}")
+            n += 1
+        return str(candidate)
     
     def create_ttl_file(self, input_path: str, expiry_ts: int = None, output_path: str = None) -> str:
         import time
@@ -51,6 +61,9 @@ class TTLFileManager:
                 output_path = str(Path(out_dir) / f"{stem}.ttl")
             else:
                 output_path = str(Path(input_path).with_suffix(".ttl"))
+
+        # Ensure we don't overwrite an existing TTL file
+        output_path = self._unique_path(output_path)
 
         # Prepare payload bytes (use original bytes; QOI removed)
         step_start = time.time()

@@ -1,36 +1,33 @@
-import os
-import binascii
 import logging
 from pathlib import Path
-from cryptography.hazmat.primitives.kdf.hkdf import HKDF
+import os, sys
 from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.kdf.hkdf import HKDF
+
+def resource_path(*parts):
+    if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
+        base = Path(sys._MEIPASS)
+    else:
+        base = Path(__file__).parent
+    return base.joinpath(*parts)
 
 def _master_key_path() -> Path:
-    return Path(__file__).parent / "config" / "master.key"
+    return resource_path("config", "master.key")
 
 def _load_or_create_static_master_key() -> bytes:
     path = _master_key_path()
     try:
         if path.exists():
             raw = path.read_bytes()
-            # Try hex-encoded first if content looks textual hex
-            stripped = raw.strip()
-            try:
-                if stripped and all(c in b"0123456789abcdefABCDEF" for c in stripped):
-                    key = binascii.unhexlify(stripped)
-                else:
-                    key = raw
-            except Exception:
-                key = raw
+            key = raw if len(raw) == 32 else raw[:32]
             if len(key) != 32:
                 raise ValueError(f"master.key must be 32 bytes (got {len(key)})")
             logging.info("Loaded static MASTER_KEY from %s", path)
             return key
-        # Create if not present
+        # Generate a default in memory only (don’t write inside bundle)
+        import os
         key = os.urandom(32)
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_bytes(key)
-        logging.info("Generated new static MASTER_KEY at %s", path)
+        logging.warning("master.key not found; generated ephemeral key")
         return key
     except Exception as e:
         logging.error("Failed to load/create static master key: %s", e)

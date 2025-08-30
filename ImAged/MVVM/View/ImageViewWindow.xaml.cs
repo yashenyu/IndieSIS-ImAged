@@ -16,6 +16,9 @@ namespace ImAged.MVVM.View
         private const double MinScale = 1;     // don't allow smaller than original fit
         private const double MaxScale = 15;    // arbitrary upper bound
 
+        private const double DefaultWidth = 900;
+        private const double DefaultHeight = 600;
+
         // fields for drag panning
         private bool _isDragging;
         private Point _dragStart;
@@ -38,20 +41,14 @@ namespace ImAged.MVVM.View
             FilePath = filePath;
             _currentImage = image;
 
-            // enforce minimum window size
-            MinWidth = 1080;
-            MinHeight = 720;
+            // enforce minimum window size and standard default size
+            MinWidth = 600;
+            MinHeight = 400;
 
-            // size window to image (at least min) and center on screen
-            double desiredW = Math.Max(MinWidth, image.PixelWidth);
-            double desiredH = Math.Max(MinHeight, image.PixelHeight);
-
+            // use a standard initial window size and center on screen (image will fit via Stretch=Uniform)
             Rect wa = SystemParameters.WorkArea;
-            desiredW = Math.Min(desiredW, wa.Width);
-            desiredH = Math.Min(desiredH, wa.Height);
-
-            Width = desiredW;
-            Height = desiredH;
+            Width = Math.Min(DefaultWidth, wa.Width);
+            Height = Math.Min(DefaultHeight, wa.Height);
 
             Left = wa.Left + (wa.Width - Width) / 2;
             Top = wa.Top + (wa.Height - Height) / 2;
@@ -213,23 +210,10 @@ namespace ImAged.MVVM.View
 
             if (WindowState == WindowState.Normal)
             {
-                // pick a window size: max(image native size, min 1080×720) but not larger than screen
-                double desiredW = MinWidth;
-                double desiredH = MinHeight;
-
-                if (FullImage?.Source is BitmapSource bmp)
-                {
-                    desiredW = Math.Max(MinWidth, bmp.PixelWidth);
-                    desiredH = Math.Max(MinHeight, bmp.PixelHeight);
-                }
-
-                // clamp to primary work area
+                // restore to standard window size; image will scale to fit
                 Rect wa = SystemParameters.WorkArea;
-                desiredW = Math.Min(desiredW, wa.Width);
-                desiredH = Math.Min(desiredH, wa.Height);
-
-                Width = desiredW;
-                Height = desiredH;
+                Width = Math.Min(DefaultWidth, wa.Width);
+                Height = Math.Min(DefaultHeight, wa.Height);
 
                 // center on screen
                 Left = wa.Left + (wa.Width - Width) / 2;

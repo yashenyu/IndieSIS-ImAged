@@ -394,6 +394,23 @@ namespace ImAged.MVVM.ViewModel
             // Set loading cursor
             var originalCursor = System.Windows.Input.Mouse.OverrideCursor;
             System.Windows.Input.Mouse.OverrideCursor = System.Windows.Input.Cursors.Wait;
+            // Auto-reset cursor after 5 seconds to avoid stuck wait cursor
+            var cursorResetCts = new System.Threading.CancellationTokenSource();
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    await Task.Delay(TimeSpan.FromSeconds(5), cursorResetCts.Token);
+                    await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
+                    {
+                        if (System.Windows.Input.Mouse.OverrideCursor == System.Windows.Input.Cursors.Wait)
+                        {
+                            System.Windows.Input.Mouse.OverrideCursor = originalCursor;
+                        }
+                    });
+                }
+                catch (TaskCanceledException) { }
+            });
 
             try
             {
@@ -488,6 +505,7 @@ namespace ImAged.MVVM.ViewModel
             finally
             {
                 // Restore original cursor
+                try { cursorResetCts.Cancel(); } catch { }
                 System.Windows.Input.Mouse.OverrideCursor = originalCursor;
             }
             System.Diagnostics.Debug.WriteLine($"Convert ran");
