@@ -266,6 +266,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="pysrc\config\iv_registries.db" />
     <Resource Include="Images\Carlo.jpg" />
     <Content Include="pysrc\config\config.json" />
     <Content Include="pysrc\config\master.key" />
