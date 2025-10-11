@@ -1,0 +1,18 @@
+version: "3.8"
+services:
+  backend:
+    build: ./ImagedBackend
+    ports:
+      - "8080:8080"
+    environment:
+      - ASPNETCORE_URLS=http://0.0.0.0:8080
+      - ASPNETCORE_ENVIRONMENT=Development
+    volumes:
+      - ./session:/sessions
+
+  frontend:
+    image: nginx:alpine
+    ports:
+      - "8081:80"
+    volumes:
+      - ./login-site:/usr/share/nginx/html:ro

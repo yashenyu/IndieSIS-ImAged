@@ -25,6 +25,8 @@ namespace ImAged
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
+            var login = new MVVM.View.Login();
+            login.Show();
 
             // Set up global exception handling to prevent error dialogs
             this.DispatcherUnhandledException += (sender, args) =>

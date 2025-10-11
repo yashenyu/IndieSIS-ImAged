@@ -1,0 +1,14 @@
+# ImAged Secure Image Processing Backend Dependencies
+# Core cryptographic libraries
+cryptography>=41.0.0
+
+# Image processing
+Pillow>=10.0.0
+
+# System monitoring and memory tracking
+psutil>=5.9.0
+
+# Standard library modules used (no additional installation needed):
+# - json, sys, os, time, struct, base64, logging, threading, weakref, signal
+# - pathlib, datetime, io, ctypes, gc, socket, hmac, hashlib, sqlite3
+# - tkinter (GUI testing - built into Python)

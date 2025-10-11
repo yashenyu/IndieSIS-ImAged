@@ -1,0 +1,6 @@
+@ImagedBackend_HostAddress = http://localhost:5258
+
+GET {{ImagedBackend_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
