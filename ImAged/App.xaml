@@ -4,7 +4,7 @@
              xmlns:local="clr-namespace:ImAged"
              xmlns:viewModel="clr-namespace:ImAged.MVVM.ViewModel"
              xmlns:view="clr-namespace:ImAged.MVVM.View"
-             StartupUri="MainWindow.xaml">
+             StartupUri="">
     <Application.Resources>
         <ResourceDictionary>
             <!--THEMES-->
